@@ -191,10 +191,15 @@
             <svg class="ic text-blue-600"><use href="#i-scale"></use></svg>
             <span>DISPONIBLE PARA GASTAR</span>
           </h2>
-          <div class="grid grid-cols-3 gap-2 text-center my-auto">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center my-auto">
             <div class="kpi-tile bg-white/90 p-2.5 rounded-2xl border border-blue-100 shadow-sm cursor-default hover:border-blue-300">
               <span class="text-[10px] uppercase font-bold text-slate-500 block">Ingresos</span>
               <span id="kpi-ingresos" class="text-xs sm:text-sm font-bold text-slate-800 num">0,00 €</span>
+            </div>
+            <div id="kpi-presupuestado-box" class="kpi-tile bg-white/90 p-2.5 rounded-2xl border border-blue-100 shadow-sm cursor-default hover:border-indigo-300">
+              <span class="text-[10px] uppercase font-bold text-slate-500 block">Presupuestado</span>
+              <span id="kpi-presupuestado" class="text-xs sm:text-sm font-bold text-indigo-600 num">0,00 €</span>
+              <span id="kpi-presupuestado-diff" class="text-[9px] font-semibold block leading-tight"></span>
             </div>
             <div class="kpi-tile bg-white/90 p-2.5 rounded-2xl border border-blue-100 shadow-sm cursor-default hover:border-pink-300">
               <span class="text-[10px] uppercase font-bold text-slate-500 block">Gastos</span>
@@ -1481,10 +1486,11 @@
     /* presupuesto por grupo */
     const containerProgress = document.getElementById('container-group-progress');
     containerProgress.innerHTML = '';
-    let sumVarEsp = 0;
+    let sumVarEsp = 0, sumVarEspCasa = 0;
     data.categoriasVariables.forEach((cat, idx) => {
       const esp = Number(cat.esperado || 0);
       sumVarEsp += esp;
+      if (!cat.excluirDelTotal) sumVarEspCasa += esp;
       const real = spentPerGroup[cat.categoria] || 0;
       const pct = esp > 0 ? Math.min(100, Math.round((real / esp) * 100)) : (real > 0 ? 100 : 0);
       const isOver = real > esp && esp > 0;
@@ -1521,9 +1527,25 @@
 
     /* indicadores */
     const totalGastosReal = sumFijosReal + sumVarCasa;
+    const totalPresupuestado = sumFijosEsp + sumVarEspCasa;
+    const margenPresupuesto = sumIngReal - totalPresupuestado;
     document.getElementById('kpi-ingresos').innerText = formatEuro(sumIngReal);
     document.getElementById('kpi-gastos').innerText = formatEuro(totalGastosReal);
     document.getElementById('kpi-restante').innerText = formatEuro(sumIngReal - totalGastosReal);
+    document.getElementById('kpi-presupuestado').innerText = formatEuro(totalPresupuestado);
+    const elPresupDiff = document.getElementById('kpi-presupuestado-diff');
+    const elPresupBox = document.getElementById('kpi-presupuestado-box');
+    if (margenPresupuesto >= 0) {
+      elPresupDiff.innerText = 'Margen ' + formatEuro(margenPresupuesto);
+      elPresupDiff.className = 'text-[9px] font-semibold block leading-tight text-emerald-600';
+      elPresupBox.classList.remove('border-red-300', 'bg-red-50/60');
+      elPresupBox.classList.add('border-blue-100', 'bg-white/90');
+    } else {
+      elPresupDiff.innerText = 'Excede en ' + formatEuro(-margenPresupuesto);
+      elPresupDiff.className = 'text-[9px] font-semibold block leading-tight text-red-600';
+      elPresupBox.classList.remove('border-blue-100', 'bg-white/90');
+      elPresupBox.classList.add('border-red-300', 'bg-red-50/60');
+    }
     document.getElementById('kpi-fijos').innerText = formatEuro(sumFijosReal);
     document.getElementById('kpi-variables').innerText = formatEuro(sumVarCasa);
     document.getElementById('kpi-ahorro').innerText = formatEuro(sumAhorro);
