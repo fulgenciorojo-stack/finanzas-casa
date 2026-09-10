@@ -196,8 +196,8 @@
               <span class="text-[10px] uppercase font-bold text-slate-500 block">Ingresos</span>
               <span id="kpi-ingresos" class="text-xs sm:text-sm font-bold text-slate-800 num">0,00 €</span>
             </div>
-            <div id="kpi-presupuestado-box" class="kpi-tile bg-white/90 p-2.5 rounded-2xl border border-blue-100 shadow-sm cursor-default hover:border-indigo-300">
-              <span class="text-[10px] uppercase font-bold text-slate-500 block">Presupuestado</span>
+            <div id="kpi-presupuestado-box" class="kpi-tile bg-white/90 p-2.5 rounded-2xl border border-blue-100 shadow-sm cursor-default hover:border-indigo-300" title="Lo que queda por gastar de lo presupuestado (fijos + variables de casa), descontando lo ya gastado">
+              <span class="text-[10px] uppercase font-bold text-slate-500 block whitespace-nowrap">Presupuesto</span>
               <span id="kpi-presupuestado" class="text-xs sm:text-sm font-bold text-indigo-600 num">0,00 €</span>
             </div>
             <div class="kpi-tile bg-white/90 p-2.5 rounded-2xl border border-blue-100 shadow-sm cursor-default hover:border-pink-300">
@@ -208,8 +208,8 @@
               <span class="text-[10px] uppercase font-bold text-slate-500 block">Restante</span>
               <span id="kpi-restante" class="text-xs sm:text-sm font-bold text-emerald-600 num">0,00 €</span>
             </div>
-            <div id="kpi-margen-box" class="col-span-2 sm:col-span-4 kpi-tile bg-white/90 p-2 rounded-2xl border border-blue-100 shadow-sm cursor-default flex items-center justify-center gap-1.5">
-              <span class="text-[10px] uppercase font-bold text-slate-500">Margen presupuesto / ingresos</span>
+            <div id="kpi-margen-box" class="col-span-2 sm:col-span-4 kpi-tile bg-white/90 p-2 rounded-2xl border border-blue-100 shadow-sm cursor-default flex items-center justify-center gap-1.5" title="Todo lo que se espera gastar este mes (fijos + variables) frente a los ingresos">
+              <span class="text-[10px] uppercase font-bold text-slate-500 whitespace-nowrap">Margen sobre ingresos</span>
               <span id="kpi-margen" class="text-xs sm:text-sm font-extrabold num">0,00 €</span>
             </div>
           </div>
@@ -435,6 +435,7 @@
               <div class="space-x-2">
                 <span class="text-slate-400">Esp: <span id="total-fijos-esperado" class="num">0 €</span></span>
                 <span class="text-pink-600 font-bold">Real: <span id="total-fijos-real" class="num">0 €</span></span>
+                <span class="text-indigo-600 font-bold">Pendiente: <span id="total-fijos-pendiente" class="num">0 €</span></span>
               </div>
             </div>
           </div>
@@ -1399,10 +1400,13 @@
     /* gastos fijos */
     const tbodyFijos = document.getElementById('tbody-gastos-fijos');
     tbodyFijos.innerHTML = '';
-    let sumFijosEsp = 0, sumFijosReal = 0;
+    let sumFijosEsp = 0, sumFijosReal = 0, sumFijosPendiente = 0;
     data.gastosFijos.forEach((gf, idx) => {
-      sumFijosEsp += Number(gf.esperado || 0);
-      sumFijosReal += Number(gf.real || 0);
+      const espFijo = Number(gf.esperado || 0);
+      const realFijo = Number(gf.real || 0);
+      sumFijosEsp += espFijo;
+      sumFijosReal += realFijo;
+      sumFijosPendiente += Math.max(espFijo - realFijo, 0);
       const tr = document.createElement('tr');
       tr.className = 'row-pop hover:bg-pink-50/50';
       tr.innerHTML =
@@ -1421,6 +1425,7 @@
     });
     document.getElementById('total-fijos-esperado').innerText = formatEuro(sumFijosEsp);
     document.getElementById('total-fijos-real').innerText = formatEuro(sumFijosReal);
+    document.getElementById('total-fijos-pendiente').innerText = formatEuro(sumFijosPendiente);
     document.getElementById('nota-fijos').value = data.nota || '';
 
     /* registro de variables */
@@ -1489,12 +1494,14 @@
     /* presupuesto por grupo */
     const containerProgress = document.getElementById('container-group-progress');
     containerProgress.innerHTML = '';
-    let sumVarEsp = 0, sumVarEspCasa = 0;
+    let sumVarEsp = 0, sumVarPendienteCasa = 0;
     data.categoriasVariables.forEach((cat, idx) => {
       const esp = Number(cat.esperado || 0);
       sumVarEsp += esp;
-      if (!cat.excluirDelTotal) sumVarEspCasa += esp;
       const real = spentPerGroup[cat.categoria] || 0;
+      if (!cat.excluirDelTotal) {
+        sumVarPendienteCasa += Math.max(esp - real, 0);
+      }
       const pct = esp > 0 ? Math.min(100, Math.round((real / esp) * 100)) : (real > 0 ? 100 : 0);
       const isOver = real > esp && esp > 0;
       const card = document.createElement('div');
@@ -1530,18 +1537,12 @@
 
     /* indicadores */
     const totalGastosReal = sumFijosReal + sumVarCasa;
-    const presupuestoOriginal = sumFijosEsp + sumVarEspCasa;
-    const presupuestoRestante = presupuestoOriginal - totalGastosReal;
+    const presupuestoRestante = sumFijosPendiente + sumVarPendienteCasa;
     const margenPresupuesto = presupuestoRestante + totalGastosReal - sumIngReal;
     document.getElementById('kpi-ingresos').innerText = formatEuro(sumIngReal);
     document.getElementById('kpi-gastos').innerText = formatEuro(totalGastosReal);
     document.getElementById('kpi-restante').innerText = formatEuro(sumIngReal - totalGastosReal);
     document.getElementById('kpi-presupuestado').innerText = formatEuro(presupuestoRestante);
-    const elPresupuestado = document.getElementById('kpi-presupuestado');
-    const elPresupBox = document.getElementById('kpi-presupuestado-box');
-    elPresupuestado.className = 'text-xs sm:text-sm font-bold num ' + (presupuestoRestante < 0 ? 'text-red-600' : 'text-indigo-600');
-    elPresupBox.classList.toggle('border-red-300', presupuestoRestante < 0);
-    elPresupBox.classList.toggle('border-blue-100', presupuestoRestante >= 0);
     const elMargen = document.getElementById('kpi-margen');
     const elMargenBox = document.getElementById('kpi-margen-box');
     if (margenPresupuesto > 0) {
