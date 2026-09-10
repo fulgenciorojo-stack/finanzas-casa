@@ -1,0 +1,12 @@
+{
+  "name": "Finanzas Dori Dori",
+  "short_name": "Dori Dori",
+  "description": "Los gastos de casa, mes a mes.",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#f8fafc",
+  "icons": [
+    { "src": "icono-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icono-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

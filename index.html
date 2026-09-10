@@ -6,7 +6,13 @@
 <meta name="theme-color" content="#f8fafc">
 <meta name="robots" content="noindex, nofollow">
 <title>Finanzas Dori Dori</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%91%9B%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="icono-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icono-192.png">
+<link rel="apple-touch-icon" href="icono-180.png">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Dori Dori">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -1013,8 +1019,19 @@
     try { guardado = localStorage.getItem('hogar_codigo'); } catch (e) { /* sin almacenamiento */ }
     const codigo = (enHash || enQuery || guardado || '').trim();
     if (!CODIGO_VALIDO.test(codigo)) return '';
-    try { localStorage.setItem('hogar_codigo', codigo); } catch (e) { /* sin almacenamiento */ }
+    fijarCodigo(codigo);
     return codigo;
+  }
+
+  // El código vuelve siempre a la barra de direcciones porque al añadir la app
+  // a la pantalla de inicio se guarda la dirección tal cual está: en iOS la app
+  // así creada tiene su propio almacén, separado del de Safari, y sin el código
+  // en la dirección arrancaría pidiéndolo otra vez.
+  function fijarCodigo(codigo) {
+    try { localStorage.setItem('hogar_codigo', codigo); } catch (e) { /* sin almacenamiento */ }
+    if (location.hash !== '#h=' + codigo) {
+      try { history.replaceState(null, '', location.pathname + '#h=' + codigo); } catch (e) { /* sin historial */ }
+    }
   }
 
   async function refrescar() {
@@ -1816,7 +1833,7 @@
       document.getElementById('puerta-error').classList.remove('hidden');
       return;
     }
-    try { localStorage.setItem('hogar_codigo', codigo); } catch (err) { /* sin almacenamiento */ }
+    fijarCodigo(codigo);
     hogar = codigo;
     const puerta = document.getElementById('puerta');
     puerta.classList.add('hidden');
