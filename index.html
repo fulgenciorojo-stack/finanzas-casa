@@ -919,12 +919,21 @@
   function fundirMes(local, remoto, remotoManda) {
     if (!remoto) return local;
     const base = remotoManda ? remoto : local;
+    const otra = remotoManda ? local : remoto;
+    const flagsLocales = {};
+    (otra.categoriasVariables || []).forEach(c => { if (c.excluirDelTotal !== undefined) flagsLocales[c.categoria] = c.excluirDelTotal; });
+    const catsMerged = (base.categoriasVariables || []).map(c => {
+      if (c.excluirDelTotal === undefined && flagsLocales[c.categoria] !== undefined) {
+        return Object.assign({}, c, { excluirDelTotal: flagsLocales[c.categoria] });
+      }
+      return c;
+    });
     const fundido = {
       objetivos: base.objetivos || [],
       ingresos: base.ingresos || [],
       ahorros: base.ahorros || [],
       gastosFijos: base.gastosFijos || [],
-      categoriasVariables: base.categoriasVariables || [],
+      categoriasVariables: catsMerged,
       registroVariables: [],
       borrados: []
     };
@@ -1034,7 +1043,7 @@
       if (!raw) return false;
       const parsed = JSON.parse(raw);
       if (!parsed || typeof parsed !== 'object') return false;
-      Object.keys(parsed).forEach(k => { if (/^\d{4}-\d{2}$/.test(k)) state.monthsData[k] = parsed[k]; });
+      Object.keys(parsed).forEach(k => { if (/^\d{4}-\d{2}$/.test(k)) { state.monthsData[k] = parsed[k]; ensureMonth(k); } });
       return true;
     } catch (e) {
       return false;
@@ -1078,6 +1087,7 @@
       state.monthsData[key] = state.monthsData[key]
         ? fundirMes(state.monthsData[key], remotos[key], true)
         : remotos[key];
+      ensureMonth(key);
       if (JSON.stringify(state.monthsData[key]) !== antes) changed = true;
     });
     setSync('cloud');
