@@ -56,7 +56,6 @@
 <body>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="i-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h12v3"/><path d="M3 7v10a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1H5"/><circle cx="16.5" cy="13.5" r="1.2" fill="currentColor" stroke="none"/></symbol>
   <symbol id="i-cloud" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.8 18a4.3 4.3 0 0 1 .8-8.5 5.8 5.8 0 0 1 11 1.5A3.6 3.6 0 0 1 18 18z"/></symbol>
   <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18.5h2"/></symbol>
   <symbol id="i-save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v6h7V3"/><path d="M8 21v-6h8v6"/></symbol>
@@ -93,9 +92,7 @@
   <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row items-center justify-between gap-4">
       <div class="flex items-center space-x-3">
-        <div class="bg-gradient-to-tr from-pink-500 to-purple-600 text-white p-3 rounded-2xl shadow-md">
-          <svg class="ic text-xl"><use href="#i-wallet"></use></svg>
-        </div>
+        <img src="icono-192.png" alt="" width="192" height="192" class="w-12 h-12 rounded-2xl shadow-md shrink-0">
         <div>
           <h1 class="text-xl md:text-2xl font-bold text-slate-800 title-font tracking-tight">FINANZAS DORI DORI</h1>
           <div class="flex items-center space-x-2">
@@ -765,13 +762,8 @@
   <!-- Puerta: hace falta el código de casa -->
   <div id="puerta" class="fixed inset-0 z-[80] hidden bg-slate-50 items-center justify-center p-6">
     <div class="w-full max-w-sm text-center space-y-5">
-      <div class="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-tr from-pink-500 to-purple-600 text-white flex items-center justify-center shadow-md">
-        <svg class="ic text-2xl"><use href="#i-wallet"></use></svg>
-      </div>
-      <div>
-        <h2 class="title-font text-xl font-bold text-slate-800">Finanzas Dori Dori</h2>
-        <p class="text-xs text-slate-500 mt-1">Pega el código de casa para ver vuestras cuentas. Solo hace falta la primera vez en cada dispositivo.</p>
-      </div>
+      <img src="icono-192.png" alt="" width="192" height="192" class="mx-auto w-28 h-28 rounded-3xl shadow-md">
+      <p class="text-xs text-slate-500">Pega el código de casa para ver vuestras cuentas. Solo hace falta la primera vez en cada dispositivo.</p>
       <form id="form-puerta" class="space-y-3">
         <input type="text" id="input-puerta" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Código de casa"
           class="w-full bg-white border border-slate-200 rounded-2xl px-4 py-3 text-center text-sm font-semibold tracking-wide focus:ring-2 focus:ring-pink-300 outline-none shadow-sm">
