@@ -402,14 +402,17 @@
                 <span class="text-pink-600 font-bold">Real: <span id="total-fijos-real" class="num">0 €</span></span>
               </div>
             </div>
-            <div class="px-4 py-3 border-t border-yellow-200 bg-gradient-to-br from-yellow-50 to-amber-50/60">
-              <div class="flex items-center gap-1.5 mb-1.5">
-                <span class="text-sm">📝</span>
-                <span class="text-[10px] font-bold text-amber-700 uppercase tracking-wide">Notas</span>
-              </div>
-              <textarea id="nota-fijos" placeholder="Apunta observaciones, detalles, recordatorios…" rows="2" class="w-full bg-white/70 border border-yellow-200 rounded-xl px-3 py-2 text-xs text-slate-700 placeholder:text-slate-300 outline-none focus:ring-2 focus:ring-yellow-300 resize-y leading-relaxed" oninput="month().nota = this.value; save()"></textarea>
-            </div>
           </div>
+
+          <details class="bg-gradient-to-br from-yellow-50 to-amber-50/60 border border-yellow-200 rounded-2xl shadow-sm">
+            <summary class="px-4 py-2.5 cursor-pointer select-none flex items-center gap-1.5 text-[11px] font-bold text-amber-700 uppercase tracking-wide list-none [&::-webkit-details-marker]:hidden">
+              <span class="text-sm">📝</span> Notas del mes
+              <svg class="ic ml-auto transition-transform duration-200 [[open]>&]:rotate-180" viewBox="0 0 20 20" fill="currentColor" style="width:14px;height:14px"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"/></svg>
+            </summary>
+            <div class="px-4 pb-3">
+              <textarea id="nota-fijos" placeholder="Apunta observaciones, detalles, recordatorios…" rows="3" class="w-full bg-white/70 border border-yellow-200 rounded-xl px-3 py-2 text-xs text-slate-700 placeholder:text-slate-300 outline-none focus:ring-2 focus:ring-yellow-300 resize-y leading-relaxed" oninput="month().nota = this.value; save()"></textarea>
+            </div>
+          </details>
 
         </div>
 
