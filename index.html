@@ -210,7 +210,7 @@
             <svg class="ic text-purple-600"><use href="#i-line"></use></svg>
             <span>RESUMEN GASTOS &amp; AHORRO</span>
           </h2>
-          <div class="grid grid-cols-4 gap-1.5 text-center my-auto">
+          <div class="grid grid-cols-5 gap-1.5 text-center my-auto">
             <div class="bg-white/90 p-2 rounded-xl border border-purple-100 shadow-sm">
               <span class="text-[9px] uppercase font-bold text-slate-500 block">Fijos</span>
               <span id="kpi-fijos" class="text-xs font-bold text-slate-800 num">0,00 €</span>
@@ -218,6 +218,10 @@
             <div class="bg-white/90 p-2 rounded-xl border border-purple-100 shadow-sm">
               <span class="text-[9px] uppercase font-bold text-slate-500 block">Variables</span>
               <span id="kpi-variables" class="text-xs font-bold text-slate-800 num">0,00 €</span>
+            </div>
+            <div class="bg-white/90 p-2 rounded-xl border border-blue-200 shadow-sm">
+              <span class="text-[9px] uppercase font-bold text-blue-500 block">Personal</span>
+              <span id="kpi-personal" class="text-xs font-bold text-blue-600 num">0,00 €</span>
             </div>
             <div class="bg-white/90 p-2 rounded-xl border border-purple-100 shadow-sm">
               <span class="text-[9px] uppercase font-bold text-slate-500 block">Ahorro</span>
@@ -792,6 +796,7 @@
 
   const MONTH_NAMES = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
   const DEFAULT_CATEGORIES = ["Compra", "Coches", "Ocio", "Pencho", "Aida", "Naia", "Noa", "Gastos Varios"];
+  const CATEGORIAS_PERSONALES = new Set(["Pencho", "Aida"]);
   const PALETTE = ['#f48fb1', '#90caf9', '#a5d6a7', '#ce93d8', '#ffcc80', '#f8bbd0', '#80cbc4', '#b39ddb'];
   const API = 'https://eqtwmihuegcnlgcsgoim.supabase.co/functions/v1/casa';
   const CODIGO_VALIDO = /^[A-Za-z0-9_-]{8,64}$/;
@@ -855,7 +860,7 @@
       ingresos: [],
       ahorros: [],
       gastosFijos: [],
-      categoriasVariables: DEFAULT_CATEGORIES.map(c => ({ categoria: c, esperado: 0 })),
+      categoriasVariables: DEFAULT_CATEGORIES.map(c => ({ categoria: c, esperado: 0, excluirDelTotal: CATEGORIAS_PERSONALES.has(c) })),
       registroVariables: [],
       borrados: []
     };
@@ -870,8 +875,11 @@
     if (!Array.isArray(m.registroVariables)) m.registroVariables = [];
     if (!Array.isArray(m.borrados)) m.borrados = [];
     if (!Array.isArray(m.categoriasVariables) || !m.categoriasVariables.length) {
-      m.categoriasVariables = DEFAULT_CATEGORIES.map(c => ({ categoria: c, esperado: 0 }));
+      m.categoriasVariables = DEFAULT_CATEGORIES.map(c => ({ categoria: c, esperado: 0, excluirDelTotal: CATEGORIAS_PERSONALES.has(c) }));
     }
+    m.categoriasVariables.forEach(c => {
+      if (c.excluirDelTotal === undefined && CATEGORIAS_PERSONALES.has(c.categoria)) c.excluirDelTotal = true;
+    });
     m.registroVariables.forEach(item => { if (!item.id) item.id = nuevoId(); });
     return m;
   }
@@ -1158,7 +1166,7 @@
     const key = fecha.slice(0, 7);
     const target = ensureMonth(key);
     if (!target.categoriasVariables.some(c => c.categoria === categoria)) {
-      target.categoriasVariables.push({ categoria: categoria, esperado: 0 });
+      target.categoriasVariables.push({ categoria: categoria, esperado: 0, excluirDelTotal: false });
     }
     const entry = { id: nuevoId(), fecha: fecha, concepto: concepto, categoria: categoria, real: importe, porRevisar: !!porRevisar };
     target.registroVariables.unshift(entry);
@@ -1319,11 +1327,14 @@
 
     /* registro de variables */
     const spentPerGroup = {};
-    let sumVarReal = 0;
+    const excluidas = new Set(data.categoriasVariables.filter(c => c.excluirDelTotal).map(c => c.categoria));
+    let sumVarReal = 0, sumVarCasa = 0, sumVarPersonal = 0;
     let pendientes = 0;
     data.registroVariables.forEach(item => {
       const amt = Number(item.real || 0);
       sumVarReal += amt;
+      if (excluidas.has(item.categoria)) sumVarPersonal += amt;
+      else sumVarCasa += amt;
       spentPerGroup[item.categoria] = (spentPerGroup[item.categoria] || 0) + amt;
       if (item.porRevisar) pendientes++;
     });
@@ -1386,11 +1397,15 @@
       const pct = esp > 0 ? Math.min(100, Math.round((real / esp) * 100)) : (real > 0 ? 100 : 0);
       const isOver = real > esp && esp > 0;
       const card = document.createElement('div');
-      card.className = 'bg-slate-50 border border-slate-200 p-3 rounded-2xl flex flex-col justify-between gap-2 hover:border-amber-300 transition-all';
+      const isPersonal = !!cat.excluirDelTotal;
+      card.className = 'p-3 rounded-2xl flex flex-col justify-between gap-2 transition-all ' +
+        (isPersonal ? 'bg-blue-50/60 border border-blue-200 hover:border-blue-300' : 'bg-slate-50 border border-slate-200 hover:border-amber-300');
       card.innerHTML =
         '<div class="flex items-center justify-between gap-2">' +
           '<div class="flex items-center gap-2 min-w-0">' +
             '<span class="font-bold text-xs text-slate-800 truncate">' + escapeHTML(cat.categoria) + '</span>' +
+            (isPersonal ? '<span class="text-[9px] font-bold text-blue-500 bg-blue-100 px-1.5 py-0.5 rounded-md shrink-0">Personal</span>' : '') +
+            '<button data-act="cat-personal" data-idx="' + idx + '" class="shrink-0 px-1.5 py-0.5 rounded-md text-[9px] font-bold transition-all ' + (isPersonal ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-slate-200 text-slate-500 hover:bg-slate-300') + '" title="' + (isPersonal ? 'Incluir en el total de casa' : 'Marcar como gasto personal (no cuenta en el total)') + '">' + (isPersonal ? 'No suma' : 'Suma') + '</button>' +
             '<button data-act="cat-remove" data-idx="' + idx + '" class="text-slate-300 hover:text-red-500 shrink-0" title="Eliminar grupo"><svg class="ic text-[10px]"><use href="#i-x"></use></svg></button>' +
           '</div>' +
           '<div class="flex items-center gap-1 text-xs shrink-0">' +
@@ -1413,14 +1428,15 @@
     document.getElementById('total-variables-esperado').innerText = formatEuro(sumVarEsp);
 
     /* indicadores */
-    const totalGastosReal = sumFijosReal + sumVarReal;
+    const totalGastosReal = sumFijosReal + sumVarCasa;
     document.getElementById('kpi-ingresos').innerText = formatEuro(sumIngReal);
     document.getElementById('kpi-gastos').innerText = formatEuro(totalGastosReal);
     document.getElementById('kpi-restante').innerText = formatEuro(sumIngReal - totalGastosReal);
     document.getElementById('kpi-fijos').innerText = formatEuro(sumFijosReal);
-    document.getElementById('kpi-variables').innerText = formatEuro(sumVarReal);
+    document.getElementById('kpi-variables').innerText = formatEuro(sumVarCasa);
     document.getElementById('kpi-ahorro').innerText = formatEuro(sumAhorro);
     document.getElementById('kpi-inversion').innerText = formatEuro(sumInversion);
+    document.getElementById('kpi-personal').innerText = formatEuro(sumVarPersonal);
 
     const spentPct = sumIngReal > 0 ? Math.min(100, Math.round((totalGastosReal / sumIngReal) * 100)) : 0;
     document.getElementById('gauge-percent').innerText = spentPct + '%';
@@ -1430,7 +1446,7 @@
       esperado: Number(cat.esperado || 0),
       real: spentPerGroup[cat.categoria] || 0
     }));
-    renderMonthlyCharts(sumIngReal, sumFijosReal, sumVarReal, sumAhorro, sumInversion, breakdown);
+    renderMonthlyCharts(sumIngReal, sumFijosReal, sumVarCasa, sumAhorro, sumInversion, sumVarPersonal, breakdown);
   }
 
   function renderCategoryPills(data, pendientes) {
@@ -1471,7 +1487,7 @@
       fecha: g.fecha ? currentKey() + '-' + g.fecha.slice(8, 10) : '',
       pagado: false
     }));
-    data.categoriasVariables = prev.categoriasVariables.map(c => ({ categoria: c.categoria, esperado: Number(c.esperado || 0) }));
+    data.categoriasVariables = prev.categoriasVariables.map(c => ({ categoria: c.categoria, esperado: Number(c.esperado || 0), excluirDelTotal: !!c.excluirDelTotal }));
     queueSave();
     renderAll();
     showToast('Ingresos y gastos fijos copiados, con los importes reales a 0');
@@ -1490,7 +1506,8 @@
       if (quitado && quitado.id) data.borrados.push(quitado.id);
     },
     'reg-review': idx => { month().registroVariables[idx].porRevisar = false; },
-    'cat-remove': idx => { month().categoriasVariables.splice(idx, 1); }
+    'cat-remove': idx => { month().categoriasVariables.splice(idx, 1); },
+    'cat-personal': idx => { const c = month().categoriasVariables[idx]; c.excluirDelTotal = !c.excluirDelTotal; }
   };
 
   const collections = { ing: 'ingresos', aho: 'ahorros', fijo: 'gastosFijos', reg: 'registroVariables', cat: 'categoriasVariables' };
@@ -1596,7 +1613,7 @@
   }
   function confirmAddCategory() {
     const cat = document.getElementById('input-nueva-categoria').value.trim();
-    if (cat) { month().categoriasVariables.push({ categoria: cat, esperado: 0 }); queueSave(); renderAll(); showToast('Grupo añadido'); }
+    if (cat) { month().categoriasVariables.push({ categoria: cat, esperado: 0, excluirDelTotal: false }); queueSave(); renderAll(); showToast('Grupo añadido'); }
     closeModal('modal-categoria');
   }
 
@@ -1624,7 +1641,7 @@
     if (charts[id]) { charts[id].destroy(); delete charts[id]; }
   }
 
-  function renderMonthlyCharts(ingresos, fijos, variables, ahorro, inversion, categories) {
+  function renderMonthlyCharts(ingresos, fijos, variables, ahorro, inversion, personal, categories) {
     if (typeof Chart === 'undefined') return;
     Chart.defaults.font.family = "'Poppins', sans-serif";
     Chart.defaults.color = '#64748b';
@@ -1639,11 +1656,19 @@
     });
 
     destroyChart('chart-global-distribution');
+    const distLabels = ['Gastos fijos', 'Variables casa', 'Ahorro', 'Inversión'];
+    const distData = [fijos, variables, ahorro, inversion];
+    const distColors = ['#f8bbd0', '#ffe0b2', '#c8e6c9', '#e1bee7'];
+    if (personal > 0) {
+      distLabels.push('Personal');
+      distData.push(personal);
+      distColors.push('#90caf9');
+    }
     charts['chart-global-distribution'] = new Chart(document.getElementById('chart-global-distribution'), {
       type: 'doughnut',
       data: {
-        labels: ['Gastos fijos', 'Gastos variables', 'Ahorro', 'Inversión'],
-        datasets: [{ data: [fijos, variables, ahorro, inversion], backgroundColor: ['#f8bbd0', '#ffe0b2', '#c8e6c9', '#e1bee7'], borderWidth: 0 }]
+        labels: distLabels,
+        datasets: [{ data: distData, backgroundColor: distColors, borderWidth: 0 }]
       },
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
     });
@@ -1686,10 +1711,13 @@
     for (let m = 0; m < 12; m++) {
       const data = state.monthsData[monthKey(state.currentYear, m)];
       const sum = (arr, field) => (arr || []).reduce((acc, cur) => acc + Number(cur[field] || 0), 0);
+      const exclSet = data ? new Set((data.categoriasVariables || []).filter(c => c.excluirDelTotal).map(c => c.categoria)) : new Set();
+      const varItems = data ? (data.registroVariables || []) : [];
       totals.push({
         ingresos: data ? sum(data.ingresos, 'real') : 0,
         fijos: data ? sum(data.gastosFijos, 'real') : 0,
-        variables: data ? sum(data.registroVariables, 'real') : 0,
+        variables: varItems.filter(i => !exclSet.has(i.categoria)).reduce((a, i) => a + Number(i.real || 0), 0),
+        personal: varItems.filter(i => exclSet.has(i.categoria)).reduce((a, i) => a + Number(i.real || 0), 0),
         ahorro: data ? sum((data.ahorros || []).filter(a => a.tipo === 'Ahorro'), 'cantidad') : 0,
         inversion: data ? sum((data.ahorros || []).filter(a => a.tipo !== 'Ahorro'), 'cantidad') : 0
       });
@@ -1698,7 +1726,8 @@
     const rows = [
       { title: 'Ingresos reales', key: 'ingresos', color: 'text-amber-800' },
       { title: 'Gastos fijos', key: 'fijos', color: 'text-pink-600' },
-      { title: 'Gastos variables', key: 'variables', color: 'text-orange-600' },
+      { title: 'Variables casa', key: 'variables', color: 'text-orange-600' },
+      { title: 'Personal', key: 'personal', color: 'text-blue-600' },
       { title: 'Ahorros', key: 'ahorro', color: 'text-emerald-600' },
       { title: 'Inversión', key: 'inversion', color: 'text-purple-600' }
     ];
@@ -1735,7 +1764,7 @@
         labels: MONTH_NAMES.map(m => m.substring(0, 3)),
         datasets: [
           { label: 'Ingresos', data: totals.map(t => t.ingresos), borderColor: '#f59e0b', fill: false, tension: 0.3 },
-          { label: 'Gastos totales', data: totals.map(t => t.fijos + t.variables), borderColor: '#ec4899', fill: false, tension: 0.3 },
+          { label: 'Gastos casa', data: totals.map(t => t.fijos + t.variables), borderColor: '#ec4899', fill: false, tension: 0.3 },
           { label: 'Ahorro e inversión', data: totals.map(t => t.ahorro + t.inversion), borderColor: '#10b981', fill: false, tension: 0.3 }
         ]
       },
