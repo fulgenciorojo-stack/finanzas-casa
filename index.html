@@ -1591,8 +1591,8 @@
     if (yaExiste) { showToast('«' + gf.concepto + '» ya existe en ' + labelForKey(nk)); return; }
     dest.gastosFijos.push({
       concepto: gf.concepto,
-      esperado: Number(gf.esperado || 0),
-      real: Number(gf.real || 0),
+      esperado: Number(gf.real || gf.esperado || 0),
+      real: 0,
       fecha: nk + '-01',
       pagado: false
     });
