@@ -192,26 +192,21 @@
             <span>DISPONIBLE PARA GASTAR</span>
             <svg class="ic ml-auto transition-transform duration-200 group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" style="width:14px;height:14px"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"/></svg>
           </summary>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center p-5 pt-3 fade-in-up my-auto">
-            <div class="kpi-tile bg-white/90 p-2.5 rounded-2xl border border-blue-100 shadow-sm cursor-default hover:border-blue-300">
+          <div class="grid grid-cols-3 gap-2 text-center p-5 pt-3 fade-in-up my-auto">
+            <div class="kpi-tile bg-white/90 p-2.5 rounded-2xl border border-blue-100 shadow-sm cursor-default hover:border-blue-300 relative">
+              <span id="kpi-ingresos-emoji" class="absolute top-1 right-1.5 text-[11px] leading-none"></span>
               <span class="text-[10px] uppercase font-bold text-slate-500 block">Ingresos</span>
               <span id="kpi-ingresos" class="text-xs sm:text-sm font-bold text-slate-800 num">0,00 €</span>
             </div>
-            <div id="kpi-presupuestado-box" class="kpi-tile bg-white/90 p-2.5 rounded-2xl border border-blue-100 shadow-sm cursor-default hover:border-indigo-300" title="Lo que queda por gastar de lo presupuestado (fijos + variables de casa), descontando lo ya gastado">
-              <span class="text-[10px] uppercase font-bold text-slate-500 block whitespace-nowrap">Presupuesto</span>
+            <div id="kpi-presupuestado-box" class="kpi-tile bg-white/90 p-2.5 rounded-2xl border border-blue-100 shadow-sm cursor-default hover:border-indigo-300 relative" title="Lo estimado que queda por gastar (fijos + variables de casa), descontando lo ya gastado">
+              <span id="kpi-estimado-emoji" class="absolute top-1 right-1.5 text-[11px] leading-none"></span>
+              <span class="text-[10px] uppercase font-bold text-slate-500 block whitespace-nowrap">Estimado</span>
               <span id="kpi-presupuestado" class="text-xs sm:text-sm font-bold text-indigo-600 num">0,00 €</span>
             </div>
-            <div class="kpi-tile bg-white/90 p-2.5 rounded-2xl border border-blue-100 shadow-sm cursor-default hover:border-pink-300">
+            <div class="kpi-tile bg-white/90 p-2.5 rounded-2xl border border-blue-100 shadow-sm cursor-default hover:border-pink-300 relative">
+              <span id="kpi-gastos-emoji" class="absolute top-1 right-1.5 text-[11px] leading-none"></span>
               <span class="text-[10px] uppercase font-bold text-slate-500 block">Gastos</span>
               <span id="kpi-gastos" class="text-xs sm:text-sm font-bold text-pink-600 num">0,00 €</span>
-            </div>
-            <div class="kpi-tile bg-white/90 p-2.5 rounded-2xl border border-blue-100 shadow-sm cursor-default hover:border-emerald-300">
-              <span class="text-[10px] uppercase font-bold text-slate-500 block">Restante</span>
-              <span id="kpi-restante" class="text-xs sm:text-sm font-bold text-emerald-600 num">0,00 €</span>
-            </div>
-            <div id="kpi-margen-box" class="col-span-2 sm:col-span-4 kpi-tile bg-white/90 p-2 rounded-2xl border border-blue-100 shadow-sm cursor-default flex items-center justify-center gap-1.5" title="Todo lo que se espera gastar este mes (fijos + variables) frente a los ingresos">
-              <span class="text-[10px] uppercase font-bold text-slate-500 whitespace-nowrap">Margen sobre ingresos</span>
-              <span id="kpi-margen" class="text-xs sm:text-sm font-extrabold num">0,00 €</span>
             </div>
           </div>
         </details>
@@ -1624,21 +1619,16 @@
     const margenPresupuesto = presupuestoRestante + totalGastosReal - sumIngReal;
     document.getElementById('kpi-ingresos').innerText = formatEuro(sumIngReal);
     document.getElementById('kpi-gastos').innerText = formatEuro(totalGastosReal);
-    document.getElementById('kpi-restante').innerText = formatEuro(sumIngReal - totalGastosReal);
     document.getElementById('kpi-presupuestado').innerText = formatEuro(presupuestoRestante);
-    const elMargen = document.getElementById('kpi-margen');
-    const elMargenBox = document.getElementById('kpi-margen-box');
-    if (margenPresupuesto > 0) {
-      elMargen.innerText = 'Excede en ' + formatEuro(margenPresupuesto);
-      elMargen.className = 'text-xs sm:text-sm font-extrabold num text-red-600';
-      elMargenBox.classList.remove('border-blue-100');
-      elMargenBox.classList.add('border-red-300', 'bg-red-50/60');
-    } else {
-      elMargen.innerText = 'Con margen de ' + formatEuro(-margenPresupuesto);
-      elMargen.className = 'text-xs sm:text-sm font-extrabold num text-emerald-600';
-      elMargenBox.classList.remove('border-red-300', 'bg-red-50/60');
-      elMargenBox.classList.add('border-blue-100');
-    }
+    const margenEmoji = margenPresupuesto > 0 ? '😢' : '😊';
+    const margenTitle = margenPresupuesto > 0
+      ? 'Lo estimado excede los ingresos en ' + formatEuro(margenPresupuesto)
+      : 'Con margen de ' + formatEuro(-margenPresupuesto) + ' sobre los ingresos';
+    ['kpi-ingresos-emoji', 'kpi-estimado-emoji', 'kpi-gastos-emoji'].forEach(id => {
+      const el = document.getElementById(id);
+      el.innerText = margenEmoji;
+      el.title = margenTitle;
+    });
     document.getElementById('kpi-fijos').innerText = formatEuro(sumFijosReal);
     document.getElementById('kpi-variables').innerText = formatEuro(sumVarCasa);
     document.getElementById('kpi-ahorro').innerText = formatEuro(sumAhorro);
