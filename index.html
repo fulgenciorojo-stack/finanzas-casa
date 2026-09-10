@@ -1040,7 +1040,9 @@
     const catsMerged = (base.categoriasVariables || []).map(c => {
       const extra = {};
       if (c.excluirDelTotal === undefined && flagsLocales[c.categoria] !== undefined) extra.excluirDelTotal = flagsLocales[c.categoria];
-      if (!c.nota && notasLocales[c.categoria]) extra.nota = notasLocales[c.categoria];
+      // Solo se rescata la nota del otro lado si aquí ni siquiera existe el campo
+      // (dato guardado antes de esta función); una nota vacía es un borrado a propósito.
+      if (c.nota === undefined && notasLocales[c.categoria]) extra.nota = notasLocales[c.categoria];
       return Object.keys(extra).length ? Object.assign({}, c, extra) : c;
     });
     const fundido = {
