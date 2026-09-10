@@ -906,9 +906,16 @@
     if (!Array.isArray(m.categoriasVariables) || !m.categoriasVariables.length) {
       m.categoriasVariables = DEFAULT_CATEGORIES.map(c => ({ categoria: c, esperado: 0, excluirDelTotal: CATEGORIAS_PERSONALES.has(c) }));
     }
-    m.categoriasVariables.forEach(c => {
-      if (c.excluirDelTotal === undefined && CATEGORIAS_PERSONALES.has(c.categoria)) c.excluirDelTotal = true;
-    });
+    if (!m._migPersonal) {
+      m.categoriasVariables.forEach(c => {
+        if (CATEGORIAS_PERSONALES.has(c.categoria)) c.excluirDelTotal = true;
+      });
+      m._migPersonal = true;
+    } else {
+      m.categoriasVariables.forEach(c => {
+        if (c.excluirDelTotal === undefined && CATEGORIAS_PERSONALES.has(c.categoria)) c.excluirDelTotal = true;
+      });
+    }
     m.registroVariables.forEach(item => { if (!item.id) item.id = nuevoId(); });
     return m;
   }
