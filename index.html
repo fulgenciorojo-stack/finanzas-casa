@@ -1488,10 +1488,20 @@
     const veredicto = document.getElementById('balanza-veredicto');
     if (Math.abs(diff) < 0.01) {
       veredicto.innerHTML = '<span class="text-emerald-600">Estáis en paz</span>';
-    } else if (diff > 0) {
-      veredicto.innerHTML = '<span class="text-blue-600">Pencho</span> ha gastado <span class="text-slate-800">' + formatEuro(diff) + '</span> más que Aida';
     } else {
-      veredicto.innerHTML = '<span class="text-pink-600">Aida</span> ha gastado <span class="text-slate-800">' + formatEuro(-diff) + '</span> más que Pencho';
+      const absDiff = Math.abs(diff);
+      const ambosPonen = netPencho <= 0 && netAida <= 0;
+      if (ambosPonen) {
+        const quienMas = diff < 0 ? 'Pencho' : 'Aida';
+        const quienMenos = diff < 0 ? 'Aida' : 'Pencho';
+        const color = diff < 0 ? 'text-blue-600' : 'text-pink-600';
+        veredicto.innerHTML = '<span class="' + color + '">' + quienMas + '</span> ha puesto <span class="text-slate-800">' + formatEuro(absDiff) + '</span> más que ' + quienMenos;
+      } else {
+        const quienMas = diff > 0 ? 'Pencho' : 'Aida';
+        const quienMenos = diff > 0 ? 'Aida' : 'Pencho';
+        const color = diff > 0 ? 'text-blue-600' : 'text-pink-600';
+        veredicto.innerHTML = '<span class="' + color + '">' + quienMas + '</span> ha gastado <span class="text-slate-800">' + formatEuro(absDiff) + '</span> más que ' + quienMenos;
+      }
     }
 
     const spentPct = sumIngReal > 0 ? Math.min(100, Math.round((totalGastosReal / sumIngReal) * 100)) : 0;
