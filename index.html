@@ -1376,7 +1376,10 @@
         '<td class="py-2 text-center"><button data-act="fijo-toggle" data-idx="' + idx + '" class="px-2 py-0.5 rounded-full text-[10px] font-bold shadow-sm inline-flex items-center gap-1 ' + (gf.pagado ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700') + '">' +
           '<svg class="ic"><use href="' + (gf.pagado ? '#i-check' : '#i-clock') + '"></use></svg>' + (gf.pagado ? 'Pagado' : 'Pendiente') +
         '</button></td>' +
-        '<td class="py-2 text-center"><button data-act="fijo-remove" data-idx="' + idx + '" class="w-6 h-6 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-all"><svg class="ic text-[10px]"><use href="#i-trash"></use></svg></button></td>';
+        '<td class="py-2 text-center whitespace-nowrap">' +
+          '<button onclick="copyFijoToNext(' + idx + ')" title="Copiar al mes siguiente" class="w-6 h-6 rounded-lg text-slate-300 hover:text-blue-500 hover:bg-blue-50 inline-flex items-center justify-center transition-all"><svg class="ic text-[10px]"><use href="#i-copy"></use></svg></button>' +
+          '<button data-act="fijo-remove" data-idx="' + idx + '" class="w-6 h-6 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 inline-flex items-center justify-center transition-all"><svg class="ic text-[10px]"><use href="#i-trash"></use></svg></button>' +
+        '</td>';
       tbodyFijos.appendChild(tr);
     });
     document.getElementById('total-fijos-esperado').innerText = formatEuro(sumFijosEsp);
@@ -1572,6 +1575,30 @@
   function previousKey(key) {
     const [y, m] = key.split('-').map(Number);
     return m === 1 ? monthKey(y - 1, 11) : monthKey(y, m - 2);
+  }
+
+  function nextKey(key) {
+    const [y, m] = key.split('-').map(Number);
+    return m === 12 ? monthKey(y + 1, 0) : monthKey(y, m);
+  }
+
+  function copyFijoToNext(idx) {
+    const gf = month().gastosFijos[idx];
+    if (!gf) return;
+    const nk = nextKey(currentKey());
+    const dest = ensureMonth(nk);
+    const yaExiste = dest.gastosFijos.some(g => g.concepto === gf.concepto);
+    if (yaExiste) { showToast('«' + gf.concepto + '» ya existe en ' + labelForKey(nk)); return; }
+    dest.gastosFijos.push({
+      concepto: gf.concepto,
+      esperado: Number(gf.esperado || 0),
+      real: 0,
+      fecha: gf.fecha ? nk + '-' + gf.fecha.slice(8, 10) : '',
+      pagado: false
+    });
+    dirtyMonths.add(nk);
+    queueSave();
+    showToast('«' + gf.concepto + '» copiado a ' + labelForKey(nk));
   }
 
   function copyPreviousMonth() {
@@ -1930,7 +1957,7 @@
 
   Object.assign(window, {
     changePeriod, switchTab, openQuickWindow, closeQuickWindow, submitQuickWindow,
-    updateQuickTargetMonth, quickAddVariableExpense, copyPreviousMonth,
+    updateQuickTargetMonth, quickAddVariableExpense, copyPreviousMonth, copyFijoToNext,
     openAddObjetivoModal, confirmAddObjetivo, openAddIngresoModal, confirmAddIngreso,
     openAddAhorroModal, confirmAddAhorro, openAddGastoFijoModal, confirmAddGastoFijo,
     openAddCategoryModal, confirmAddCategory, openResetModal, confirmReset,
