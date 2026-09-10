@@ -402,6 +402,13 @@
                 <span class="text-pink-600 font-bold">Real: <span id="total-fijos-real" class="num">0 €</span></span>
               </div>
             </div>
+            <div class="px-4 py-3 border-t border-yellow-200 bg-gradient-to-br from-yellow-50 to-amber-50/60">
+              <div class="flex items-center gap-1.5 mb-1.5">
+                <span class="text-sm">📝</span>
+                <span class="text-[10px] font-bold text-amber-700 uppercase tracking-wide">Notas</span>
+              </div>
+              <textarea id="nota-fijos" placeholder="Apunta observaciones, detalles, recordatorios…" rows="2" class="w-full bg-white/70 border border-yellow-200 rounded-xl px-3 py-2 text-xs text-slate-700 placeholder:text-slate-300 outline-none focus:ring-2 focus:ring-yellow-300 resize-y leading-relaxed" oninput="month().nota = this.value; save()"></textarea>
+            </div>
           </div>
 
         </div>
@@ -891,7 +898,8 @@
       gastosFijos: [],
       categoriasVariables: DEFAULT_CATEGORIES.map(c => ({ categoria: c, esperado: 0, excluirDelTotal: CATEGORIAS_PERSONALES.has(c) })),
       registroVariables: [],
-      borrados: []
+      borrados: [],
+      nota: ''
     };
   }
 
@@ -1370,6 +1378,7 @@
     });
     document.getElementById('total-fijos-esperado').innerText = formatEuro(sumFijosEsp);
     document.getElementById('total-fijos-real').innerText = formatEuro(sumFijosReal);
+    document.getElementById('nota-fijos').value = data.nota || '';
 
     /* registro de variables */
     const spentPerGroup = {};
