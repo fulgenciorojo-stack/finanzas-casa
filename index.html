@@ -991,7 +991,7 @@
       ingresos: [],
       ahorros: [],
       gastosFijos: [],
-      categoriasVariables: DEFAULT_CATEGORIES.map(c => ({ categoria: c, esperado: 0, excluirDelTotal: CATEGORIAS_PERSONALES.has(c) })),
+      categoriasVariables: DEFAULT_CATEGORIES.map(c => ({ categoria: c, esperado: 0, excluirDelTotal: CATEGORIAS_PERSONALES.has(c), nota: '' })),
       registroVariables: [],
       borrados: [],
       nota: ''
@@ -1007,7 +1007,7 @@
     if (!Array.isArray(m.registroVariables)) m.registroVariables = [];
     if (!Array.isArray(m.borrados)) m.borrados = [];
     if (!Array.isArray(m.categoriasVariables) || !m.categoriasVariables.length) {
-      m.categoriasVariables = DEFAULT_CATEGORIES.map(c => ({ categoria: c, esperado: 0, excluirDelTotal: CATEGORIAS_PERSONALES.has(c) }));
+      m.categoriasVariables = DEFAULT_CATEGORIES.map(c => ({ categoria: c, esperado: 0, excluirDelTotal: CATEGORIAS_PERSONALES.has(c), nota: '' }));
     }
     if (!m._migPersonal) {
       m.categoriasVariables.forEach(c => {
@@ -1019,6 +1019,7 @@
         if (c.excluirDelTotal === undefined && CATEGORIAS_PERSONALES.has(c.categoria)) c.excluirDelTotal = true;
       });
     }
+    m.categoriasVariables.forEach(c => { if (c.nota === undefined) c.nota = ''; });
     m.registroVariables.forEach(item => { if (!item.id) item.id = nuevoId(); });
     return m;
   }
@@ -1031,12 +1032,16 @@
     const base = remotoManda ? remoto : local;
     const otra = remotoManda ? local : remoto;
     const flagsLocales = {};
-    (otra.categoriasVariables || []).forEach(c => { if (c.excluirDelTotal !== undefined) flagsLocales[c.categoria] = c.excluirDelTotal; });
+    const notasLocales = {};
+    (otra.categoriasVariables || []).forEach(c => {
+      if (c.excluirDelTotal !== undefined) flagsLocales[c.categoria] = c.excluirDelTotal;
+      if (c.nota) notasLocales[c.categoria] = c.nota;
+    });
     const catsMerged = (base.categoriasVariables || []).map(c => {
-      if (c.excluirDelTotal === undefined && flagsLocales[c.categoria] !== undefined) {
-        return Object.assign({}, c, { excluirDelTotal: flagsLocales[c.categoria] });
-      }
-      return c;
+      const extra = {};
+      if (c.excluirDelTotal === undefined && flagsLocales[c.categoria] !== undefined) extra.excluirDelTotal = flagsLocales[c.categoria];
+      if (!c.nota && notasLocales[c.categoria]) extra.nota = notasLocales[c.categoria];
+      return Object.keys(extra).length ? Object.assign({}, c, extra) : c;
     });
     const fundido = {
       objetivos: base.objetivos || [],
@@ -1315,7 +1320,7 @@
     const key = fecha.slice(0, 7);
     const target = ensureMonth(key);
     if (!target.categoriasVariables.some(c => c.categoria === categoria)) {
-      target.categoriasVariables.push({ categoria: categoria, esperado: 0, excluirDelTotal: false });
+      target.categoriasVariables.push({ categoria: categoria, esperado: 0, excluirDelTotal: false, nota: '' });
     }
     const entry = { id: nuevoId(), fecha: fecha, concepto: concepto, categoria: categoria, real: importe, porRevisar: !!porRevisar };
     target.registroVariables.unshift(entry);
@@ -1591,7 +1596,13 @@
             '<span class="' + (isOver ? 'text-red-600' : 'text-slate-600') + '">Gastado: ' + formatEuro(real) + ' (' + pct + '%)</span>' +
             '<span class="' + (esp - real < 0 ? 'text-red-500' : 'text-emerald-600') + '">' + (esp - real >= 0 ? 'Quedan ' + formatEuro(esp - real) : 'Excedido por ' + formatEuro(real - esp)) + '</span>' +
           '</div>' +
-        '</div>';
+        '</div>' +
+        '<details class="mt-1.5 pt-1.5 border-t border-slate-200/70"' + (cat.nota ? ' open' : '') + '>' +
+          '<summary class="text-[10px] text-slate-400 hover:text-slate-600 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden flex items-center gap-1 transition-colors">' +
+            '<span>📝</span><span>' + (cat.nota ? 'Nota de previsión' : 'Añadir nota de previsión') + '</span>' +
+          '</summary>' +
+          '<textarea data-act="cat" data-field="nota" data-idx="' + idx + '" rows="2" placeholder="Ej: en octubre habrá un gasto extra de…" class="mt-1 w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-[11px] text-slate-700 placeholder:text-slate-300 outline-none focus:ring-1 focus:ring-amber-300 resize-y">' + escapeHTML(cat.nota || '') + '</textarea>' +
+        '</details>';
       containerProgress.appendChild(card);
     });
     document.getElementById('total-variables-esperado').innerText = formatEuro(sumVarEsp);
@@ -1882,7 +1893,7 @@
   }
   function confirmAddCategory() {
     const cat = document.getElementById('input-nueva-categoria').value.trim();
-    if (cat) { month().categoriasVariables.push({ categoria: cat, esperado: 0, excluirDelTotal: false }); queueSave(); renderAll(); showToast('Grupo añadido'); }
+    if (cat) { month().categoriasVariables.push({ categoria: cat, esperado: 0, excluirDelTotal: false, nota: '' }); queueSave(); renderAll(); showToast('Grupo añadido'); }
     closeModal('modal-categoria');
   }
 
