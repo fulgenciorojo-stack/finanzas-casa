@@ -1599,9 +1599,9 @@
         '</div>' +
         '<details class="mt-1.5 pt-1.5 border-t border-slate-200/70"' + (cat.nota ? ' open' : '') + '>' +
           '<summary class="text-[10px] text-slate-400 hover:text-slate-600 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden flex items-center gap-1 transition-colors">' +
-            '<span>📝</span><span>' + (cat.nota ? 'Nota de previsión' : 'Añadir nota de previsión') + '</span>' +
+            '<span>📝</span><span>' + (cat.nota ? 'Previsión de ' : 'Añadir previsión a ') + '<span class="font-bold text-slate-600">' + escapeHTML(cat.categoria) + '</span></span>' +
           '</summary>' +
-          '<textarea data-act="cat" data-field="nota" data-idx="' + idx + '" rows="2" placeholder="Ej: en octubre habrá un gasto extra de…" class="mt-1 w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-[11px] text-slate-700 placeholder:text-slate-300 outline-none focus:ring-1 focus:ring-amber-300 resize-y">' + escapeHTML(cat.nota || '') + '</textarea>' +
+          '<textarea data-act="cat" data-field="nota" data-idx="' + idx + '" rows="2" placeholder="Previsión de gasto en ' + escapeHTML(cat.categoria) + '…" class="mt-1 w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-[11px] text-slate-700 placeholder:text-slate-300 outline-none focus:ring-1 focus:ring-amber-300 resize-y">' + escapeHTML(cat.nota || '') + '</textarea>' +
         '</details>';
       containerProgress.appendChild(card);
     });
