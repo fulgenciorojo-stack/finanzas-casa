@@ -1625,7 +1625,7 @@
     'ing-remove': idx => { month().ingresos.splice(idx, 1); },
     'aho-remove': idx => { month().ahorros.splice(idx, 1); },
     'fijo-remove': idx => { month().gastosFijos.splice(idx, 1); },
-    'fijo-toggle': idx => { const g = month().gastosFijos[idx]; g.pagado = !g.pagado; },
+    'fijo-toggle': idx => { const g = month().gastosFijos[idx]; g.pagado = !g.pagado; if (g.pagado && !g.real && g.esperado) g.real = g.esperado; },
     'reg-remove': idx => {
       const data = month();
       const quitado = data.registroVariables.splice(idx, 1)[0];
