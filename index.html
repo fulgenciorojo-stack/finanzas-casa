@@ -1592,8 +1592,8 @@
     dest.gastosFijos.push({
       concepto: gf.concepto,
       esperado: Number(gf.esperado || 0),
-      real: 0,
-      fecha: gf.fecha ? nk + '-' + gf.fecha.slice(8, 10) : '',
+      real: Number(gf.real || 0),
+      fecha: nk + '-01',
       pagado: false
     });
     dirtyMonths.add(nk);
