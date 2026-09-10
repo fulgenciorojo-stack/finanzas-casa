@@ -1195,7 +1195,7 @@
     const toast = document.getElementById('toast');
     document.getElementById('toast-msg').innerText = message;
     const icon = document.getElementById('toast-icon');
-    icon.className = 'ic ' + (isError ? 'text-red-400' : 'text-emerald-400');
+    icon.setAttribute('class', 'ic ' + (isError ? 'text-red-400' : 'text-emerald-400'));
     icon.innerHTML = '<use href="' + (isError ? '#i-warning' : '#i-check') + '"></use>';
     toast.classList.remove('translate-y-20', 'opacity-0');
     clearTimeout(showToast.timer);
