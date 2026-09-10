@@ -1,0 +1,1839 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f8fafc">
+<meta name="robots" content="noindex, nofollow">
+<title>Finanzas Dori Dori</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%91%9B%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          title: ['Comfortaa', 'cursive'],
+          body: ['Poppins', 'sans-serif']
+        }
+      }
+    }
+  };
+</script>
+<style>
+  :root { color-scheme: light; }
+  body {
+    font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    background-color: #f8fafc;
+    color: #1e293b;
+  }
+  .title-font { font-family: 'Comfortaa', 'Poppins', cursive; }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type="number"] { -moz-appearance: textfield; }
+  .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+  .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  .ic { width: 1em; height: 1em; display: inline-block; vertical-align: -0.125em; }
+  .num { font-variant-numeric: tabular-nums; }
+  :focus-visible { outline: 2px solid #f48fb1; outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h12v3"/><path d="M3 7v10a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1H5"/><circle cx="16.5" cy="13.5" r="1.2" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.8 18a4.3 4.3 0 0 1 .8-8.5 5.8 5.8 0 0 1 11 1.5A3.6 3.6 0 0 1 18 18z"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18.5h2"/></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v6h7V3"/><path d="M8 21v-6h8v6"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M4 20h16"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17V5"/><path d="M7 9l5-5 5 5"/><path d="M4 20h16"/></symbol>
+  <symbol id="i-broom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v6h6"/><path d="M4.6 13a8 8 0 1 0 1.9-6.4L4 10"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-pie" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M14.5 3.4A9 9 0 0 1 20.6 9.5H14.5z"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l-5 6 5 6"/><path d="M16 6l5 6-5 6"/></symbol>
+  <symbol id="i-scale" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M6 20h12M4 8h16M4 8l-2 6h4zM20 8l2 6h-4z"/></symbol>
+  <symbol id="i-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v16h16"/><path d="M7 15l4-5 3 3 5-6"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-income" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="11" rx="2"/><circle cx="12" cy="11.5" r="2.6"/></symbol>
+  <symbol id="i-piggy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19v-3a7 7 0 0 1 7-7h3a6 6 0 0 1 6 6v4h-3v-2H7v2z"/><path d="M11 6a3 3 0 0 1 5 0"/><circle cx="16.5" cy="13" r="1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-house" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-receipt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></symbol>
+  <symbol id="i-bars" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V10M10 21V4M16 21v-7M22 21H2"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12.5V4a1 1 0 0 1 1-1h8.5L21 11.5 12.5 20z"/><circle cx="7.5" cy="7.5" r="1.3" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 17H3z"/><path d="M12 9v5M12 17.2v.1"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="2.6"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></symbol>
+</svg>
+
+<div id="app" class="text-slate-800 min-h-screen pb-24">
+
+  <!-- Cabecera -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="bg-gradient-to-tr from-pink-500 to-purple-600 text-white p-3 rounded-2xl shadow-md">
+          <svg class="ic text-xl"><use href="#i-wallet"></use></svg>
+        </div>
+        <div>
+          <h1 class="text-xl md:text-2xl font-bold text-slate-800 title-font tracking-tight">FINANZAS DORI DORI</h1>
+          <div class="flex items-center space-x-2">
+            <span id="sync-status" class="text-xs font-semibold text-slate-500 flex items-center gap-1">
+              <svg class="ic"><use href="#i-cloud"></use></svg> Conectando…
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mes y año -->
+      <div class="flex items-center space-x-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+        <select id="select-year" onchange="changePeriod()" class="bg-white text-slate-700 font-semibold text-sm px-3 py-1.5 rounded-xl border-none focus:ring-2 focus:ring-pink-300 shadow-sm outline-none cursor-pointer">
+          <option value="2025">2025</option>
+          <option value="2026" selected>2026</option>
+          <option value="2027">2027</option>
+          <option value="2028">2028</option>
+        </select>
+        <select id="select-month" onchange="changePeriod()" class="bg-white text-slate-700 font-semibold text-sm px-3 py-1.5 rounded-xl border-none focus:ring-2 focus:ring-pink-300 shadow-sm outline-none cursor-pointer">
+          <option value="0">ENERO</option>
+          <option value="1">FEBRERO</option>
+          <option value="2">MARZO</option>
+          <option value="3">ABRIL</option>
+          <option value="4">MAYO</option>
+          <option value="5">JUNIO</option>
+          <option value="6">JULIO</option>
+          <option value="7">AGOSTO</option>
+          <option value="8">SEPTIEMBRE</option>
+          <option value="9">OCTUBRE</option>
+          <option value="10">NOVIEMBRE</option>
+          <option value="11">DICIEMBRE</option>
+        </select>
+      </div>
+
+      <!-- Acciones -->
+      <div class="flex items-center space-x-2">
+        <button onclick="openQuickWindow()" class="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-semibold rounded-xl shadow-sm transition-all flex items-center gap-1.5">
+          <svg class="ic"><use href="#i-bolt"></use></svg>
+          <span>Apuntar gasto</span>
+        </button>
+        <button onclick="exportJSON()" title="Descargar copia de seguridad" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all">
+          <svg class="ic"><use href="#i-download"></use></svg>
+        </button>
+        <button onclick="document.getElementById('import-file-input').click()" title="Restaurar desde una copia" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all">
+          <svg class="ic"><use href="#i-upload"></use></svg>
+        </button>
+        <input type="file" id="import-file-input" class="hidden" accept=".json" onchange="importJSON(event)">
+        <button onclick="openResetModal()" title="Vaciar el mes que estás viendo" class="p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl transition-all">
+          <svg class="ic"><use href="#i-broom"></use></svg>
+        </button>
+      </div>
+
+      <!-- Pestañas -->
+      <div class="flex items-center bg-slate-100 p-1 rounded-2xl text-xs font-semibold">
+        <button id="btn-tab-monthly" onclick="switchTab('monthly')" class="px-3 py-2 rounded-xl transition-all shadow-sm bg-white text-pink-600 flex items-center gap-1">
+          <svg class="ic"><use href="#i-calendar"></use></svg> Mensual
+        </button>
+        <button id="btn-tab-annual" onclick="switchTab('annual')" class="px-3 py-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1">
+          <svg class="ic"><use href="#i-pie"></use></svg> Anual
+        </button>
+        <button id="btn-tab-formulas" onclick="switchTab('formulas')" class="px-3 py-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1">
+          <svg class="ic"><use href="#i-code"></use></svg> Fórmulas
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+
+    <!-- ==================== VISTA MENSUAL ==================== -->
+    <div id="view-monthly" class="space-y-6">
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch">
+
+        <div class="md:col-span-4 bg-gradient-to-br from-blue-50 to-indigo-50/50 border border-blue-200/80 rounded-3xl p-5 shadow-sm flex flex-col justify-between">
+          <h2 class="text-xs font-bold text-blue-900 tracking-wider uppercase mb-3 text-center border-b border-blue-200/60 pb-2 flex items-center justify-center gap-1.5">
+            <svg class="ic text-blue-600"><use href="#i-scale"></use></svg>
+            <span>DISPONIBLE PARA GASTAR</span>
+          </h2>
+          <div class="grid grid-cols-3 gap-2 text-center my-auto">
+            <div class="bg-white/90 p-2.5 rounded-2xl border border-blue-100 shadow-sm">
+              <span class="text-[10px] uppercase font-bold text-slate-500 block">Ingresos</span>
+              <span id="kpi-ingresos" class="text-xs sm:text-sm font-bold text-slate-800 num">0,00 €</span>
+            </div>
+            <div class="bg-white/90 p-2.5 rounded-2xl border border-blue-100 shadow-sm">
+              <span class="text-[10px] uppercase font-bold text-slate-500 block">Gastos</span>
+              <span id="kpi-gastos" class="text-xs sm:text-sm font-bold text-pink-600 num">0,00 €</span>
+            </div>
+            <div class="bg-white/90 p-2.5 rounded-2xl border border-blue-100 shadow-sm">
+              <span class="text-[10px] uppercase font-bold text-slate-500 block">Restante</span>
+              <span id="kpi-restante" class="text-xs sm:text-sm font-bold text-emerald-600 num">0,00 €</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="md:col-span-4 bg-white border border-slate-200/80 rounded-3xl p-4 shadow-sm flex flex-col items-center justify-center relative">
+          <div class="text-center mb-1">
+            <span id="header-month-display" class="title-font text-lg font-bold text-slate-800">ENERO 2026</span>
+          </div>
+          <div class="w-36 h-36 relative flex items-center justify-center">
+            <canvas id="chart-gauge"></canvas>
+            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
+              <span id="gauge-percent" class="text-lg font-bold text-slate-800 num">0%</span>
+              <span class="text-[9px] font-semibold text-slate-400 uppercase">Gastado</span>
+            </div>
+          </div>
+          <button id="btn-copy-previous" onclick="copyPreviousMonth()" class="hidden mt-2 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] font-semibold rounded-xl transition-all items-center gap-1.5">
+            <svg class="ic"><use href="#i-copy"></use></svg>
+            <span>Traer ingresos y fijos del mes anterior</span>
+          </button>
+        </div>
+
+        <div class="md:col-span-4 bg-gradient-to-br from-purple-50 to-pink-50/50 border border-purple-200/80 rounded-3xl p-5 shadow-sm flex flex-col justify-between">
+          <h2 class="text-xs font-bold text-purple-900 tracking-wider uppercase mb-3 text-center border-b border-purple-200/60 pb-2 flex items-center justify-center gap-1.5">
+            <svg class="ic text-purple-600"><use href="#i-line"></use></svg>
+            <span>RESUMEN GASTOS &amp; AHORRO</span>
+          </h2>
+          <div class="grid grid-cols-4 gap-1.5 text-center my-auto">
+            <div class="bg-white/90 p-2 rounded-xl border border-purple-100 shadow-sm">
+              <span class="text-[9px] uppercase font-bold text-slate-500 block">Fijos</span>
+              <span id="kpi-fijos" class="text-xs font-bold text-slate-800 num">0,00 €</span>
+            </div>
+            <div class="bg-white/90 p-2 rounded-xl border border-purple-100 shadow-sm">
+              <span class="text-[9px] uppercase font-bold text-slate-500 block">Variables</span>
+              <span id="kpi-variables" class="text-xs font-bold text-slate-800 num">0,00 €</span>
+            </div>
+            <div class="bg-white/90 p-2 rounded-xl border border-purple-100 shadow-sm">
+              <span class="text-[9px] uppercase font-bold text-slate-500 block">Ahorro</span>
+              <span id="kpi-ahorro" class="text-xs font-bold text-emerald-600 num">0,00 €</span>
+            </div>
+            <div class="bg-white/90 p-2 rounded-xl border border-purple-100 shadow-sm">
+              <span class="text-[9px] uppercase font-bold text-slate-500 block">Inversión</span>
+              <span id="kpi-inversion" class="text-xs font-bold text-purple-600 num">0,00 €</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- Columna izquierda -->
+        <div class="lg:col-span-5 space-y-6">
+
+          <div class="bg-white border border-purple-200/80 rounded-3xl shadow-sm overflow-hidden transition-all hover:shadow-md">
+            <div class="bg-gradient-to-r from-purple-100/90 to-purple-50 px-4 py-3 border-b border-purple-200/60 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <div class="bg-purple-600 text-white w-7 h-7 rounded-xl flex items-center justify-center text-xs shadow-sm">
+                  <svg class="ic"><use href="#i-target"></use></svg>
+                </div>
+                <div>
+                  <h3 class="font-bold text-xs text-purple-950 uppercase tracking-wide">Objetivos financieros</h3>
+                  <p class="text-[10px] text-purple-700 font-medium" id="objetivos-counter-badge">0/0 completados</p>
+                </div>
+              </div>
+              <button onclick="openAddObjetivoModal()" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1">
+                <svg class="ic"><use href="#i-plus"></use></svg><span>Nuevo</span>
+              </button>
+            </div>
+            <div class="p-3 space-y-2 max-h-56 overflow-y-auto custom-scrollbar" id="container-objetivos"></div>
+          </div>
+
+          <div class="bg-white border border-amber-200/80 rounded-3xl shadow-sm overflow-hidden transition-all hover:shadow-md">
+            <div class="bg-gradient-to-r from-amber-100/90 to-amber-50 px-4 py-3 border-b border-amber-200/60 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <div class="bg-amber-500 text-white w-7 h-7 rounded-xl flex items-center justify-center text-xs shadow-sm">
+                  <svg class="ic"><use href="#i-income"></use></svg>
+                </div>
+                <div>
+                  <h3 class="font-bold text-xs text-amber-950 uppercase tracking-wide">Ingresos</h3>
+                  <p class="text-[10px] text-amber-700 font-medium">Lo que entra este mes</p>
+                </div>
+              </div>
+              <button onclick="openAddIngresoModal()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1">
+                <svg class="ic"><use href="#i-plus"></use></svg><span>Añadir</span>
+              </button>
+            </div>
+            <div class="p-3">
+              <table class="w-full text-xs">
+                <thead>
+                  <tr class="text-slate-400 font-semibold border-b border-slate-100 text-[11px]">
+                    <th class="text-left pb-1.5 font-medium">Concepto</th>
+                    <th class="text-right pb-1.5 font-medium">Esp.</th>
+                    <th class="text-right pb-1.5 font-medium">Real</th>
+                    <th class="w-8"></th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-ingresos" class="divide-y divide-slate-50"></tbody>
+              </table>
+              <div class="mt-3 pt-2.5 border-t border-slate-200 flex justify-between items-center text-xs font-bold text-slate-700">
+                <span>TOTAL INGRESOS</span>
+                <div class="space-x-2">
+                  <span class="text-slate-400">Esp: <span id="total-ingresos-esperado" class="num">0 €</span></span>
+                  <span class="text-amber-700 font-extrabold text-sm">Real: <span id="total-ingresos-real" class="num">0 €</span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white border border-emerald-200/80 rounded-3xl shadow-sm overflow-hidden transition-all hover:shadow-md">
+            <div class="bg-gradient-to-r from-emerald-100/90 to-emerald-50 px-4 py-3 border-b border-emerald-200/60 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <div class="bg-emerald-600 text-white w-7 h-7 rounded-xl flex items-center justify-center text-xs shadow-sm">
+                  <svg class="ic"><use href="#i-piggy"></use></svg>
+                </div>
+                <div>
+                  <h3 class="font-bold text-xs text-emerald-950 uppercase tracking-wide">Ahorro e inversión</h3>
+                  <p class="text-[10px] text-emerald-700 font-medium">Fondo futuro y patrimonio</p>
+                </div>
+              </div>
+              <button onclick="openAddAhorroModal()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1">
+                <svg class="ic"><use href="#i-plus"></use></svg><span>Añadir</span>
+              </button>
+            </div>
+            <div class="p-3">
+              <table class="w-full text-xs">
+                <thead>
+                  <tr class="text-slate-400 font-semibold border-b border-slate-100 text-[11px]">
+                    <th class="text-left pb-1.5 font-medium">Concepto</th>
+                    <th class="text-left pb-1.5 font-medium">Tipo</th>
+                    <th class="text-right pb-1.5 font-medium">Importe</th>
+                    <th class="w-8"></th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-ahorros" class="divide-y divide-slate-50"></tbody>
+              </table>
+              <div class="mt-3 pt-2.5 border-t border-slate-200 space-y-1 text-xs">
+                <div class="flex justify-between text-slate-600 font-medium">
+                  <span>TOTAL AHORROS</span>
+                  <span id="total-ahorro-sum" class="font-bold text-emerald-600 num">0 €</span>
+                </div>
+                <div class="flex justify-between text-slate-600 font-medium">
+                  <span>TOTAL INVERSIÓN</span>
+                  <span id="total-inversion-sum" class="font-bold text-purple-600 num">0 €</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white border border-pink-200/80 rounded-3xl shadow-sm overflow-hidden transition-all hover:shadow-md">
+            <div class="bg-gradient-to-r from-pink-100/90 to-pink-50 px-4 py-3 border-b border-pink-200/60 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <div class="bg-pink-500 text-white w-7 h-7 rounded-xl flex items-center justify-center text-xs shadow-sm">
+                  <svg class="ic"><use href="#i-house"></use></svg>
+                </div>
+                <div>
+                  <h3 class="font-bold text-xs text-pink-950 uppercase tracking-wide">Gastos fijos</h3>
+                  <p class="text-[10px] text-pink-700 font-medium">Recibos y obligaciones</p>
+                </div>
+              </div>
+              <button onclick="openAddGastoFijoModal()" class="px-3 py-1.5 bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold rounded-xl shadow-sm transition-all flex items-center gap-1">
+                <svg class="ic"><use href="#i-plus"></use></svg><span>Añadir</span>
+              </button>
+            </div>
+            <div class="p-3 overflow-x-auto custom-scrollbar">
+              <table class="w-full text-xs text-left">
+                <thead>
+                  <tr class="text-slate-400 font-semibold border-b border-slate-100 text-[11px]">
+                    <th class="pb-1.5 font-medium">Concepto</th>
+                    <th class="pb-1.5 text-right font-medium">Esp.</th>
+                    <th class="pb-1.5 text-right font-medium">Real</th>
+                    <th class="pb-1.5 text-center font-medium">Cobro</th>
+                    <th class="pb-1.5 text-center font-medium">Estado</th>
+                    <th class="pb-1.5 w-6 text-center"></th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-gastos-fijos" class="divide-y divide-slate-50"></tbody>
+              </table>
+            </div>
+            <div class="bg-pink-50/50 px-4 py-2.5 border-t border-pink-100 flex justify-between items-center text-xs font-bold text-slate-700">
+              <span>TOTAL FIJOS</span>
+              <div class="space-x-2">
+                <span class="text-slate-400">Esp: <span id="total-fijos-esperado" class="num">0 €</span></span>
+                <span class="text-pink-600 font-bold">Real: <span id="total-fijos-real" class="num">0 €</span></span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Columna derecha -->
+        <div class="lg:col-span-7 space-y-6">
+
+          <div class="bg-white border border-amber-200 rounded-3xl shadow-md overflow-hidden">
+
+            <div class="bg-gradient-to-r from-amber-100 via-orange-100 to-amber-50 px-5 py-3.5 border-b border-amber-200 flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center space-x-2">
+                <div class="bg-amber-500 text-white p-2 rounded-xl shadow-sm text-xs">
+                  <svg class="ic"><use href="#i-receipt"></use></svg>
+                </div>
+                <div>
+                  <h3 class="font-bold text-sm text-amber-950 uppercase tracking-wider title-font">Registro de gastos variables</h3>
+                  <p class="text-[11px] text-amber-800 font-medium">Lo que apuntas desde el móvil aparece aquí</p>
+                </div>
+              </div>
+              <span class="bg-white/90 border border-amber-200 text-amber-900 text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+                Total: <span id="total-variables-real" class="text-pink-600 num">0,00 €</span>
+              </span>
+            </div>
+
+            <div class="p-4 bg-amber-50/50 border-b border-amber-100">
+              <span class="text-[10px] font-bold text-amber-900 uppercase tracking-wider mb-2 flex items-center gap-1">
+                <svg class="ic text-amber-500"><use href="#i-bolt"></use></svg> Entrada rápida de gasto
+              </span>
+              <form onsubmit="quickAddVariableExpense(event)" class="grid grid-cols-12 gap-2.5 items-center">
+                <div class="col-span-3 sm:col-span-2">
+                  <input type="date" id="quick-date" class="w-full bg-white border border-slate-200 rounded-xl px-2 py-2 text-xs text-center font-semibold focus:ring-2 focus:ring-amber-300 outline-none shadow-sm" required>
+                </div>
+                <div class="col-span-9 sm:col-span-4">
+                  <input type="text" id="quick-concept" placeholder="Ej: Compra Mercadona…" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-amber-300 outline-none shadow-sm" required>
+                </div>
+                <div class="col-span-6 sm:col-span-3">
+                  <select id="quick-category" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-amber-300 outline-none shadow-sm"></select>
+                </div>
+                <div class="col-span-4 sm:col-span-2">
+                  <div class="relative">
+                    <input type="number" step="0.01" inputmode="decimal" id="quick-amount" placeholder="0,00" class="w-full bg-white border border-slate-200 rounded-xl pl-2.5 pr-5 py-2 text-xs text-right font-bold focus:ring-2 focus:ring-amber-300 outline-none shadow-sm num" required>
+                    <span class="absolute right-2 top-2 text-xs text-slate-400 font-bold">€</span>
+                  </div>
+                </div>
+                <div class="col-span-2 sm:col-span-1 flex justify-end">
+                  <button type="submit" title="Registrar gasto" class="w-full py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl shadow-md transition-all flex items-center justify-center font-bold">
+                    <svg class="ic text-sm"><use href="#i-plus"></use></svg>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <div class="px-4 py-2.5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2 bg-slate-50/50">
+              <div id="container-category-pills" class="flex flex-wrap items-center gap-1.5 text-xs"></div>
+              <div class="relative w-full sm:w-48">
+                <svg class="ic absolute left-3 top-2 text-slate-400"><use href="#i-search"></use></svg>
+                <input type="text" id="search-expenses" oninput="renderMonthlyView()" placeholder="Buscar gasto…" class="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-3 py-1.5 text-xs focus:ring-2 focus:ring-amber-300 outline-none shadow-sm">
+              </div>
+            </div>
+
+            <div class="p-4 max-h-80 overflow-y-auto custom-scrollbar">
+              <table class="w-full text-xs text-left">
+                <thead>
+                  <tr class="text-slate-400 font-bold border-b border-slate-100 uppercase text-[10px] tracking-wider">
+                    <th class="pb-2 w-16 text-center">Fecha</th>
+                    <th class="pb-2">Concepto</th>
+                    <th class="pb-2 w-36">Grupo / Categoría</th>
+                    <th class="pb-2 text-right w-24">Importe</th>
+                    <th class="pb-2 w-16 text-center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-registro-variables" class="divide-y divide-slate-100"></tbody>
+              </table>
+              <div id="empty-state-variables" class="hidden text-center py-8 text-slate-400">
+                <svg class="ic text-3xl mb-2 text-slate-300"><use href="#i-receipt"></use></svg>
+                <p class="text-xs">No hay gastos registrados con este filtro.</p>
+              </div>
+            </div>
+
+            <div class="bg-amber-50/30 px-5 py-2.5 border-t border-amber-100 flex justify-between items-center text-xs font-bold text-slate-700">
+              <span class="text-slate-500">Registros mostrados: <span id="count-variables" class="text-amber-800 num">0</span></span>
+              <div>
+                <span class="text-slate-500 mr-2">Total de este periodo:</span>
+                <span id="total-variables-period" class="text-amber-800 font-extrabold text-sm num">0,00 €</span>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="bg-white border border-amber-200 rounded-3xl shadow-sm overflow-hidden">
+            <div class="bg-amber-100/80 px-4 py-3 border-b border-amber-200 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <svg class="ic text-amber-800"><use href="#i-bars"></use></svg>
+                <h3 class="font-bold text-xs text-amber-950 uppercase tracking-wider">Presupuesto vs gasto real por grupo</h3>
+              </div>
+              <button onclick="openAddCategoryModal()" class="px-2.5 py-1 bg-white hover:bg-amber-50 text-amber-800 font-bold rounded-xl text-xs shadow-sm border border-amber-200 transition-all flex items-center gap-1">
+                <svg class="ic text-[10px]"><use href="#i-plus"></use></svg><span>Nuevo grupo</span>
+              </button>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3" id="container-group-progress"></div>
+            <div class="bg-orange-50/60 px-4 py-2.5 border-t border-amber-100 flex justify-between items-center text-xs font-bold text-slate-700">
+              <span>TOTAL PRESUPUESTADO VS REAL</span>
+              <div class="space-x-3">
+                <span class="text-slate-400">Esp: <span id="total-variables-esperado" class="num">0 €</span></span>
+                <span class="text-amber-800 font-bold">Real: <span id="total-variables-real-summary" class="num">0 €</span></span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+        <div class="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
+          <h3 class="font-bold text-xs text-slate-700 uppercase tracking-wider text-center mb-4">Distribución global del ingreso</h3>
+          <div class="w-full h-64 flex justify-center items-center"><canvas id="chart-global-distribution"></canvas></div>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
+          <h3 class="font-bold text-xs text-slate-700 uppercase tracking-wider text-center mb-4">Desglose de gastos variables por categoría</h3>
+          <div class="w-full h-64 flex justify-center items-center"><canvas id="chart-variables-categories"></canvas></div>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
+          <h3 class="font-bold text-xs text-slate-700 uppercase tracking-wider text-center mb-4">Comparativa: esperado vs real por grupo</h3>
+          <div class="w-full h-64 flex justify-center items-center"><canvas id="chart-variables-bar"></canvas></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==================== VISTA ANUAL ==================== -->
+    <div id="view-annual" class="hidden space-y-6">
+      <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center pb-4 mb-4 border-b border-slate-100 gap-4">
+          <div>
+            <h2 class="title-font text-xl font-bold text-slate-800">RESUMEN ANUAL <span id="annual-year-title">2026</span></h2>
+            <p class="text-xs text-slate-500">Cada mes lleva sus propias cuentas; aquí se suman todos</p>
+          </div>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+            <svg class="ic"><use href="#i-check"></use></svg> Calculado en vivo
+          </span>
+        </div>
+        <div class="overflow-x-auto custom-scrollbar">
+          <table class="w-full text-xs text-center border-collapse num">
+            <thead>
+              <tr class="bg-emerald-100 text-emerald-950 font-bold">
+                <th class="p-3 text-left rounded-l-xl">CONCEPTO</th>
+                <th class="p-2">ENE</th><th class="p-2">FEB</th><th class="p-2">MAR</th><th class="p-2">ABR</th>
+                <th class="p-2">MAY</th><th class="p-2">JUN</th><th class="p-2">JUL</th><th class="p-2">AGO</th>
+                <th class="p-2">SEP</th><th class="p-2">OCT</th><th class="p-2">NOV</th><th class="p-2">DIC</th>
+                <th class="p-2 bg-emerald-200">MEDIA</th>
+                <th class="p-3 bg-emerald-300 font-extrabold rounded-r-xl">TOTAL</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-annual-summary" class="divide-y divide-slate-100 font-medium"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+        <h3 class="title-font text-lg font-bold text-slate-800 mb-4">Evolución anual (ingresos vs gastos vs ahorro)</h3>
+        <div class="w-full h-80"><canvas id="chart-annual-trend"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ==================== FÓRMULAS ==================== -->
+    <div id="view-formulas" class="hidden space-y-6">
+      <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-6">
+        <div>
+          <h2 class="title-font text-xl font-bold text-slate-800 mb-1">Guía de fórmulas para tu hoja de cálculo</h2>
+          <p class="text-xs text-slate-500">Si algún día quieres rehacer estas cuentas en Google Sheets o Excel, estas son las fórmulas equivalentes:</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+          <div class="bg-blue-50/40 p-4 rounded-2xl border border-blue-200 space-y-3">
+            <h3 class="font-bold text-blue-900 text-sm flex items-center gap-2"><svg class="ic"><use href="#i-scale"></use></svg>Totales e ingresos</h3>
+            <div class="bg-white p-2.5 rounded-xl border border-blue-100">
+              <span class="font-semibold block text-slate-700">Total ingresos reales:</span>
+              <code class="text-pink-600 bg-slate-50 px-1.5 py-0.5 rounded font-mono">=SUMA(C15:C25)</code>
+            </div>
+            <div class="bg-white p-2.5 rounded-xl border border-blue-100">
+              <span class="font-semibold block text-slate-700">Gastos totales (fijos + variables):</span>
+              <code class="text-pink-600 bg-slate-50 px-1.5 py-0.5 rounded font-mono">=SUMA(C35:C50) + SUMA(C55:C75)</code>
+            </div>
+            <div class="bg-white p-2.5 rounded-xl border border-blue-100">
+              <span class="font-semibold block text-slate-700">Disponible restante:</span>
+              <code class="text-pink-600 bg-slate-50 px-1.5 py-0.5 rounded font-mono">=Total_Ingresos - Gastos_Totales - Total_Ahorro</code>
+            </div>
+          </div>
+          <div class="bg-purple-50/40 p-4 rounded-2xl border border-purple-200 space-y-3">
+            <h3 class="font-bold text-purple-900 text-sm flex items-center gap-2"><svg class="ic"><use href="#i-pie"></use></svg>Porcentajes y resumen anual</h3>
+            <div class="bg-white p-2.5 rounded-xl border border-purple-100">
+              <span class="font-semibold block text-slate-700">% de gasto por categoría:</span>
+              <code class="text-pink-600 bg-slate-50 px-1.5 py-0.5 rounded font-mono">=SIERROR(Gasto_Categoria / Total_Gastos_Variables; 0)</code>
+            </div>
+            <div class="bg-white p-2.5 rounded-xl border border-purple-100">
+              <span class="font-semibold block text-slate-700">Media anual:</span>
+              <code class="text-pink-600 bg-slate-50 px-1.5 py-0.5 rounded font-mono">=PROMEDIO(B5:M5)</code>
+            </div>
+            <div class="bg-white p-2.5 rounded-xl border border-purple-100">
+              <span class="font-semibold block text-slate-700">Total anual acumulado:</span>
+              <code class="text-pink-600 bg-slate-50 px-1.5 py-0.5 rounded font-mono">=SUMA(B5:M5)</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Botón flotante -->
+  <button onclick="openQuickWindow()" aria-label="Apuntar un gasto" class="fixed bottom-5 right-5 z-40 w-16 h-16 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 text-white shadow-xl hover:shadow-2xl transition-all flex items-center justify-center">
+    <svg class="ic text-2xl"><use href="#i-plus"></use></svg>
+  </button>
+
+  <!-- ==================== VENTANA DIRECTA DE GASTO ==================== -->
+  <div id="quick-window" class="fixed inset-0 z-[60] hidden bg-slate-900/50 backdrop-blur-sm">
+    <div class="absolute inset-0 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-full sm:max-w-md sm:rounded-3xl bg-white shadow-2xl flex flex-col overflow-hidden">
+
+      <div class="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-5 py-4 flex items-center justify-between shrink-0">
+        <div>
+          <h2 class="title-font text-lg font-bold">Apuntar gasto</h2>
+          <p id="quick-target-month" class="text-[11px] text-amber-50 font-medium">Se guardará en SEPTIEMBRE 2026</p>
+        </div>
+        <button onclick="closeQuickWindow()" aria-label="Cerrar" class="w-9 h-9 rounded-xl bg-white/20 hover:bg-white/30 flex items-center justify-center transition-all">
+          <svg class="ic"><use href="#i-x"></use></svg>
+        </button>
+      </div>
+
+      <form onsubmit="submitQuickWindow(event)" class="p-5 space-y-4 overflow-y-auto custom-scrollbar grow">
+
+        <div>
+          <label for="qw-amount" class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Importe</label>
+          <div class="relative">
+            <input type="number" step="0.01" inputmode="decimal" id="qw-amount" placeholder="0,00" required
+              class="w-full bg-amber-50 border-2 border-amber-200 rounded-2xl pl-4 pr-12 py-4 text-3xl text-right font-bold text-slate-800 focus:ring-2 focus:ring-amber-400 focus:border-amber-400 outline-none num">
+            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-2xl text-amber-400 font-bold">€</span>
+          </div>
+        </div>
+
+        <div>
+          <label for="qw-concept" class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">¿En qué?</label>
+          <input type="text" id="qw-concept" placeholder="Ej: Gasolina, farmacia, Mercadona…" required
+            class="w-full bg-white border border-slate-200 rounded-2xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-amber-300 outline-none shadow-sm">
+        </div>
+
+        <div>
+          <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Categoría</span>
+          <div id="qw-categories" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <div>
+          <label for="qw-date" class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Fecha</label>
+          <input type="date" id="qw-date" onchange="updateQuickTargetMonth()" required
+            class="w-full bg-white border border-slate-200 rounded-2xl px-4 py-3 text-sm font-semibold focus:ring-2 focus:ring-amber-300 outline-none shadow-sm">
+        </div>
+
+        <button type="submit" class="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-2xl shadow-lg font-bold text-sm transition-all flex items-center justify-center gap-2">
+          <svg class="ic"><use href="#i-check"></use></svg>
+          <span>Guardar gasto</span>
+        </button>
+
+        <div id="qw-recent-wrap" class="hidden pt-2 border-t border-slate-100">
+          <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Apuntados hoy en esta sesión</span>
+          <ul id="qw-recent" class="space-y-1.5"></ul>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Aviso flotante -->
+  <div id="toast" class="fixed bottom-24 right-5 z-[70] transform translate-y-20 opacity-0 transition-all duration-300 ease-out flex items-center bg-slate-900 text-white text-xs px-4 py-3 rounded-2xl shadow-xl gap-2 pointer-events-none">
+    <svg id="toast-icon" class="ic text-emerald-400"><use href="#i-check"></use></svg>
+    <span id="toast-msg">Mensaje</span>
+  </div>
+
+  <!-- Modales -->
+  <div id="modal-objetivo" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-xl space-y-4">
+      <h3 class="font-bold text-base text-slate-800 title-font flex items-center gap-2"><svg class="ic text-purple-600"><use href="#i-target"></use></svg>Nuevo objetivo financiero</h3>
+      <input type="text" id="input-nuevo-objetivo" placeholder="Ej: Fondo imprevistos 500 €" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-purple-300 outline-none">
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeModal('modal-objetivo')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl">Cancelar</button>
+        <button onclick="confirmAddObjetivo()" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold rounded-xl">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-ingreso" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-xl space-y-4">
+      <h3 class="font-bold text-base text-slate-800 title-font flex items-center gap-2"><svg class="ic text-amber-500"><use href="#i-income"></use></svg>Nuevo ingreso</h3>
+      <div class="space-y-3">
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-500 mb-1" for="input-ingreso-concepto">Concepto</label>
+          <input type="text" id="input-ingreso-concepto" placeholder="Ej: Nómina, trabajo extra…" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-amber-300 outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-500 mb-1" for="input-ingreso-esperado">Esperado (€)</label>
+            <input type="number" step="0.01" id="input-ingreso-esperado" placeholder="0,00" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-amber-300 outline-none">
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-500 mb-1" for="input-ingreso-real">Real (€)</label>
+            <input type="number" step="0.01" id="input-ingreso-real" placeholder="0,00" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-amber-300 outline-none">
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeModal('modal-ingreso')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl">Cancelar</button>
+        <button onclick="confirmAddIngreso()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-xl">Guardar ingreso</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-ahorro" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-xl space-y-4">
+      <h3 class="font-bold text-base text-slate-800 title-font flex items-center gap-2"><svg class="ic text-emerald-600"><use href="#i-piggy"></use></svg>Nuevo ahorro o inversión</h3>
+      <div class="space-y-3">
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-500 mb-1" for="input-ahorro-concepto">Concepto</label>
+          <input type="text" id="input-ahorro-concepto" placeholder="Ej: Fondo de emergencia, indexados…" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-300 outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-500 mb-1" for="input-ahorro-tipo">Tipo</label>
+            <select id="input-ahorro-tipo" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-300 outline-none bg-white">
+              <option value="Ahorro">Ahorro</option>
+              <option value="Inversión">Inversión</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-500 mb-1" for="input-ahorro-cantidad">Importe (€)</label>
+            <input type="number" step="0.01" id="input-ahorro-cantidad" placeholder="0,00" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-300 outline-none">
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeModal('modal-ahorro')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl">Cancelar</button>
+        <button onclick="confirmAddAhorro()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-gastofijo" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-xl space-y-4">
+      <h3 class="font-bold text-base text-slate-800 title-font flex items-center gap-2"><svg class="ic text-pink-500"><use href="#i-house"></use></svg>Nuevo gasto fijo</h3>
+      <div class="space-y-3">
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-500 mb-1" for="input-fijo-concepto">Concepto</label>
+          <input type="text" id="input-fijo-concepto" placeholder="Ej: Alquiler, gimnasio, luz…" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-pink-300 outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-500 mb-1" for="input-fijo-esperado">Esperado (€)</label>
+            <input type="number" step="0.01" id="input-fijo-esperado" placeholder="0,00" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-pink-300 outline-none">
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-500 mb-1" for="input-fijo-real">Real (€)</label>
+            <input type="number" step="0.01" id="input-fijo-real" placeholder="0,00" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-pink-300 outline-none">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2 items-center">
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-500 mb-1" for="input-fijo-fecha">Fecha de cobro</label>
+            <input type="date" id="input-fijo-fecha" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-pink-300 outline-none">
+          </div>
+          <div class="pt-4 flex items-center gap-2">
+            <input type="checkbox" id="input-fijo-pagado" class="w-4 h-4 text-pink-500 rounded border-slate-300 focus:ring-pink-300 cursor-pointer">
+            <label for="input-fijo-pagado" class="text-xs font-medium text-slate-700 cursor-pointer">Ya pagado</label>
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeModal('modal-gastofijo')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl">Cancelar</button>
+        <button onclick="confirmAddGastoFijo()" class="px-3 py-1.5 bg-pink-500 hover:bg-pink-600 text-white text-xs font-semibold rounded-xl">Guardar gasto fijo</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-categoria" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-xl space-y-4">
+      <h3 class="font-bold text-base text-slate-800 title-font flex items-center gap-2"><svg class="ic text-amber-600"><use href="#i-tag"></use></svg>Nuevo grupo de gasto</h3>
+      <input type="text" id="input-nueva-categoria" placeholder="Ej: Regalos y fiestas" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-amber-300 outline-none">
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeModal('modal-categoria')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl">Cancelar</button>
+        <button onclick="confirmAddCategory()" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-xl">Guardar grupo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Puerta: hace falta el código de casa -->
+  <div id="puerta" class="fixed inset-0 z-[80] hidden bg-slate-50 items-center justify-center p-6">
+    <div class="w-full max-w-sm text-center space-y-5">
+      <div class="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-tr from-pink-500 to-purple-600 text-white flex items-center justify-center shadow-md">
+        <svg class="ic text-2xl"><use href="#i-wallet"></use></svg>
+      </div>
+      <div>
+        <h2 class="title-font text-xl font-bold text-slate-800">Finanzas Dori Dori</h2>
+        <p class="text-xs text-slate-500 mt-1">Pega el código de casa para ver vuestras cuentas. Solo hace falta la primera vez en cada dispositivo.</p>
+      </div>
+      <form id="form-puerta" class="space-y-3">
+        <input type="text" id="input-puerta" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Código de casa"
+          class="w-full bg-white border border-slate-200 rounded-2xl px-4 py-3 text-center text-sm font-semibold tracking-wide focus:ring-2 focus:ring-pink-300 outline-none shadow-sm">
+        <p id="puerta-error" class="hidden text-xs font-semibold text-red-600">Ese código no vale. Copia el que te pasaron, entero y sin espacios.</p>
+        <button type="submit" class="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-2xl shadow-lg font-bold text-sm transition-all">Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="modal-reset" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-xl space-y-4">
+      <h3 class="font-bold text-base text-red-600 title-font flex items-center gap-2"><svg class="ic"><use href="#i-warning"></use></svg>¿Vaciar este mes?</h3>
+      <p class="text-xs text-slate-600">Se borrarán los ingresos, ahorros, gastos fijos y todos los gastos variables de <span id="reset-month-name" class="font-bold text-slate-800">este mes</span>. Los demás meses no se tocan.</p>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeModal('modal-reset')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl">Cancelar</button>
+        <button onclick="confirmReset()" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-xl">Sí, vaciar el mes</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const MONTH_NAMES = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+  const DEFAULT_CATEGORIES = ["Compra", "Coches", "Ocio", "Pencho", "Aida", "Naia", "Noa", "Gastos Varios"];
+  const PALETTE = ['#f48fb1', '#90caf9', '#a5d6a7', '#ce93d8', '#ffcc80', '#f8bbd0', '#80cbc4', '#b39ddb'];
+  const API = 'https://eqtwmihuegcnlgcsgoim.supabase.co/functions/v1/casa';
+  const CODIGO_VALIDO = /^[A-Za-z0-9_-]{8,64}$/;
+  const REFRESCO_MS = 15000;
+
+  const today = new Date();
+  const state = {
+    currentYear: String(today.getFullYear()),
+    currentMonth: today.getMonth(),
+    activeCategoryFilter: 'Todos',
+    monthsData: {}
+  };
+
+  let hogar = '';
+  let refrescoTimer = null;
+  let quickWinCategory = null;
+  const sessionAdded = [];
+  const dirtyMonths = new Set();
+  const pendingMonths = new Set();
+  let saveTimer = null;
+  const charts = {};
+
+  /* ---------- utilidades ---------- */
+
+  function formatEuro(val) {
+    const num = Number(val) || 0;
+    return num.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+  }
+
+  function monthKey(year, month) {
+    return String(year) + '-' + String(month + 1).padStart(2, '0');
+  }
+
+  function currentKey() {
+    return monthKey(state.currentYear, state.currentMonth);
+  }
+
+  function labelForKey(key) {
+    const [y, m] = key.split('-');
+    return MONTH_NAMES[Number(m) - 1] + ' ' + y;
+  }
+
+  function todayISO() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function escapeHTML(str) {
+    return String(str == null ? '' : str).replace(/[&<>"']/g, c => (
+      { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+    ));
+  }
+
+  function nuevoId() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+
+  function emptyMonth() {
+    return {
+      objetivos: [],
+      ingresos: [],
+      ahorros: [],
+      gastosFijos: [],
+      categoriasVariables: DEFAULT_CATEGORIES.map(c => ({ categoria: c, esperado: 0 })),
+      registroVariables: [],
+      borrados: []
+    };
+  }
+
+  function ensureMonth(key) {
+    const m = state.monthsData[key] || (state.monthsData[key] = emptyMonth());
+    if (!Array.isArray(m.objetivos)) m.objetivos = [];
+    if (!Array.isArray(m.ingresos)) m.ingresos = [];
+    if (!Array.isArray(m.ahorros)) m.ahorros = [];
+    if (!Array.isArray(m.gastosFijos)) m.gastosFijos = [];
+    if (!Array.isArray(m.registroVariables)) m.registroVariables = [];
+    if (!Array.isArray(m.borrados)) m.borrados = [];
+    if (!Array.isArray(m.categoriasVariables) || !m.categoriasVariables.length) {
+      m.categoriasVariables = DEFAULT_CATEGORIES.map(c => ({ categoria: c, esperado: 0 }));
+    }
+    m.registroVariables.forEach(item => { if (!item.id) item.id = nuevoId(); });
+    return m;
+  }
+
+  // Los dos podéis apuntar a la vez desde sitios distintos: cada gasto lleva su
+  // id, así se juntan las dos listas en vez de que la última en guardar borre
+  // lo del otro. `borrados` recuerda lo que se quitó para que no reaparezca.
+  function fundirMes(local, remoto, remotoManda) {
+    if (!remoto) return local;
+    const base = remotoManda ? remoto : local;
+    const fundido = {
+      objetivos: base.objetivos || [],
+      ingresos: base.ingresos || [],
+      ahorros: base.ahorros || [],
+      gastosFijos: base.gastosFijos || [],
+      categoriasVariables: base.categoriasVariables || [],
+      registroVariables: [],
+      borrados: []
+    };
+
+    const borrados = new Set([].concat(local.borrados || [], remoto.borrados || []));
+    fundido.borrados = Array.from(borrados).slice(-300);
+
+    const porId = new Map();
+    (remoto.registroVariables || []).forEach(item => { if (item.id) porId.set(item.id, item); });
+    (local.registroVariables || []).forEach(item => { if (item.id) porId.set(item.id, item); });
+
+    fundido.registroVariables = Array.from(porId.values())
+      .filter(item => !borrados.has(item.id))
+      .sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')) || String(b.id).localeCompare(String(a.id)));
+
+    return fundido;
+  }
+
+  function month() {
+    return ensureMonth(currentKey());
+  }
+
+  /* ---------- guardado ---------- */
+
+  function setSync(kind, detail) {
+    const badge = document.getElementById('sync-status');
+    const shapes = {
+      cloud: ['#i-cloud', 'text-emerald-600', 'Sincronizado'],
+      saving: ['#i-cloud', 'text-amber-600', 'Guardando…'],
+      local: ['#i-phone', 'text-slate-500', 'Solo en este dispositivo'],
+      error: ['#i-warning', 'text-red-600', detail || 'Sin conexión']
+    };
+    const [icon, color, label] = shapes[kind] || shapes.local;
+    badge.className = 'text-xs font-semibold flex items-center gap-1 ' + color;
+    badge.innerHTML = '<svg class="ic"><use href="' + icon + '"></use></svg> ' + escapeHTML(label);
+  }
+
+  function persistLocal() {
+    try {
+      localStorage.setItem('finanzas_' + hogar, JSON.stringify(state.monthsData));
+    } catch (e) {
+      /* almacenamiento lleno o bloqueado: el servidor sigue siendo la copia buena */
+    }
+  }
+
+  async function pedir(opciones) {
+    const res = await fetch(opciones.url || API, {
+      method: opciones.method || 'GET',
+      cache: 'no-store',
+      headers: opciones.body ? { 'Content-Type': 'application/json' } : undefined,
+      body: opciones.body ? JSON.stringify(opciones.body) : undefined
+    });
+    if (!res.ok) throw new Error(String(res.status));
+    return res.json();
+  }
+
+  function leerRemoto() {
+    return pedir({ url: API + '?api=meses&h=' + encodeURIComponent(hogar) })
+      .then(r => r.meses || {});
+  }
+
+  function queueSave(key) {
+    dirtyMonths.add(key || currentKey());
+    persistLocal();
+    if (saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(flushSaves, 600);
+  }
+
+  async function flushSaves() {
+    saveTimer = null;
+    const keys = Array.from(dirtyMonths);
+    dirtyMonths.clear();
+    if (!keys.length || !hogar) return;
+    setSync('saving');
+
+    let remotos = null;
+    try {
+      remotos = await leerRemoto();
+    } catch (e) {
+      /* si no se puede leer, guardamos lo nuestro tal cual */
+    }
+
+    let failed = null;
+    for (const key of keys) {
+      pendingMonths.add(key);
+      try {
+        if (remotos && remotos[key]) {
+          state.monthsData[key] = fundirMes(ensureMonth(key), remotos[key], false);
+        }
+        await pedir({ method: 'POST', body: { h: hogar, mes: key, datos: state.monthsData[key] } });
+      } catch (err) {
+        failed = 'Sin conexión, guardado solo en este dispositivo';
+      } finally {
+        pendingMonths.delete(key);
+      }
+    }
+    persistLocal();
+    setSync(failed ? 'error' : 'cloud', failed);
+    if (!failed) renderFromRemote();
+  }
+
+  /* ---------- arranque y sincronización ---------- */
+
+  function loadLocal() {
+    try {
+      const raw = localStorage.getItem('finanzas_' + hogar);
+      if (!raw) return false;
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object') return false;
+      Object.keys(parsed).forEach(k => { if (/^\d{4}-\d{2}$/.test(k)) state.monthsData[k] = parsed[k]; });
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function resolverHogar() {
+    const enHash = new URLSearchParams(location.hash.replace(/^#/, '')).get('h');
+    const enQuery = new URLSearchParams(location.search).get('h');
+    let guardado = null;
+    try { guardado = localStorage.getItem('hogar_codigo'); } catch (e) { /* sin almacenamiento */ }
+    const codigo = (enHash || enQuery || guardado || '').trim();
+    if (!CODIGO_VALIDO.test(codigo)) return '';
+    try { localStorage.setItem('hogar_codigo', codigo); } catch (e) { /* sin almacenamiento */ }
+    return codigo;
+  }
+
+  async function refrescar() {
+    if (!hogar || dirtyMonths.size || pendingMonths.size) return;
+    let remotos;
+    try {
+      remotos = await leerRemoto();
+    } catch (e) {
+      setSync('error', 'Sin conexión, guardado solo en este dispositivo');
+      return;
+    }
+    let changed = false;
+    Object.keys(remotos).forEach(key => {
+      const antes = JSON.stringify(state.monthsData[key]);
+      state.monthsData[key] = state.monthsData[key]
+        ? fundirMes(state.monthsData[key], remotos[key], true)
+        : remotos[key];
+      if (JSON.stringify(state.monthsData[key]) !== antes) changed = true;
+    });
+    setSync('cloud');
+    if (changed) { persistLocal(); renderFromRemote(); }
+  }
+
+  function arrancarRefresco() {
+    if (refrescoTimer) clearInterval(refrescoTimer);
+    refrescoTimer = setInterval(() => {
+      if (document.visibilityState === 'visible') refrescar();
+    }, REFRESCO_MS);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') refrescar();
+    });
+    window.addEventListener('focus', refrescar);
+  }
+
+  let deferredRender = false;
+  function renderFromRemote() {
+    const el = document.activeElement;
+    const typing = el && /^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName);
+    if (typing) {
+      if (!deferredRender) {
+        deferredRender = true;
+        el.addEventListener('blur', () => { deferredRender = false; renderAll(); }, { once: true });
+      }
+      return;
+    }
+    renderAll();
+  }
+
+  /* ---------- navegación ---------- */
+
+  function changePeriod() {
+    state.currentYear = document.getElementById('select-year').value;
+    state.currentMonth = parseInt(document.getElementById('select-month').value, 10);
+    state.activeCategoryFilter = 'Todos';
+    renderAll();
+  }
+
+  function switchTab(tab) {
+    const views = { monthly: 'view-monthly', annual: 'view-annual', formulas: 'view-formulas' };
+    const buttons = { monthly: 'btn-tab-monthly', annual: 'btn-tab-annual', formulas: 'btn-tab-formulas' };
+    const base = 'px-3 py-2 rounded-xl transition-all flex items-center gap-1 ';
+    Object.keys(views).forEach(k => {
+      const active = k === tab;
+      document.getElementById(views[k]).classList.toggle('hidden', !active);
+      document.getElementById(buttons[k]).className = base + (active ? 'shadow-sm bg-white text-pink-600' : 'text-slate-600 hover:text-slate-900');
+    });
+    if (tab === 'annual') renderAnnualView();
+  }
+
+  /* ---------- ventana directa ---------- */
+
+  function openQuickWindow() {
+    const win = document.getElementById('quick-window');
+    win.classList.remove('hidden');
+    document.getElementById('qw-date').value = todayISO();
+    document.getElementById('qw-amount').value = '';
+    document.getElementById('qw-concept').value = '';
+    quickWinCategory = quickWinCategory || month().categoriasVariables[0].categoria;
+    updateQuickTargetMonth();
+    renderQuickCategories();
+    renderQuickRecent();
+    setTimeout(() => document.getElementById('qw-amount').focus(), 50);
+  }
+
+  function closeQuickWindow() {
+    document.getElementById('quick-window').classList.add('hidden');
+    renderAll();
+  }
+
+  function quickTargetKey() {
+    const value = document.getElementById('qw-date').value || todayISO();
+    const [y, m] = value.split('-');
+    return y + '-' + m;
+  }
+
+  function updateQuickTargetMonth() {
+    document.getElementById('quick-target-month').innerText = 'Se guardará en ' + labelForKey(quickTargetKey());
+    renderQuickCategories();
+  }
+
+  function renderQuickCategories() {
+    const wrap = document.getElementById('qw-categories');
+    const cats = ensureMonth(quickTargetKey()).categoriasVariables;
+    if (!cats.some(c => c.categoria === quickWinCategory)) quickWinCategory = cats[0].categoria;
+    wrap.innerHTML = '';
+    cats.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      const active = cat.categoria === quickWinCategory;
+      btn.className = 'px-3.5 py-2 rounded-xl text-xs font-semibold transition-all border ' +
+        (active ? 'bg-amber-500 text-white border-amber-500 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:border-amber-300');
+      btn.innerText = cat.categoria;
+      btn.onclick = () => { quickWinCategory = cat.categoria; renderQuickCategories(); };
+      wrap.appendChild(btn);
+    });
+  }
+
+  function renderQuickRecent() {
+    const wrap = document.getElementById('qw-recent-wrap');
+    const list = document.getElementById('qw-recent');
+    if (!sessionAdded.length) { wrap.classList.add('hidden'); return; }
+    wrap.classList.remove('hidden');
+    list.innerHTML = sessionAdded.slice(0, 5).map(item => (
+      '<li class="flex items-center justify-between text-xs bg-slate-50 rounded-xl px-3 py-2">' +
+        '<span class="font-medium text-slate-700 truncate mr-2">' + escapeHTML(item.concepto) + '</span>' +
+        '<span class="font-bold text-amber-700 num shrink-0">' + formatEuro(item.real) + '</span>' +
+      '</li>'
+    )).join('');
+  }
+
+  function addExpense(fecha, concepto, categoria, importe, porRevisar) {
+    const key = fecha.slice(0, 7);
+    const target = ensureMonth(key);
+    if (!target.categoriasVariables.some(c => c.categoria === categoria)) {
+      target.categoriasVariables.push({ categoria: categoria, esperado: 0 });
+    }
+    const entry = { id: nuevoId(), fecha: fecha, concepto: concepto, categoria: categoria, real: importe, porRevisar: !!porRevisar };
+    target.registroVariables.unshift(entry);
+    queueSave(key);
+    return entry;
+  }
+
+  function submitQuickWindow(e) {
+    e.preventDefault();
+    const importe = Number(document.getElementById('qw-amount').value);
+    const concepto = document.getElementById('qw-concept').value.trim();
+    const fecha = document.getElementById('qw-date').value || todayISO();
+    if (!concepto || !isFinite(importe)) return;
+
+    const entry = addExpense(fecha, concepto, quickWinCategory, importe, true);
+    sessionAdded.unshift(entry);
+
+    document.getElementById('qw-amount').value = '';
+    document.getElementById('qw-concept').value = '';
+    document.getElementById('qw-amount').focus();
+    renderQuickRecent();
+    showToast(formatEuro(importe) + ' apuntado en ' + labelForKey(fecha.slice(0, 7)));
+  }
+
+  function quickAddVariableExpense(e) {
+    e.preventDefault();
+    const fecha = document.getElementById('quick-date').value || todayISO();
+    const concepto = document.getElementById('quick-concept').value.trim();
+    const categoria = document.getElementById('quick-category').value;
+    const importe = Number(document.getElementById('quick-amount').value);
+    if (!concepto || !isFinite(importe)) return;
+
+    addExpense(fecha, concepto, categoria, importe, false);
+    document.getElementById('quick-concept').value = '';
+    document.getElementById('quick-amount').value = '';
+    renderAll();
+    showToast('Gasto añadido a ' + labelForKey(fecha.slice(0, 7)));
+  }
+
+  /* ---------- avisos ---------- */
+
+  function showToast(message, isError) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toast-msg').innerText = message;
+    const icon = document.getElementById('toast-icon');
+    icon.className = 'ic ' + (isError ? 'text-red-400' : 'text-emerald-400');
+    icon.innerHTML = '<use href="' + (isError ? '#i-warning' : '#i-check') + '"></use>';
+    toast.classList.remove('translate-y-20', 'opacity-0');
+    clearTimeout(showToast.timer);
+    showToast.timer = setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 2500);
+  }
+
+  /* ---------- vista mensual ---------- */
+
+  function renderMonthlyView() {
+    const data = month();
+    const key = currentKey();
+
+    document.getElementById('header-month-display').innerText = labelForKey(key);
+    document.getElementById('reset-month-name').innerText = labelForKey(key);
+    document.getElementById('select-year').value = state.currentYear;
+    document.getElementById('select-month').value = String(state.currentMonth);
+
+    const emptyStart = !data.ingresos.length && !data.gastosFijos.length;
+    const prev = state.monthsData[previousKey(key)];
+    const canCopy = emptyStart && prev && (prev.ingresos.length || prev.gastosFijos.length);
+    const copyBtn = document.getElementById('btn-copy-previous');
+    copyBtn.classList.toggle('hidden', !canCopy);
+    copyBtn.classList.toggle('flex', !!canCopy);
+
+    const quickCatSelect = document.getElementById('quick-category');
+    quickCatSelect.innerHTML = data.categoriasVariables
+      .map(cat => '<option value="' + escapeHTML(cat.categoria) + '">' + escapeHTML(cat.categoria) + '</option>')
+      .join('');
+
+    /* objetivos */
+    const containerObj = document.getElementById('container-objetivos');
+    containerObj.innerHTML = '';
+    let objDone = 0;
+    data.objetivos.forEach((obj, idx) => {
+      if (obj.done) objDone++;
+      const div = document.createElement('div');
+      div.className = 'flex items-center justify-between text-xs p-2 hover:bg-purple-50/70 rounded-2xl border border-slate-100 transition-all';
+      div.innerHTML =
+        '<div class="flex items-center gap-2.5">' +
+          '<input type="checkbox" ' + (obj.done ? 'checked' : '') + ' class="w-4 h-4 text-purple-600 rounded-md border-purple-300 focus:ring-purple-400 cursor-pointer" data-act="obj-toggle" data-idx="' + idx + '">' +
+          '<span class="' + (obj.done ? 'line-through text-slate-400 font-normal' : 'text-slate-700 font-medium') + '">' + escapeHTML(obj.text) + '</span>' +
+        '</div>' +
+        '<button data-act="obj-remove" data-idx="' + idx + '" class="w-6 h-6 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-all"><svg class="ic text-[10px]"><use href="#i-trash"></use></svg></button>';
+      containerObj.appendChild(div);
+    });
+    document.getElementById('objetivos-counter-badge').innerText = objDone + '/' + data.objetivos.length + ' completados';
+
+    /* ingresos */
+    const tbodyIng = document.getElementById('tbody-ingresos');
+    tbodyIng.innerHTML = '';
+    let sumIngEsp = 0, sumIngReal = 0;
+    data.ingresos.forEach((ing, idx) => {
+      sumIngEsp += Number(ing.esperado || 0);
+      sumIngReal += Number(ing.real || 0);
+      const tr = document.createElement('tr');
+      tr.className = 'hover:bg-amber-50/30 transition-all';
+      tr.innerHTML =
+        '<td class="py-2"><input type="text" value="' + escapeHTML(ing.concepto) + '" data-act="ing" data-field="concepto" data-idx="' + idx + '" class="w-full bg-transparent outline-none font-medium text-slate-800 focus:border-b focus:border-amber-400"></td>' +
+        '<td class="py-2 text-right"><input type="number" step="0.01" value="' + Number(ing.esperado || 0) + '" data-act="ing" data-field="esperado" data-idx="' + idx + '" class="w-16 text-right bg-transparent outline-none text-slate-400 font-semibold num"> €</td>' +
+        '<td class="py-2 text-right"><input type="number" step="0.01" value="' + Number(ing.real || 0) + '" data-act="ing" data-field="real" data-idx="' + idx + '" class="w-16 text-right bg-transparent outline-none font-bold text-amber-800 num"> €</td>' +
+        '<td class="py-2 text-center"><button data-act="ing-remove" data-idx="' + idx + '" class="w-6 h-6 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-all"><svg class="ic text-[10px]"><use href="#i-trash"></use></svg></button></td>';
+      tbodyIng.appendChild(tr);
+    });
+    document.getElementById('total-ingresos-esperado').innerText = formatEuro(sumIngEsp);
+    document.getElementById('total-ingresos-real').innerText = formatEuro(sumIngReal);
+
+    /* ahorro e inversión */
+    const tbodyAho = document.getElementById('tbody-ahorros');
+    tbodyAho.innerHTML = '';
+    let sumAhorro = 0, sumInversion = 0;
+    data.ahorros.forEach((aho, idx) => {
+      const isAhorro = aho.tipo === 'Ahorro';
+      if (isAhorro) sumAhorro += Number(aho.cantidad || 0);
+      else sumInversion += Number(aho.cantidad || 0);
+      const tr = document.createElement('tr');
+      tr.className = 'hover:bg-emerald-50/30 transition-all';
+      tr.innerHTML =
+        '<td class="py-2"><input type="text" value="' + escapeHTML(aho.concepto) + '" data-act="aho" data-field="concepto" data-idx="' + idx + '" class="w-full bg-transparent outline-none font-medium text-slate-800"></td>' +
+        '<td class="py-2"><select data-act="aho" data-field="tipo" data-idx="' + idx + '" class="' + (isAhorro ? 'bg-emerald-100 text-emerald-800' : 'bg-purple-100 text-purple-800') + ' font-bold rounded-lg px-2 py-0.5 text-[10px] border-none outline-none cursor-pointer">' +
+          '<option value="Ahorro" ' + (isAhorro ? 'selected' : '') + '>Ahorro</option>' +
+          '<option value="Inversión" ' + (!isAhorro ? 'selected' : '') + '>Inversión</option>' +
+        '</select></td>' +
+        '<td class="py-2 text-right"><input type="number" step="0.01" value="' + Number(aho.cantidad || 0) + '" data-act="aho" data-field="cantidad" data-idx="' + idx + '" class="w-16 text-right bg-transparent outline-none font-bold text-slate-800 num"> €</td>' +
+        '<td class="py-2 text-center"><button data-act="aho-remove" data-idx="' + idx + '" class="w-6 h-6 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-all"><svg class="ic text-[10px]"><use href="#i-trash"></use></svg></button></td>';
+      tbodyAho.appendChild(tr);
+    });
+    document.getElementById('total-ahorro-sum').innerText = formatEuro(sumAhorro);
+    document.getElementById('total-inversion-sum').innerText = formatEuro(sumInversion);
+
+    /* gastos fijos */
+    const tbodyFijos = document.getElementById('tbody-gastos-fijos');
+    tbodyFijos.innerHTML = '';
+    let sumFijosEsp = 0, sumFijosReal = 0;
+    data.gastosFijos.forEach((gf, idx) => {
+      sumFijosEsp += Number(gf.esperado || 0);
+      sumFijosReal += Number(gf.real || 0);
+      const tr = document.createElement('tr');
+      tr.className = 'hover:bg-pink-50/30 transition-all';
+      tr.innerHTML =
+        '<td class="py-2"><input type="text" value="' + escapeHTML(gf.concepto) + '" data-act="fijo" data-field="concepto" data-idx="' + idx + '" class="w-full bg-transparent outline-none font-medium text-slate-800"></td>' +
+        '<td class="py-2 text-right"><input type="number" step="0.01" value="' + Number(gf.esperado || 0) + '" data-act="fijo" data-field="esperado" data-idx="' + idx + '" class="w-14 text-right bg-transparent outline-none text-slate-400 font-semibold num"> €</td>' +
+        '<td class="py-2 text-right"><input type="number" step="0.01" value="' + Number(gf.real || 0) + '" data-act="fijo" data-field="real" data-idx="' + idx + '" class="w-14 text-right bg-transparent outline-none font-bold text-slate-800 num"> €</td>' +
+        '<td class="py-2 text-center"><input type="date" value="' + escapeHTML(gf.fecha || '') + '" data-act="fijo" data-field="fecha" data-idx="' + idx + '" class="w-28 text-center text-[10px] font-semibold bg-slate-100 rounded-lg py-1 border-none outline-none"></td>' +
+        '<td class="py-2 text-center"><button data-act="fijo-toggle" data-idx="' + idx + '" class="px-2 py-0.5 rounded-full text-[10px] font-bold shadow-sm inline-flex items-center gap-1 ' + (gf.pagado ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700') + '">' +
+          '<svg class="ic"><use href="' + (gf.pagado ? '#i-check' : '#i-clock') + '"></use></svg>' + (gf.pagado ? 'Pagado' : 'Pendiente') +
+        '</button></td>' +
+        '<td class="py-2 text-center"><button data-act="fijo-remove" data-idx="' + idx + '" class="w-6 h-6 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-all"><svg class="ic text-[10px]"><use href="#i-trash"></use></svg></button></td>';
+      tbodyFijos.appendChild(tr);
+    });
+    document.getElementById('total-fijos-esperado').innerText = formatEuro(sumFijosEsp);
+    document.getElementById('total-fijos-real').innerText = formatEuro(sumFijosReal);
+
+    /* registro de variables */
+    const spentPerGroup = {};
+    let sumVarReal = 0;
+    let pendientes = 0;
+    data.registroVariables.forEach(item => {
+      const amt = Number(item.real || 0);
+      sumVarReal += amt;
+      spentPerGroup[item.categoria] = (spentPerGroup[item.categoria] || 0) + amt;
+      if (item.porRevisar) pendientes++;
+    });
+
+    renderCategoryPills(data, pendientes);
+
+    const searchVal = (document.getElementById('search-expenses').value || '').toLowerCase().trim();
+    const tbodyReg = document.getElementById('tbody-registro-variables');
+    tbodyReg.innerHTML = '';
+    let filteredCount = 0, filteredSum = 0;
+
+    data.registroVariables.forEach((item, idx) => {
+      const filter = state.activeCategoryFilter;
+      const matchesCategory = filter === 'Todos' || (filter === '__revisar' ? !!item.porRevisar : item.categoria === filter);
+      const matchesSearch = !searchVal ||
+        String(item.concepto).toLowerCase().includes(searchVal) ||
+        String(item.categoria).toLowerCase().includes(searchVal);
+      if (!matchesCategory || !matchesSearch) return;
+
+      filteredCount++;
+      filteredSum += Number(item.real || 0);
+
+      const options = data.categoriasVariables.map(cat =>
+        '<option value="' + escapeHTML(cat.categoria) + '"' + (item.categoria === cat.categoria ? ' selected' : '') + '>' + escapeHTML(cat.categoria) + '</option>'
+      ).join('');
+
+      const tr = document.createElement('tr');
+      tr.className = 'transition-all ' + (item.porRevisar ? 'bg-amber-50/60 hover:bg-amber-50' : 'hover:bg-amber-50/40');
+      tr.innerHTML =
+        '<td class="py-2 text-center"><input type="date" value="' + escapeHTML(item.fecha || '') + '" data-act="reg" data-field="fecha" data-idx="' + idx + '" class="w-28 text-center text-xs font-semibold bg-slate-100 rounded-lg py-1 px-1 border-none focus:ring-1 focus:ring-amber-300 outline-none"></td>' +
+        '<td class="py-2"><input type="text" value="' + escapeHTML(item.concepto) + '" data-act="reg" data-field="concepto" data-idx="' + idx + '" class="w-full bg-transparent outline-none font-medium text-slate-800 text-xs focus:border-b focus:border-amber-400"></td>' +
+        '<td class="py-2"><select data-act="reg" data-field="categoria" data-idx="' + idx + '" class="bg-amber-100/70 text-amber-950 font-bold rounded-xl px-2 py-1 text-[11px] border border-amber-200 outline-none w-full cursor-pointer">' + options + '</select></td>' +
+        '<td class="py-2 text-right"><div class="flex items-center justify-end gap-1">' +
+          '<input type="number" step="0.01" value="' + Number(item.real || 0) + '" data-act="reg" data-field="real" data-idx="' + idx + '" class="w-20 text-right bg-transparent outline-none font-extrabold text-slate-800 text-xs num">' +
+          '<span class="text-slate-400 font-bold text-xs">€</span>' +
+        '</div></td>' +
+        '<td class="py-2"><div class="flex items-center justify-center gap-0.5">' +
+          (item.porRevisar
+            ? '<button data-act="reg-review" data-idx="' + idx + '" title="Marcar como revisado" class="w-7 h-7 rounded-lg text-amber-500 hover:text-emerald-600 hover:bg-emerald-50 transition-all flex items-center justify-center"><svg class="ic text-xs"><use href="#i-eye"></use></svg></button>'
+            : '<span class="w-7 h-7 flex items-center justify-center text-emerald-400"><svg class="ic text-xs"><use href="#i-check"></use></svg></span>') +
+          '<button data-act="reg-remove" data-idx="' + idx + '" title="Eliminar registro" class="w-7 h-7 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all flex items-center justify-center"><svg class="ic text-xs"><use href="#i-trash"></use></svg></button>' +
+        '</div></td>';
+      tbodyReg.appendChild(tr);
+    });
+
+    document.getElementById('empty-state-variables').classList.toggle('hidden', filteredCount !== 0);
+    document.getElementById('count-variables').innerText = String(filteredCount);
+    document.getElementById('total-variables-period').innerText = formatEuro(filteredSum);
+    document.getElementById('total-variables-real').innerText = formatEuro(sumVarReal);
+    document.getElementById('total-variables-real-summary').innerText = formatEuro(sumVarReal);
+
+    /* presupuesto por grupo */
+    const containerProgress = document.getElementById('container-group-progress');
+    containerProgress.innerHTML = '';
+    let sumVarEsp = 0;
+    data.categoriasVariables.forEach((cat, idx) => {
+      const esp = Number(cat.esperado || 0);
+      sumVarEsp += esp;
+      const real = spentPerGroup[cat.categoria] || 0;
+      const pct = esp > 0 ? Math.min(100, Math.round((real / esp) * 100)) : (real > 0 ? 100 : 0);
+      const isOver = real > esp && esp > 0;
+      const card = document.createElement('div');
+      card.className = 'bg-slate-50 border border-slate-200 p-3 rounded-2xl flex flex-col justify-between gap-2 hover:border-amber-300 transition-all';
+      card.innerHTML =
+        '<div class="flex items-center justify-between gap-2">' +
+          '<div class="flex items-center gap-2 min-w-0">' +
+            '<span class="font-bold text-xs text-slate-800 truncate">' + escapeHTML(cat.categoria) + '</span>' +
+            '<button data-act="cat-remove" data-idx="' + idx + '" class="text-slate-300 hover:text-red-500 shrink-0" title="Eliminar grupo"><svg class="ic text-[10px]"><use href="#i-x"></use></svg></button>' +
+          '</div>' +
+          '<div class="flex items-center gap-1 text-xs shrink-0">' +
+            '<span class="text-slate-400 font-medium">Presupuesto:</span>' +
+            '<input type="number" step="0.01" value="' + esp + '" data-act="cat" data-field="esperado" data-idx="' + idx + '" class="w-16 text-right font-semibold text-slate-700 bg-white border border-slate-200 rounded px-1 text-xs outline-none num">' +
+            '<span class="text-slate-400">€</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="space-y-1">' +
+          '<div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">' +
+            '<div class="' + (isOver ? 'bg-red-500' : (pct > 85 ? 'bg-amber-500' : 'bg-emerald-500')) + ' h-full rounded-full transition-all duration-500" style="width: ' + pct + '%"></div>' +
+          '</div>' +
+          '<div class="flex justify-between items-center text-[10px] font-bold num">' +
+            '<span class="' + (isOver ? 'text-red-600' : 'text-slate-600') + '">Gastado: ' + formatEuro(real) + ' (' + pct + '%)</span>' +
+            '<span class="' + (esp - real < 0 ? 'text-red-500' : 'text-emerald-600') + '">' + (esp - real >= 0 ? 'Quedan ' + formatEuro(esp - real) : 'Excedido por ' + formatEuro(real - esp)) + '</span>' +
+          '</div>' +
+        '</div>';
+      containerProgress.appendChild(card);
+    });
+    document.getElementById('total-variables-esperado').innerText = formatEuro(sumVarEsp);
+
+    /* indicadores */
+    const totalGastosReal = sumFijosReal + sumVarReal;
+    document.getElementById('kpi-ingresos').innerText = formatEuro(sumIngReal);
+    document.getElementById('kpi-gastos').innerText = formatEuro(totalGastosReal);
+    document.getElementById('kpi-restante').innerText = formatEuro(sumIngReal - totalGastosReal);
+    document.getElementById('kpi-fijos').innerText = formatEuro(sumFijosReal);
+    document.getElementById('kpi-variables').innerText = formatEuro(sumVarReal);
+    document.getElementById('kpi-ahorro').innerText = formatEuro(sumAhorro);
+    document.getElementById('kpi-inversion').innerText = formatEuro(sumInversion);
+
+    const spentPct = sumIngReal > 0 ? Math.min(100, Math.round((totalGastosReal / sumIngReal) * 100)) : 0;
+    document.getElementById('gauge-percent').innerText = spentPct + '%';
+
+    const breakdown = data.categoriasVariables.map(cat => ({
+      categoria: cat.categoria,
+      esperado: Number(cat.esperado || 0),
+      real: spentPerGroup[cat.categoria] || 0
+    }));
+    renderMonthlyCharts(sumIngReal, sumFijosReal, sumVarReal, sumAhorro, sumInversion, breakdown);
+  }
+
+  function renderCategoryPills(data, pendientes) {
+    const wrap = document.getElementById('container-category-pills');
+    wrap.innerHTML = '';
+    const make = (label, value, tone) => {
+      const btn = document.createElement('button');
+      const active = state.activeCategoryFilter === value;
+      btn.className = 'px-2.5 py-1 rounded-xl font-semibold transition-all shadow-sm ' +
+        (active
+          ? (tone === 'warn' ? 'bg-amber-600 text-white' : 'bg-amber-500 text-white')
+          : (tone === 'warn' ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'));
+      btn.innerText = label;
+      btn.onclick = () => { state.activeCategoryFilter = value; renderMonthlyView(); };
+      wrap.appendChild(btn);
+    };
+    make('Todos', 'Todos');
+    if (pendientes) make('Por revisar (' + pendientes + ')', '__revisar', 'warn');
+    data.categoriasVariables.forEach(cat => make(cat.categoria, cat.categoria));
+  }
+
+  /* ---------- mutaciones ---------- */
+
+  function previousKey(key) {
+    const [y, m] = key.split('-').map(Number);
+    return m === 1 ? monthKey(y - 1, 11) : monthKey(y, m - 2);
+  }
+
+  function copyPreviousMonth() {
+    const prev = state.monthsData[previousKey(currentKey())];
+    if (!prev) return;
+    const data = month();
+    data.ingresos = prev.ingresos.map(i => ({ concepto: i.concepto, esperado: Number(i.esperado || 0), real: 0 }));
+    data.gastosFijos = prev.gastosFijos.map(g => ({
+      concepto: g.concepto,
+      esperado: Number(g.esperado || 0),
+      real: 0,
+      fecha: g.fecha ? currentKey() + '-' + g.fecha.slice(8, 10) : '',
+      pagado: false
+    }));
+    data.categoriasVariables = prev.categoriasVariables.map(c => ({ categoria: c.categoria, esperado: Number(c.esperado || 0) }));
+    queueSave();
+    renderAll();
+    showToast('Ingresos y gastos fijos copiados, con los importes reales a 0');
+  }
+
+  const mutators = {
+    'obj-toggle': idx => { const o = month().objetivos[idx]; o.done = !o.done; },
+    'obj-remove': idx => { month().objetivos.splice(idx, 1); },
+    'ing-remove': idx => { month().ingresos.splice(idx, 1); },
+    'aho-remove': idx => { month().ahorros.splice(idx, 1); },
+    'fijo-remove': idx => { month().gastosFijos.splice(idx, 1); },
+    'fijo-toggle': idx => { const g = month().gastosFijos[idx]; g.pagado = !g.pagado; },
+    'reg-remove': idx => {
+      const data = month();
+      const quitado = data.registroVariables.splice(idx, 1)[0];
+      if (quitado && quitado.id) data.borrados.push(quitado.id);
+    },
+    'reg-review': idx => { month().registroVariables[idx].porRevisar = false; },
+    'cat-remove': idx => { month().categoriasVariables.splice(idx, 1); }
+  };
+
+  const collections = { ing: 'ingresos', aho: 'ahorros', fijo: 'gastosFijos', reg: 'registroVariables', cat: 'categoriasVariables' };
+  const numericFields = new Set(['esperado', 'real', 'cantidad']);
+
+  document.getElementById('app').addEventListener('click', e => {
+    const btn = e.target.closest('[data-act]');
+    if (!btn || !mutators[btn.dataset.act]) return;
+    mutators[btn.dataset.act](Number(btn.dataset.idx));
+    queueSave();
+    renderAll();
+  });
+
+  document.getElementById('app').addEventListener('change', e => {
+    const el = e.target.closest('[data-act]');
+    if (!el) return;
+    const list = collections[el.dataset.act];
+    if (!list || !el.dataset.field) return;
+    const field = el.dataset.field;
+    const row = month()[list][Number(el.dataset.idx)];
+    if (!row) return;
+    row[field] = numericFields.has(field) ? Number(el.value) || 0 : el.value;
+    queueSave();
+    renderAll();
+  });
+
+  /* ---------- modales ---------- */
+
+  function openModal(id) {
+    const el = document.getElementById(id);
+    el.classList.remove('hidden');
+    el.classList.add('flex');
+  }
+  function closeModal(id) {
+    const el = document.getElementById(id);
+    el.classList.add('hidden');
+    el.classList.remove('flex');
+  }
+
+  function openAddObjetivoModal() {
+    document.getElementById('input-nuevo-objetivo').value = '';
+    openModal('modal-objetivo');
+    document.getElementById('input-nuevo-objetivo').focus();
+  }
+  function confirmAddObjetivo() {
+    const val = document.getElementById('input-nuevo-objetivo').value.trim();
+    if (val) { month().objetivos.push({ text: val, done: false }); queueSave(); renderAll(); showToast('Objetivo añadido'); }
+    closeModal('modal-objetivo');
+  }
+
+  function openAddIngresoModal() {
+    ['input-ingreso-concepto', 'input-ingreso-esperado', 'input-ingreso-real'].forEach(id => { document.getElementById(id).value = ''; });
+    openModal('modal-ingreso');
+    document.getElementById('input-ingreso-concepto').focus();
+  }
+  function confirmAddIngreso() {
+    month().ingresos.push({
+      concepto: document.getElementById('input-ingreso-concepto').value.trim() || 'Nuevo ingreso',
+      esperado: Number(document.getElementById('input-ingreso-esperado').value) || 0,
+      real: Number(document.getElementById('input-ingreso-real').value) || 0
+    });
+    queueSave(); renderAll(); closeModal('modal-ingreso'); showToast('Ingreso añadido');
+  }
+
+  function openAddAhorroModal() {
+    document.getElementById('input-ahorro-concepto').value = '';
+    document.getElementById('input-ahorro-tipo').value = 'Ahorro';
+    document.getElementById('input-ahorro-cantidad').value = '';
+    openModal('modal-ahorro');
+    document.getElementById('input-ahorro-concepto').focus();
+  }
+  function confirmAddAhorro() {
+    month().ahorros.push({
+      concepto: document.getElementById('input-ahorro-concepto').value.trim() || 'Nuevo ahorro',
+      tipo: document.getElementById('input-ahorro-tipo').value,
+      cantidad: Number(document.getElementById('input-ahorro-cantidad').value) || 0
+    });
+    queueSave(); renderAll(); closeModal('modal-ahorro'); showToast('Ahorro registrado');
+  }
+
+  function openAddGastoFijoModal() {
+    ['input-fijo-concepto', 'input-fijo-esperado', 'input-fijo-real'].forEach(id => { document.getElementById(id).value = ''; });
+    document.getElementById('input-fijo-fecha').value = currentKey() + '-01';
+    document.getElementById('input-fijo-pagado').checked = false;
+    openModal('modal-gastofijo');
+    document.getElementById('input-fijo-concepto').focus();
+  }
+  function confirmAddGastoFijo() {
+    month().gastosFijos.push({
+      concepto: document.getElementById('input-fijo-concepto').value.trim() || 'Nuevo gasto fijo',
+      esperado: Number(document.getElementById('input-fijo-esperado').value) || 0,
+      real: Number(document.getElementById('input-fijo-real').value) || 0,
+      fecha: document.getElementById('input-fijo-fecha').value,
+      pagado: document.getElementById('input-fijo-pagado').checked
+    });
+    queueSave(); renderAll(); closeModal('modal-gastofijo'); showToast('Gasto fijo añadido');
+  }
+
+  function openAddCategoryModal() {
+    document.getElementById('input-nueva-categoria').value = '';
+    openModal('modal-categoria');
+    document.getElementById('input-nueva-categoria').focus();
+  }
+  function confirmAddCategory() {
+    const cat = document.getElementById('input-nueva-categoria').value.trim();
+    if (cat) { month().categoriasVariables.push({ categoria: cat, esperado: 0 }); queueSave(); renderAll(); showToast('Grupo añadido'); }
+    closeModal('modal-categoria');
+  }
+
+  function openResetModal() { openModal('modal-reset'); }
+  async function confirmReset() {
+    const key = currentKey();
+    state.monthsData[key] = emptyMonth();
+    persistLocal();
+    closeModal('modal-reset');
+    pendingMonths.add(key);
+    try {
+      await pedir({ method: 'POST', body: { h: hogar, mes: key, accion: 'borrar' } });
+      setSync('cloud');
+    } catch (e) {
+      setSync('error', 'El mes se vació aquí, pero no en el servidor');
+    }
+    pendingMonths.delete(key);
+    renderAll();
+    showToast(labelForKey(key) + ' vaciado');
+  }
+
+  /* ---------- gráficos ---------- */
+
+  function destroyChart(id) {
+    if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+  }
+
+  function renderMonthlyCharts(ingresos, fijos, variables, ahorro, inversion, categories) {
+    if (typeof Chart === 'undefined') return;
+    Chart.defaults.font.family = "'Poppins', sans-serif";
+    Chart.defaults.color = '#64748b';
+
+    destroyChart('chart-gauge');
+    const totalSpent = fijos + variables;
+    const pct = ingresos > 0 ? Math.min(100, (totalSpent / ingresos) * 100) : 0;
+    charts['chart-gauge'] = new Chart(document.getElementById('chart-gauge'), {
+      type: 'doughnut',
+      data: { datasets: [{ data: [pct, 100 - pct], backgroundColor: [pct > 90 ? '#ef4444' : '#f48fb1', '#f1f5f9'], borderWidth: 0 }] },
+      options: { rotation: -90, circumference: 180, cutout: '80%', responsive: true, maintainAspectRatio: false, plugins: { tooltip: { enabled: false }, legend: { display: false } } }
+    });
+
+    destroyChart('chart-global-distribution');
+    charts['chart-global-distribution'] = new Chart(document.getElementById('chart-global-distribution'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Gastos fijos', 'Gastos variables', 'Ahorro', 'Inversión'],
+        datasets: [{ data: [fijos, variables, ahorro, inversion], backgroundColor: ['#f8bbd0', '#ffe0b2', '#c8e6c9', '#e1bee7'], borderWidth: 0 }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
+    });
+
+    destroyChart('chart-variables-categories');
+    charts['chart-variables-categories'] = new Chart(document.getElementById('chart-variables-categories'), {
+      type: 'doughnut',
+      data: {
+        labels: categories.map(c => c.categoria),
+        datasets: [{ data: categories.map(c => c.real), backgroundColor: categories.map((c, i) => PALETTE[i % PALETTE.length]), borderWidth: 0 }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
+    });
+
+    destroyChart('chart-variables-bar');
+    charts['chart-variables-bar'] = new Chart(document.getElementById('chart-variables-bar'), {
+      type: 'bar',
+      data: {
+        labels: categories.map(c => c.categoria),
+        datasets: [
+          { label: 'Esperado', data: categories.map(c => c.esperado), backgroundColor: '#cbd5e1', borderRadius: 4 },
+          { label: 'Real', data: categories.map(c => c.real), backgroundColor: '#f59e0b', borderRadius: 4 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } },
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } }
+      }
+    });
+  }
+
+  /* ---------- vista anual ---------- */
+
+  function renderAnnualView() {
+    document.getElementById('annual-year-title').innerText = state.currentYear;
+    const tbody = document.getElementById('tbody-annual-summary');
+
+    const totals = [];
+    for (let m = 0; m < 12; m++) {
+      const data = state.monthsData[monthKey(state.currentYear, m)];
+      const sum = (arr, field) => (arr || []).reduce((acc, cur) => acc + Number(cur[field] || 0), 0);
+      totals.push({
+        ingresos: data ? sum(data.ingresos, 'real') : 0,
+        fijos: data ? sum(data.gastosFijos, 'real') : 0,
+        variables: data ? sum(data.registroVariables, 'real') : 0,
+        ahorro: data ? sum((data.ahorros || []).filter(a => a.tipo === 'Ahorro'), 'cantidad') : 0,
+        inversion: data ? sum((data.ahorros || []).filter(a => a.tipo !== 'Ahorro'), 'cantidad') : 0
+      });
+    }
+
+    const rows = [
+      { title: 'Ingresos reales', key: 'ingresos', color: 'text-amber-800' },
+      { title: 'Gastos fijos', key: 'fijos', color: 'text-pink-600' },
+      { title: 'Gastos variables', key: 'variables', color: 'text-orange-600' },
+      { title: 'Ahorros', key: 'ahorro', color: 'text-emerald-600' },
+      { title: 'Inversión', key: 'inversion', color: 'text-purple-600' }
+    ];
+
+    tbody.innerHTML = '';
+    rows.forEach(r => {
+      const values = totals.map(t => t[r.key]);
+      const total = values.reduce((a, b) => a + b, 0);
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td class="p-3 text-left font-bold text-slate-700">' + r.title + '</td>' +
+        values.map(v => '<td class="p-2 ' + r.color + '">' + formatEuro(v) + '</td>').join('') +
+        '<td class="p-2 bg-emerald-50 font-bold">' + formatEuro(total / 12) + '</td>' +
+        '<td class="p-3 bg-emerald-100 font-extrabold ' + r.color + '">' + formatEuro(total) + '</td>';
+      tbody.appendChild(tr);
+    });
+
+    const net = totals.map(t => t.ingresos - t.fijos - t.variables - t.ahorro - t.inversion);
+    const totalNet = net.reduce((a, b) => a + b, 0);
+    const trNet = document.createElement('tr');
+    trNet.className = 'font-extrabold bg-slate-100/70';
+    trNet.innerHTML =
+      '<td class="p-3 text-left font-bold text-slate-800">Saldo restante</td>' +
+      net.map(v => '<td class="p-2 ' + (v >= 0 ? 'text-emerald-600' : 'text-red-500') + '">' + formatEuro(v) + '</td>').join('') +
+      '<td class="p-2 bg-emerald-100 font-bold">' + formatEuro(totalNet / 12) + '</td>' +
+      '<td class="p-3 bg-emerald-200 font-extrabold ' + (totalNet >= 0 ? 'text-emerald-700' : 'text-red-600') + '">' + formatEuro(totalNet) + '</td>';
+    tbody.appendChild(trNet);
+
+    if (typeof Chart === 'undefined') return;
+    destroyChart('chart-annual-trend');
+    charts['chart-annual-trend'] = new Chart(document.getElementById('chart-annual-trend'), {
+      type: 'line',
+      data: {
+        labels: MONTH_NAMES.map(m => m.substring(0, 3)),
+        datasets: [
+          { label: 'Ingresos', data: totals.map(t => t.ingresos), borderColor: '#f59e0b', fill: false, tension: 0.3 },
+          { label: 'Gastos totales', data: totals.map(t => t.fijos + t.variables), borderColor: '#ec4899', fill: false, tension: 0.3 },
+          { label: 'Ahorro e inversión', data: totals.map(t => t.ahorro + t.inversion), borderColor: '#10b981', fill: false, tension: 0.3 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' } },
+        scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+      }
+    });
+  }
+
+  /* ---------- copia de seguridad ---------- */
+
+  function exportJSON() {
+    const blob = new Blob([JSON.stringify(state.monthsData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'finanzas-dori-dori-' + state.currentYear + '.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    showToast('Copia de seguridad descargada');
+  }
+
+  function importJSON(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const imported = JSON.parse(e.target.result);
+        const source = imported && imported.monthsData ? imported.monthsData : imported;
+        const keys = Object.keys(source || {}).filter(k => /^\d{4}-\d{2}$/.test(k));
+        if (!keys.length) { showToast('Ese archivo no tiene meses que importar', true); return; }
+        keys.forEach(k => { state.monthsData[k] = source[k]; queueSave(k); });
+        renderAll();
+        showToast(keys.length + ' meses importados');
+      } catch (err) {
+        showToast('No se pudo leer el archivo', true);
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  }
+
+  /* ---------- inicio ---------- */
+
+  function renderAll() {
+    renderMonthlyView();
+    if (!document.getElementById('view-annual').classList.contains('hidden')) renderAnnualView();
+  }
+
+  document.getElementById('quick-window').addEventListener('click', e => {
+    if (e.target.id === 'quick-window') closeQuickWindow();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    if (!document.getElementById('quick-window').classList.contains('hidden')) { closeQuickWindow(); return; }
+    ['modal-objetivo', 'modal-ingreso', 'modal-ahorro', 'modal-gastofijo', 'modal-categoria', 'modal-reset'].forEach(closeModal);
+  });
+
+  Object.assign(window, {
+    changePeriod, switchTab, openQuickWindow, closeQuickWindow, submitQuickWindow,
+    updateQuickTargetMonth, quickAddVariableExpense, copyPreviousMonth,
+    openAddObjetivoModal, confirmAddObjetivo, openAddIngresoModal, confirmAddIngreso,
+    openAddAhorroModal, confirmAddAhorro, openAddGastoFijoModal, confirmAddGastoFijo,
+    openAddCategoryModal, confirmAddCategory, openResetModal, confirmReset,
+    closeModal, exportJSON, importJSON, renderMonthlyView
+  });
+
+  function arrancar() {
+    document.getElementById('quick-date').value = todayISO();
+    loadLocal();
+    ensureMonth(currentKey());
+    renderAll();
+    refrescar();
+    arrancarRefresco();
+  }
+
+  document.getElementById('form-puerta').addEventListener('submit', e => {
+    e.preventDefault();
+    const codigo = document.getElementById('input-puerta').value.trim();
+    if (!CODIGO_VALIDO.test(codigo)) {
+      document.getElementById('puerta-error').classList.remove('hidden');
+      return;
+    }
+    try { localStorage.setItem('hogar_codigo', codigo); } catch (err) { /* sin almacenamiento */ }
+    hogar = codigo;
+    const puerta = document.getElementById('puerta');
+    puerta.classList.add('hidden');
+    puerta.classList.remove('flex');
+    arrancar();
+  });
+
+  hogar = resolverHogar();
+  if (hogar) {
+    arrancar();
+  } else {
+    const puerta = document.getElementById('puerta');
+    puerta.classList.remove('hidden');
+    puerta.classList.add('flex');
+    document.getElementById('input-puerta').focus();
+  }
+})();
+</script>
+</body>
+</html>
