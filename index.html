@@ -2059,6 +2059,24 @@
       (m.personal ? filaValor('Personal (Pencho y Aida)', formatEuro(m.personal), 'text-blue-600') : '') +
       '</div>';
 
+    if (m.presupuesto > 0) {
+      const pctPres = Math.round((m.gastos / m.presupuesto) * 100);
+      const dif = m.presupuesto - m.gastos;
+      html += '<div class="pt-1"><p class="text-[11px] font-bold text-slate-500 mb-1">PRESUPUESTADO FRENTE A GASTADO</p>' +
+        '<div class="text-xs">' +
+          filaValor('Se presupuestó', formatEuro(m.presupuesto), 'text-indigo-600') +
+          filaValor('Se ha gastado', formatEuro(m.gastos), 'text-pink-600') +
+          filaValor(dif >= 0 ? 'Ha sobrado del presupuesto' : 'Se ha pasado del presupuesto',
+            formatEuro(Math.abs(dif)), dif >= 0 ? 'text-emerald-600' : 'text-red-600') +
+        '</div>' +
+        '<div class="flex justify-between text-[11px] font-bold mt-1.5 mb-1">' +
+          '<span class="text-slate-500">CONSUMIDO DEL PRESUPUESTO</span>' +
+          '<span class="' + (pctPres > 100 ? 'text-red-600' : pctPres > 85 ? 'text-amber-600' : 'text-emerald-600') + '">' + pctPres + '%</span></div>' +
+        '<div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">' +
+          '<div class="' + (pctPres > 100 ? 'bg-red-500' : pctPres > 85 ? 'bg-amber-500' : 'bg-emerald-500') +
+          ' h-full rounded-full transition-all duration-700" style="width:' + Math.min(100, pctPres) + '%"></div></div></div>';
+    }
+
     if (m.ingresos > 0) {
       const pct = Math.round(m.tasaAhorro);
       html += '<div class="pt-1"><div class="flex justify-between text-[11px] font-bold mb-1">' +
@@ -2099,6 +2117,54 @@
     return html;
   }
 
+  // En las categorías personales un importe negativo es dinero que esa persona
+  // ha puesto, y uno positivo dinero que ha sacado. Aquí se reparte a partes
+  // iguales: quien haya puesto de menos le compensa a quien puso de más.
+  function liquidacionPersonal(key) {
+    const d = state.monthsData[key];
+    if (!d) return null;
+    const neto = {};
+    (d.categoriasVariables || []).filter(c => c.excluirDelTotal).forEach(c => { neto[c.categoria] = 0; });
+    const nombres = Object.keys(neto);
+    if (nombres.length < 2) return null;
+    (d.registroVariables || []).forEach(i => {
+      if (neto[i.categoria] !== undefined) neto[i.categoria] += Number(i.real || 0);
+    });
+    const gente = nombres.map(n => ({ nombre: n, puesto: -neto[n] }));
+    const total = gente.reduce((a, p) => a + p.puesto, 0);
+    const justo = total / gente.length;
+    gente.forEach(p => { p.desvio = p.puesto - justo; });
+    return { gente, total, justo, hayMovimiento: gente.some(p => Math.abs(p.puesto) > 0.005) };
+  }
+
+  function bloqueLiquidacion(liq) {
+    if (!liq || !liq.hayMovimiento) return '';
+    let html = '<div class="pt-1 space-y-1"><p class="text-[11px] font-bold text-slate-500">CUENTAS ENTRE VOSOTROS</p><div class="text-xs">' +
+      liq.gente.map(p => filaValor(
+        escapeHTML(p.nombre) + (p.puesto >= 0 ? ' ha puesto' : ' ha sacado'),
+        formatEuro(Math.abs(p.puesto)),
+        p.puesto >= 0 ? 'text-emerald-600' : 'text-orange-600'
+      )).join('') +
+      filaValor('Le tocaría a cada uno', formatEuro(liq.justo), 'text-slate-700') +
+      '</div>';
+
+    const ordenados = liq.gente.slice().sort((a, b) => a.desvio - b.desvio);
+    if (Math.abs(ordenados[ordenados.length - 1].desvio) < 0.01) {
+      html += bloqueAviso('Está equilibrado, no hay que ajustar nada.', 'bien');
+    } else if (liq.gente.length === 2) {
+      const debe = ordenados[0], cobra = ordenados[1];
+      html += bloqueAviso('<span class="font-bold">' + escapeHTML(debe.nombre) + '</span> tiene que darle ' +
+        '<span class="font-bold">' + formatEuro(Math.abs(debe.desvio)) + '</span> a ' +
+        '<span class="font-bold">' + escapeHTML(cobra.nombre) + '</span> para quedar iguales.', 'aviso');
+    } else {
+      html += ordenados.map(p => '<div class="flex justify-between text-xs">' +
+        '<span class="text-slate-700 font-medium">' + escapeHTML(p.nombre) + '</span>' +
+        '<span class="font-bold num ' + (p.desvio < 0 ? 'text-red-600' : 'text-emerald-600') + '">' +
+        (p.desvio < 0 ? 'pone ' + formatEuro(-p.desvio) : 'recibe ' + formatEuro(p.desvio)) + '</span></div>').join('');
+    }
+    return html + '</div>';
+  }
+
   function abrirValoracionMes() {
     const key = currentKey();
     const m = metricasMes(key);
@@ -2114,7 +2180,7 @@
     const m = metricasMes(key);
     if (!m) return;
     const v = veredictoMes(m);
-    let cuerpo = cuerpoMes(m, v);
+    let cuerpo = cuerpoMes(m, v) + bloqueLiquidacion(liquidacionPersonal(key));
     let pie;
 
     if (m.cerrado) {
@@ -2177,8 +2243,9 @@
 
     const tot = meses.reduce((a, x) => ({
       ingresos: a.ingresos + x.m.ingresos, gastos: a.gastos + x.m.gastos,
-      ahorro: a.ahorro + x.m.ahorro + x.m.inversion, personal: a.personal + x.m.personal
-    }), { ingresos: 0, gastos: 0, ahorro: 0, personal: 0 });
+      ahorro: a.ahorro + x.m.ahorro + x.m.inversion, personal: a.personal + x.m.personal,
+      presupuesto: a.presupuesto + x.m.presupuesto
+    }), { ingresos: 0, gastos: 0, ahorro: 0, personal: 0, presupuesto: 0 });
 
     const balance = tot.ingresos - tot.gastos;
     const tasa = tot.ingresos > 0 ? (balance / tot.ingresos) * 100 : 0;
@@ -2194,7 +2261,12 @@
     cuerpo += '<div class="text-xs">' +
       filaValor('Meses con movimientos', meses.length + ' de 12' + (cerrados ? ' (' + cerrados + ' cerrados)' : ''), 'text-slate-700') +
       filaValor('Ha entrado en el año', formatEuro(tot.ingresos), 'text-amber-700') +
+      filaValor('Presupuestado en el año', formatEuro(tot.presupuesto), 'text-indigo-600') +
       filaValor('Gastado en el año', formatEuro(tot.gastos), 'text-pink-600') +
+      (tot.presupuesto > 0 ? filaValor(
+        tot.presupuesto - tot.gastos >= 0 ? 'Ha sobrado del presupuesto' : 'Se ha pasado del presupuesto',
+        formatEuro(Math.abs(tot.presupuesto - tot.gastos)),
+        tot.presupuesto - tot.gastos >= 0 ? 'text-emerald-600' : 'text-red-600') : '') +
       filaValor('Diferencia', formatEuro(balance), balance >= 0 ? 'text-emerald-600' : 'text-red-600') +
       filaValor('Media de gasto al mes', formatEuro(tot.gastos / meses.length), 'text-slate-700') +
       (tot.ahorro ? filaValor('Ahorro e inversión', formatEuro(tot.ahorro), 'text-emerald-600') : '') +
