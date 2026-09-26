@@ -373,7 +373,7 @@
                     <th class="text-left pb-1.5 font-medium">Concepto</th>
                     <th class="text-right pb-1.5 font-medium">Esp.</th>
                     <th class="text-right pb-1.5 font-medium">Real</th>
-                    <th class="w-8"></th>
+                    <th class="w-14"></th>
                   </tr>
                 </thead>
                 <tbody id="tbody-ingresos" class="divide-y divide-slate-50"></tbody>
@@ -1429,7 +1429,10 @@
         '<td class="py-2"><input type="text" value="' + escapeHTML(ing.concepto) + '" data-act="ing" data-field="concepto" data-idx="' + idx + '" class="w-full bg-transparent outline-none font-medium text-slate-800 focus:border-b focus:border-amber-400"></td>' +
         '<td class="py-2 text-right"><input type="number" step="0.01" value="' + Number(ing.esperado || 0) + '" data-act="ing" data-field="esperado" data-idx="' + idx + '" class="w-16 text-right bg-transparent outline-none text-slate-400 font-semibold num"> €</td>' +
         '<td class="py-2 text-right"><input type="number" step="0.01" value="' + Number(ing.real || 0) + '" data-act="ing" data-field="real" data-idx="' + idx + '" class="w-16 text-right bg-transparent outline-none font-bold text-amber-800 num"> €</td>' +
-        '<td class="py-2 text-center"><button data-act="ing-remove" data-idx="' + idx + '" class="btn-pop w-6 h-6 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-all"><svg class="ic text-[10px]"><use href="#i-trash"></use></svg></button></td>';
+        '<td class="py-2 text-center whitespace-nowrap">' +
+          '<button onclick="copyIngresoToNext(' + idx + ')" title="Pasar al mes siguiente" class="btn-pop w-6 h-6 rounded-lg text-slate-300 hover:text-blue-500 hover:bg-blue-50 inline-flex items-center justify-center"><svg class="ic text-[10px]"><use href="#i-copy"></use></svg></button>' +
+          '<button data-act="ing-remove" data-idx="' + idx + '" class="btn-pop w-6 h-6 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 inline-flex items-center justify-center"><svg class="ic text-[10px]"><use href="#i-trash"></use></svg></button>' +
+        '</td>';
       tbodyIng.appendChild(tr);
     });
     document.getElementById('total-ingresos-esperado').innerText = formatEuro(sumIngEsp);
@@ -1736,6 +1739,25 @@
   function nextKey(key) {
     const [y, m] = key.split('-').map(Number);
     return m === 12 ? monthKey(y + 1, 0) : monthKey(y, m);
+  }
+
+  function copyIngresoToNext(idx) {
+    const ing = month().ingresos[idx];
+    if (!ing) return;
+    const nk = nextKey(currentKey());
+    const dest = ensureMonth(nk);
+    if (dest.ingresos.some(i => i.concepto === ing.concepto)) {
+      showToast('«' + ing.concepto + '» ya existe en ' + labelForKey(nk));
+      return;
+    }
+    dest.ingresos.push({
+      concepto: ing.concepto,
+      esperado: Number(ing.real || ing.esperado || 0),
+      real: 0
+    });
+    dirtyMonths.add(nk);
+    queueSave();
+    showToast('«' + ing.concepto + '» copiado a ' + labelForKey(nk));
   }
 
   function copyFijoToNext(idx) {
@@ -2121,7 +2143,7 @@
 
   Object.assign(window, {
     changePeriod, switchTab, openQuickWindow, closeQuickWindow, submitQuickWindow,
-    updateQuickTargetMonth, quickAddVariableExpense, copyPreviousMonth, copyFijoToNext,
+    updateQuickTargetMonth, quickAddVariableExpense, copyPreviousMonth, copyFijoToNext, copyIngresoToNext,
     openAddObjetivoModal, confirmAddObjetivo, openAddIngresoModal, confirmAddIngreso,
     openAddAhorroModal, confirmAddAhorro, openAddGastoFijoModal, confirmAddGastoFijo,
     openAddCategoryModal, confirmAddCategory, openResetModal, confirmReset,
