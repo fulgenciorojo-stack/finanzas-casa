@@ -648,6 +648,15 @@
         </details>
       </div>
 
+      <div class="flex flex-wrap items-center justify-center gap-3 pt-2 pb-2">
+        <button onclick="abrirValoracionMes()" class="btn-pop px-5 py-3 bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-600 hover:to-blue-600 text-white text-sm font-bold rounded-2xl shadow-md flex items-center gap-2">
+          <svg class="ic"><use href="#i-eye"></use></svg><span>¿Cómo voy este mes?</span>
+        </button>
+        <button id="btn-cerrar-mes" onclick="abrirCierreMes()" class="btn-pop px-5 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white text-sm font-bold rounded-2xl shadow-md flex items-center gap-2">
+          <svg class="ic"><use href="#i-check"></use></svg><span>Cerrar el mes</span>
+        </button>
+      </div>
+
     </div>
 
     <!-- ==================== VISTA ANUAL ==================== -->
@@ -658,9 +667,14 @@
             <h2 class="title-font text-xl font-bold text-slate-800">RESUMEN ANUAL <span id="annual-year-title">2026</span></h2>
             <p class="text-xs text-slate-500">Cada mes lleva sus propias cuentas; aquí se suman todos</p>
           </div>
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
-            <svg class="ic"><use href="#i-check"></use></svg> Calculado en vivo
-          </span>
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+              <svg class="ic"><use href="#i-check"></use></svg> Calculado en vivo
+            </span>
+            <button onclick="abrirValoracionAnual()" class="btn-pop px-4 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-600 hover:to-blue-600 text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5">
+              <svg class="ic"><use href="#i-line"></use></svg><span>Valoración del año</span>
+            </button>
+          </div>
         </div>
         <div class="overflow-x-auto custom-scrollbar">
           <table class="w-full text-xs text-center border-collapse num">
@@ -928,6 +942,23 @@
     </div>
   </div>
 
+  <div id="modal-valoracion" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div id="valoracion-cabecera" class="px-5 py-4 text-white flex items-center gap-3 bg-gradient-to-r from-slate-500 to-slate-600">
+        <span id="valoracion-emoji" class="text-3xl leading-none">🙂</span>
+        <div class="min-w-0">
+          <h3 id="valoracion-titulo" class="title-font text-lg font-bold leading-tight">Valoración</h3>
+          <p id="valoracion-subtitulo" class="text-[11px] font-medium text-white/80"></p>
+        </div>
+        <button onclick="closeModal('modal-valoracion')" aria-label="Cerrar" class="ml-auto shrink-0 w-9 h-9 rounded-xl bg-white/20 hover:bg-white/30 flex items-center justify-center transition-all">
+          <svg class="ic"><use href="#i-x"></use></svg>
+        </button>
+      </div>
+      <div id="valoracion-cuerpo" class="p-5 space-y-3 overflow-y-auto custom-scrollbar text-sm"></div>
+      <div id="valoracion-pie" class="px-5 py-3 border-t border-slate-100 bg-slate-50/60 flex justify-end gap-2"></div>
+    </div>
+  </div>
+
   <div id="modal-reset" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
     <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-xl space-y-4">
       <h3 class="font-bold text-base text-red-600 title-font flex items-center gap-2"><svg class="ic"><use href="#i-warning"></use></svg>¿Vaciar este mes?</h3>
@@ -1014,7 +1045,9 @@
       categoriasVariables: DEFAULT_CATEGORIES.map(c => ({ categoria: c, esperado: 0, excluirDelTotal: CATEGORIAS_PERSONALES.has(c), nota: '' })),
       registroVariables: [],
       borrados: [],
-      nota: ''
+      nota: '',
+      cerrado: false,
+      cerradoEl: ''
     };
   }
 
@@ -1040,6 +1073,7 @@
       });
     }
     m.categoriasVariables.forEach(c => { if (c.nota === undefined) c.nota = ''; });
+    if (m.cerrado === undefined) m.cerrado = false;
     m.registroVariables.forEach(item => { if (!item.id) item.id = nuevoId(); });
     return m;
   }
@@ -1072,7 +1106,12 @@
       gastosFijos: base.gastosFijos || [],
       categoriasVariables: catsMerged,
       registroVariables: [],
-      borrados: []
+      borrados: [],
+      // Si el lado que manda trae el campo se respeta (aunque esté vacío: puede
+      // ser un borrado); si ni siquiera existe, se rescata del otro lado.
+      nota: base.nota !== undefined ? base.nota : (otra.nota || ''),
+      cerrado: base.cerrado !== undefined ? base.cerrado : !!otra.cerrado,
+      cerradoEl: base.cerradoEl !== undefined ? base.cerradoEl : (otra.cerradoEl || '')
     };
 
     const borrados = new Set([].concat(local.borrados || [], remoto.borrados || []));
@@ -1768,6 +1807,7 @@
       real: spentPerGroup[cat.categoria] || 0
     }));
     renderMonthlyCharts(sumIngReal, sumFijosReal, sumVarCasa, sumAhorro, sumInversion, sumVarPersonal, breakdown);
+    pintarEstadoCierre();
   }
 
   function renderCategoryPills(data, pendientes) {
@@ -1905,6 +1945,281 @@
     queueSave();
     renderAll();
   });
+
+  /* ---------- valoraciones ---------- */
+
+  function metricasMes(key) {
+    const d = state.monthsData[key];
+    if (!d) return null;
+    const sum = (arr, f) => (arr || []).reduce((a, c) => a + Number(c[f] || 0), 0);
+    const excl = new Set((d.categoriasVariables || []).filter(c => c.excluirDelTotal).map(c => c.categoria));
+    const reg = d.registroVariables || [];
+
+    const gastadoPorCat = {};
+    reg.forEach(i => { gastadoPorCat[i.categoria] = (gastadoPorCat[i.categoria] || 0) + Number(i.real || 0); });
+
+    const ingresos = sum(d.ingresos, 'real');
+    const fijos = sum(d.gastosFijos, 'real');
+    const variables = reg.filter(i => !excl.has(i.categoria)).reduce((a, i) => a + Number(i.real || 0), 0);
+    const personal = reg.filter(i => excl.has(i.categoria)).reduce((a, i) => a + Number(i.real || 0), 0);
+    const ahorro = sum((d.ahorros || []).filter(a => a.tipo === 'Ahorro'), 'cantidad');
+    const inversion = sum((d.ahorros || []).filter(a => a.tipo !== 'Ahorro'), 'cantidad');
+    const gastos = fijos + variables;
+
+    // Para los fijos sin "esperado" puesto se usa lo realmente pagado: si no,
+    // el presupuesto se quedaría corto y la comparación no diría nada.
+    const presFijos = (d.gastosFijos || []).reduce((a, g) => a + Math.max(Number(g.esperado || 0), Number(g.real || 0)), 0);
+    const presVar = (d.categoriasVariables || []).filter(c => !c.excluirDelTotal).reduce((a, c) => a + Number(c.esperado || 0), 0);
+
+    const excedidas = (d.categoriasVariables || [])
+      .filter(c => !c.excluirDelTotal && Number(c.esperado || 0) > 0 && (gastadoPorCat[c.categoria] || 0) > Number(c.esperado))
+      .map(c => ({ categoria: c.categoria, exceso: (gastadoPorCat[c.categoria] || 0) - Number(c.esperado) }))
+      .sort((a, b) => b.exceso - a.exceso);
+
+    const top = Object.keys(gastadoPorCat)
+      .filter(c => !excl.has(c) && gastadoPorCat[c] > 0)
+      .map(c => ({ categoria: c, total: gastadoPorCat[c] }))
+      .sort((a, b) => b.total - a.total)[0] || null;
+
+    const [anio, mes] = key.split('-').map(Number);
+    const hoy = new Date();
+    const enCurso = key === monthKey(hoy.getFullYear(), hoy.getMonth());
+    const diasMes = new Date(anio, mes, 0).getDate();
+    const diaHoy = enCurso ? hoy.getDate() : diasMes;
+
+    return {
+      key, cerrado: !!d.cerrado, cerradoEl: d.cerradoEl || '',
+      ingresos, fijos, variables, personal, ahorro, inversion, gastos,
+      balance: ingresos - gastos,
+      libre: ingresos - gastos - ahorro - inversion,
+      tasaAhorro: ingresos > 0 ? ((ingresos - gastos) / ingresos) * 100 : 0,
+      presupuesto: presFijos + presVar, presVar,
+      pctPresupuesto: presVar > 0 ? (variables / presVar) * 100 : 0,
+      excedidas, top,
+      enCurso, diasMes, diaHoy,
+      pctTiempo: (diaHoy / diasMes) * 100,
+      sinDatos: ingresos === 0 && gastos === 0
+    };
+  }
+
+  function veredictoMes(m) {
+    if (m.sinDatos) return { emoji: '🫥', titulo: 'Sin datos todavía', tono: 'slate', frase: 'Aún no hay ingresos ni gastos apuntados en este mes.' };
+    if (m.balance < 0) return { emoji: '😰', titulo: 'En números rojos', tono: 'red', frase: 'Se ha gastado más de lo que ha entrado.' };
+    const t = m.tasaAhorro;
+    if (t < 5) return { emoji: '😬', titulo: 'Muy justo', tono: 'orange', frase: 'Se salva por poco: casi todo lo que entra se va.' };
+    if (t < 15) return { emoji: '🙂', titulo: 'Va bien', tono: 'amber', frase: 'Queda un margen razonable a final de mes.' };
+    if (t < 30) return { emoji: '😄', titulo: 'Muy bien', tono: 'emerald', frase: 'Buen colchón: sobra una parte importante.' };
+    return { emoji: '🤩', titulo: 'Excelente', tono: 'emerald', frase: 'Mes redondo, sobra buena parte de lo que ha entrado.' };
+  }
+
+  const TONOS = {
+    slate: 'from-slate-500 to-slate-600',
+    red: 'from-red-500 to-rose-600',
+    orange: 'from-orange-500 to-amber-600',
+    amber: 'from-amber-500 to-orange-500',
+    emerald: 'from-emerald-500 to-teal-600'
+  };
+
+  function filaValor(etiqueta, valor, clase) {
+    return '<div class="flex justify-between items-center py-1.5 border-b border-slate-100 last:border-0">' +
+      '<span class="text-slate-600">' + etiqueta + '</span>' +
+      '<span class="font-bold num ' + (clase || 'text-slate-800') + '">' + valor + '</span></div>';
+  }
+
+  function bloqueAviso(texto, tono) {
+    const c = tono === 'bien' ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+      : tono === 'mal' ? 'bg-red-50 border-red-200 text-red-800'
+      : 'bg-amber-50 border-amber-200 text-amber-900';
+    return '<div class="' + c + ' border rounded-2xl px-3 py-2 text-xs font-medium">' + texto + '</div>';
+  }
+
+  function pintarValoracion(titulo, subtitulo, v, cuerpoHTML, pieHTML) {
+    document.getElementById('valoracion-cabecera').className =
+      'px-5 py-4 text-white flex items-center gap-3 bg-gradient-to-r ' + TONOS[v.tono];
+    document.getElementById('valoracion-emoji').innerText = v.emoji;
+    document.getElementById('valoracion-titulo').innerText = titulo;
+    document.getElementById('valoracion-subtitulo').innerText = subtitulo;
+    document.getElementById('valoracion-cuerpo').innerHTML = cuerpoHTML;
+    document.getElementById('valoracion-pie').innerHTML = pieHTML;
+    openModal('modal-valoracion');
+  }
+
+  function cuerpoMes(m, v) {
+    let html = '<div class="bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3">' +
+      '<p class="text-sm font-bold text-slate-800 mb-0.5">' + v.titulo + '</p>' +
+      '<p class="text-xs text-slate-600">' + v.frase + '</p></div>';
+
+    html += '<div class="text-xs">' +
+      filaValor('Ha entrado', formatEuro(m.ingresos), 'text-amber-700') +
+      filaValor('Gastos fijos', formatEuro(m.fijos), 'text-pink-600') +
+      filaValor('Gastos variables de casa', formatEuro(m.variables), 'text-orange-600') +
+      filaValor('Total gastado', formatEuro(m.gastos), 'text-pink-700') +
+      filaValor('Diferencia', formatEuro(m.balance), m.balance >= 0 ? 'text-emerald-600' : 'text-red-600') +
+      (m.ahorro || m.inversion ? filaValor('Ahorro e inversión', formatEuro(m.ahorro + m.inversion), 'text-emerald-600') : '') +
+      (m.personal ? filaValor('Personal (Pencho y Aida)', formatEuro(m.personal), 'text-blue-600') : '') +
+      '</div>';
+
+    if (m.ingresos > 0) {
+      const pct = Math.round(m.tasaAhorro);
+      html += '<div class="pt-1"><div class="flex justify-between text-[11px] font-bold mb-1">' +
+        '<span class="text-slate-500">DE CADA 100 € QUE ENTRAN, SOBRAN</span>' +
+        '<span class="' + (pct >= 0 ? 'text-emerald-600' : 'text-red-600') + '">' + pct + ' €</span></div>' +
+        '<div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">' +
+        '<div class="' + (pct < 0 ? 'bg-red-500' : pct < 15 ? 'bg-amber-500' : 'bg-emerald-500') +
+        ' h-full rounded-full transition-all duration-700" style="width:' + Math.min(100, Math.max(0, pct)) + '%"></div></div></div>';
+    }
+
+    if (m.enCurso && m.presVar > 0) {
+      const t = Math.round(m.pctTiempo), g = Math.round(m.pctPresupuesto);
+      html += '<div class="pt-1 space-y-1">' +
+        '<p class="text-[11px] font-bold text-slate-500">RITMO DEL MES</p>' +
+        '<p class="text-xs text-slate-600">Va el <span class="font-bold text-slate-800">' + t + '%</span> del mes (día ' + m.diaHoy + ' de ' + m.diasMes + ') y se ha gastado el <span class="font-bold text-slate-800">' + g + '%</span> del presupuesto variable.</p>' +
+        (g > t + 10
+          ? bloqueAviso('Vais por delante del ritmo: a este paso el presupuesto variable se queda corto antes de acabar el mes.', 'mal')
+          : g < t - 10
+            ? bloqueAviso('Vais por debajo del ritmo, el presupuesto variable aguanta de sobra.', 'bien')
+            : bloqueAviso('El ritmo de gasto va acompasado con lo que queda de mes.', 'aviso')) +
+        '</div>';
+    }
+
+    if (m.excedidas.length) {
+      html += '<div class="pt-1 space-y-1"><p class="text-[11px] font-bold text-slate-500">GRUPOS PASADOS DE PRESUPUESTO</p>' +
+        m.excedidas.slice(0, 4).map(e =>
+          '<div class="flex justify-between text-xs"><span class="text-slate-700 font-medium">' + escapeHTML(e.categoria) + '</span>' +
+          '<span class="text-red-600 font-bold num">+' + formatEuro(e.exceso) + '</span></div>').join('') +
+        '</div>';
+    } else if (m.presVar > 0) {
+      html += bloqueAviso('Ningún grupo se ha pasado de su presupuesto.', 'bien');
+    }
+
+    if (m.top) {
+      html += '<p class="text-xs text-slate-500 pt-1">Donde más se ha ido: <span class="font-bold text-slate-700">' +
+        escapeHTML(m.top.categoria) + '</span> con ' + formatEuro(m.top.total) + '.</p>';
+    }
+    return html;
+  }
+
+  function abrirValoracionMes() {
+    const key = currentKey();
+    const m = metricasMes(key);
+    if (!m) return;
+    const v = veredictoMes(m);
+    pintarValoracion('Cómo va ' + labelForKey(key), m.enCurso ? 'Mes en curso, día ' + m.diaHoy + ' de ' + m.diasMes : 'Mes ya terminado', v,
+      cuerpoMes(m, v),
+      '<button onclick="closeModal(\'modal-valoracion\')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">Cerrar</button>');
+  }
+
+  function abrirCierreMes() {
+    const key = currentKey();
+    const m = metricasMes(key);
+    if (!m) return;
+    const v = veredictoMes(m);
+    let cuerpo = cuerpoMes(m, v);
+    let pie;
+
+    if (m.cerrado) {
+      cuerpo = bloqueAviso('Este mes ya está cerrado' + (m.cerradoEl ? ' desde el ' + m.cerradoEl.split('-').reverse().join('/') : '') + '.', 'bien') + cuerpo;
+      pie = '<button onclick="reabrirMes()" class="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs font-bold rounded-xl transition-all">Reabrir el mes</button>' +
+        '<button onclick="closeModal(\'modal-valoracion\')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">Cerrar</button>';
+    } else {
+      cuerpo += '<p class="text-[11px] text-slate-400 pt-1">Cerrar el mes solo lo marca como terminado y guarda esta valoración. Se puede reabrir cuando quieras.</p>';
+      pie = '<button onclick="closeModal(\'modal-valoracion\')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">Ahora no</button>' +
+        '<button onclick="confirmarCierreMes()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-all">Cerrar el mes</button>';
+    }
+    pintarValoracion('Valoración final de ' + labelForKey(key), m.cerrado ? 'Mes cerrado' : 'Antes de cerrarlo, así queda', v, cuerpo, pie);
+  }
+
+  function confirmarCierreMes() {
+    const d = month();
+    d.cerrado = true;
+    d.cerradoEl = todayISO();
+    queueSave();
+    renderAll();
+    closeModal('modal-valoracion');
+    showToast('Mes cerrado: ' + labelForKey(currentKey()));
+  }
+
+  function reabrirMes() {
+    const d = month();
+    d.cerrado = false;
+    d.cerradoEl = '';
+    queueSave();
+    renderAll();
+    closeModal('modal-valoracion');
+    showToast('Mes reabierto');
+  }
+
+  function pintarEstadoCierre() {
+    const cerrado = !!month().cerrado;
+    const btn = document.getElementById('btn-cerrar-mes');
+    if (btn) {
+      btn.querySelector('span').innerText = cerrado ? 'Mes cerrado · ver' : 'Cerrar el mes';
+      btn.className = 'btn-pop px-5 py-3 text-white text-sm font-bold rounded-2xl shadow-md flex items-center gap-2 bg-gradient-to-r ' +
+        (cerrado ? 'from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700' : 'from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600');
+    }
+    const badge = document.getElementById('badge-mes-cerrado');
+    if (badge) badge.classList.toggle('hidden', !cerrado);
+  }
+
+  function abrirValoracionAnual() {
+    const anio = state.currentYear;
+    const meses = [];
+    for (let i = 0; i < 12; i++) {
+      const m = metricasMes(monthKey(anio, i));
+      if (m && !m.sinDatos) meses.push({ nombre: MONTH_NAMES[i], m });
+    }
+    if (!meses.length) {
+      pintarValoracion('Valoración de ' + anio, 'Sin datos', { emoji: '🫥', titulo: 'Sin datos', tono: 'slate', frase: '' },
+        bloqueAviso('Todavía no hay ningún mes con movimientos en ' + anio + '.', 'aviso'),
+        '<button onclick="closeModal(\'modal-valoracion\')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">Cerrar</button>');
+      return;
+    }
+
+    const tot = meses.reduce((a, x) => ({
+      ingresos: a.ingresos + x.m.ingresos, gastos: a.gastos + x.m.gastos,
+      ahorro: a.ahorro + x.m.ahorro + x.m.inversion, personal: a.personal + x.m.personal
+    }), { ingresos: 0, gastos: 0, ahorro: 0, personal: 0 });
+
+    const balance = tot.ingresos - tot.gastos;
+    const tasa = tot.ingresos > 0 ? (balance / tot.ingresos) * 100 : 0;
+    const v = veredictoMes({ sinDatos: false, balance, tasaAhorro: tasa });
+    const mejor = meses.slice().sort((a, b) => b.m.balance - a.m.balance)[0];
+    const peor = meses.slice().sort((a, b) => a.m.balance - b.m.balance)[0];
+    const cerrados = meses.filter(x => x.m.cerrado).length;
+
+    let cuerpo = '<div class="bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3">' +
+      '<p class="text-sm font-bold text-slate-800 mb-0.5">' + v.titulo + '</p>' +
+      '<p class="text-xs text-slate-600">' + v.frase + '</p></div>';
+
+    cuerpo += '<div class="text-xs">' +
+      filaValor('Meses con movimientos', meses.length + ' de 12' + (cerrados ? ' (' + cerrados + ' cerrados)' : ''), 'text-slate-700') +
+      filaValor('Ha entrado en el año', formatEuro(tot.ingresos), 'text-amber-700') +
+      filaValor('Gastado en el año', formatEuro(tot.gastos), 'text-pink-600') +
+      filaValor('Diferencia', formatEuro(balance), balance >= 0 ? 'text-emerald-600' : 'text-red-600') +
+      filaValor('Media de gasto al mes', formatEuro(tot.gastos / meses.length), 'text-slate-700') +
+      (tot.ahorro ? filaValor('Ahorro e inversión', formatEuro(tot.ahorro), 'text-emerald-600') : '') +
+      (tot.personal ? filaValor('Personal (Pencho y Aida)', formatEuro(tot.personal), 'text-blue-600') : '') +
+      '</div>';
+
+    cuerpo += '<div class="grid grid-cols-2 gap-2 pt-1">' +
+      '<div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-3 text-center">' +
+        '<p class="text-[10px] font-bold text-emerald-700 uppercase">Mejor mes</p>' +
+        '<p class="text-sm font-bold text-slate-800">' + mejor.nombre + '</p>' +
+        '<p class="text-xs font-bold text-emerald-600 num">' + formatEuro(mejor.m.balance) + '</p></div>' +
+      '<div class="bg-red-50 border border-red-200 rounded-2xl p-3 text-center">' +
+        '<p class="text-[10px] font-bold text-red-700 uppercase">Mes más apretado</p>' +
+        '<p class="text-sm font-bold text-slate-800">' + peor.nombre + '</p>' +
+        '<p class="text-xs font-bold text-red-600 num">' + formatEuro(peor.m.balance) + '</p></div>' +
+      '</div>';
+
+    const enRojo = meses.filter(x => x.m.balance < 0);
+    cuerpo += enRojo.length
+      ? bloqueAviso(enRojo.length === 1 ? 'Un mes cerró en rojo: ' + enRojo[0].nombre + '.' : 'Hay ' + enRojo.length + ' meses en rojo: ' + enRojo.map(x => x.nombre).join(', ') + '.', 'mal')
+      : bloqueAviso('Ningún mes ha cerrado en rojo.', 'bien');
+
+    pintarValoracion('Valoración de ' + anio, meses.length + ' meses con movimientos', v, cuerpo,
+      '<button onclick="closeModal(\'modal-valoracion\')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">Cerrar</button>');
+  }
 
   /* ---------- modales ---------- */
 
@@ -2205,6 +2520,7 @@
     changePeriod, switchTab, openQuickWindow, closeQuickWindow, submitQuickWindow,
     updateQuickTargetMonth, quickAddVariableExpense, copyPreviousMonth, copyFijoToNext, copyIngresoToNext,
     toggleSignoImporte, sincronizarSignoImporte,
+    abrirValoracionMes, abrirCierreMes, confirmarCierreMes, reabrirMes, abrirValoracionAnual,
     openAddObjetivoModal, confirmAddObjetivo, openAddIngresoModal, confirmAddIngreso,
     openAddAhorroModal, confirmAddAhorro, openAddGastoFijoModal, confirmAddGastoFijo,
     openAddCategoryModal, confirmAddCategory, openResetModal, confirmReset,
