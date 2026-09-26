@@ -2145,7 +2145,8 @@
         formatEuro(Math.abs(p.puesto)),
         p.puesto >= 0 ? 'text-emerald-600' : 'text-orange-600'
       )).join('') +
-      filaValor('Le tocaría a cada uno', formatEuro(liq.justo), 'text-slate-700') +
+      filaValor(liq.justo >= 0 ? 'A cada uno le tocaba poner' : 'A cada uno le tocaba sacar',
+        formatEuro(Math.abs(liq.justo)), 'text-slate-700') +
       '</div>';
 
     const ordenados = liq.gente.slice().sort((a, b) => a.desvio - b.desvio);
