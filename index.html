@@ -2137,6 +2137,14 @@
     const total = aCents(gente.reduce((a, p) => a + p.puesto, 0));
     const justo = total / gente.length;
     gente.forEach(p => { p.desvio = aCents(p.puesto - justo); });
+    // Con dos personas el ajuste es el mismo para los dos, así que se calcula
+    // una sola vez: restar por separado contra la media deja un céntimo suelto.
+    if (gente.length === 2) {
+      const ajuste = aCents(Math.abs(gente[0].puesto - gente[1].puesto) / 2);
+      const pone = gente[0].puesto <= gente[1].puesto ? 0 : 1;
+      gente[pone].desvio = -ajuste;
+      gente[1 - pone].desvio = ajuste;
+    }
     return { gente, total, justo, hayMovimiento: gente.some(p => Math.abs(p.puesto) > 0.005) };
   }
 
