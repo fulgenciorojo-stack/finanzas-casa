@@ -2130,10 +2130,13 @@
     (d.registroVariables || []).forEach(i => {
       if (neto[i.categoria] !== undefined) neto[i.categoria] += Number(i.real || 0);
     });
-    const gente = nombres.map(n => ({ nombre: n, puesto: -neto[n] }));
-    const total = gente.reduce((a, p) => a + p.puesto, 0);
+    // Se redondea a céntimos antes de repartir: si no, la basura decimal de los
+    // sumatorios hace que a uno le salga un céntimo más que al otro.
+    const aCents = v => Math.round(v * 100) / 100;
+    const gente = nombres.map(n => ({ nombre: n, puesto: aCents(-neto[n]) }));
+    const total = aCents(gente.reduce((a, p) => a + p.puesto, 0));
     const justo = total / gente.length;
-    gente.forEach(p => { p.desvio = p.puesto - justo; });
+    gente.forEach(p => { p.desvio = aCents(p.puesto - justo); });
     return { gente, total, justo, hayMovimiento: gente.some(p => Math.abs(p.puesto) > 0.005) };
   }
 
@@ -2148,7 +2151,7 @@
       (nota ? '<span class="block text-[10px] font-semibold ' + nota.clase + '">' + nota.texto + '</span>' : '') +
       '</span></div>';
 
-    const movimiento = liq.justo >= 0 ? ' ha puesto' : ' ha sacado';
+    const movimiento = liq.justo >= 0 ? ' han puesto' : ' han sacado';
     let html = '<div class="pt-1 space-y-1"><p class="text-[11px] font-bold text-slate-500">CUENTAS ENTRE VOSOTROS</p><div class="text-xs">' +
       liq.gente.map(p => {
         const dif = Math.abs(p.desvio);
