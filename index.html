@@ -495,7 +495,7 @@
               <svg class="ic ml-auto transition-transform duration-200 group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" style="width:14px;height:14px"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"/></svg>
             </summary>
             <div class="px-4 pb-3 fade-in-up">
-              <textarea id="nota-fijos" placeholder="Apunta observaciones, detalles, recordatorios…" rows="3" class="w-full bg-white/70 border border-yellow-200 rounded-xl px-3 py-2 text-xs text-slate-700 placeholder:text-slate-300 outline-none focus:ring-2 focus:ring-yellow-300 resize-y leading-relaxed transition-colors focus:bg-white" oninput="month().nota = this.value; save()"></textarea>
+              <textarea id="nota-fijos" placeholder="Apunta observaciones, detalles, recordatorios…" rows="3" class="w-full bg-white/70 border border-yellow-200 rounded-xl px-3 py-2 text-xs text-slate-700 placeholder:text-slate-300 outline-none focus:ring-2 focus:ring-yellow-300 resize-y leading-relaxed transition-colors focus:bg-white" oninput="guardarNotaMes(this.value)"></textarea>
             </div>
           </details>
 
@@ -1354,6 +1354,11 @@
     if (!el) return;
     el.dataset.negativo = '';
     pintarSignoImporte(id);
+  }
+
+  function guardarNotaMes(valor) {
+    month().nota = valor;
+    queueSave();
   }
 
   function openQuickWindow() {
@@ -2618,7 +2623,7 @@
   Object.assign(window, {
     changePeriod, switchTab, openQuickWindow, closeQuickWindow, submitQuickWindow,
     updateQuickTargetMonth, quickAddVariableExpense, copyPreviousMonth, copyFijoToNext, copyIngresoToNext,
-    toggleSignoImporte, sincronizarSignoImporte,
+    toggleSignoImporte, sincronizarSignoImporte, guardarNotaMes,
     abrirValoracionMes, abrirCierreMes, confirmarCierreMes, reabrirMes, abrirValoracionAnual,
     openAddObjetivoModal, confirmAddObjetivo, openAddIngresoModal, confirmAddIngreso,
     openAddAhorroModal, confirmAddAhorro, openAddGastoFijoModal, confirmAddGastoFijo,
