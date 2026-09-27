@@ -558,13 +558,28 @@
 
             <div class="px-4 py-2.5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2 bg-slate-50/50">
               <div id="container-category-pills" class="flex flex-wrap items-center gap-1.5 text-xs"></div>
-              <div class="relative w-full sm:w-48">
-                <svg class="ic absolute left-3 top-2 text-slate-400"><use href="#i-search"></use></svg>
-                <input type="text" id="search-expenses" oninput="renderMonthlyView()" placeholder="Buscar gasto…" class="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-3 py-1.5 text-xs focus:ring-2 focus:ring-amber-300 outline-none shadow-sm">
+              <div class="flex items-center gap-2 w-full sm:w-auto">
+                <div class="flex items-center bg-slate-100 p-0.5 rounded-xl text-[11px] font-bold shrink-0">
+                  <button id="btn-vista-lista" onclick="cambiarVistaVariables('lista')" class="px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1">
+                    <svg class="ic text-[10px]"><use href="#i-bars"></use></svg> Lista
+                  </button>
+                  <button id="btn-vista-columnas" onclick="cambiarVistaVariables('columnas')" class="px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1">
+                    <svg class="ic text-[10px]"><use href="#i-tag"></use></svg> Columnas
+                  </button>
+                </div>
+                <div class="relative flex-1 sm:w-48 sm:flex-none">
+                  <svg class="ic absolute left-3 top-2 text-slate-400"><use href="#i-search"></use></svg>
+                  <input type="text" id="search-expenses" oninput="renderMonthlyView()" placeholder="Buscar gasto…" class="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-3 py-1.5 text-xs focus:ring-2 focus:ring-amber-300 outline-none shadow-sm">
+                </div>
               </div>
             </div>
 
-            <div class="p-4 max-h-80 overflow-y-auto custom-scrollbar">
+            <div id="vista-columnas" class="hidden p-4">
+              <p id="columnas-pista" class="text-[11px] text-slate-500 mb-2"></p>
+              <div id="container-variables-columnas" class="flex gap-3 overflow-x-auto custom-scrollbar pb-2 items-start"></div>
+            </div>
+
+            <div id="vista-lista" class="p-4 max-h-80 overflow-y-auto custom-scrollbar">
               <table class="w-full text-xs text-left">
                 <thead>
                   <tr class="text-slate-400 font-bold border-b border-slate-100 uppercase text-[10px] tracking-wider">
@@ -989,6 +1004,7 @@
     currentYear: String(today.getFullYear()),
     currentMonth: today.getMonth(),
     activeCategoryFilter: 'Todos',
+    vistaVariables: 'lista',
     monthsData: {}
   };
 
@@ -1214,6 +1230,10 @@
   /* ---------- arranque y sincronización ---------- */
 
   function loadLocal() {
+    try {
+      const vista = localStorage.getItem('finanzas_vista_variables');
+      if (vista === 'columnas' || vista === 'lista') state.vistaVariables = vista;
+    } catch (e) {}
     try {
       const raw = localStorage.getItem('finanzas_' + hogar);
       if (!raw) return false;
@@ -1618,6 +1638,7 @@
     renderCategoryPills(data, pendientes);
 
     const searchVal = (document.getElementById('search-expenses').value || '').toLowerCase().trim();
+    renderColumnasVariables(data, searchVal, excluidas);
     const tbodyReg = document.getElementById('tbody-registro-variables');
     tbodyReg.innerHTML = '';
     let filteredCount = 0, filteredSum = 0, filteredSumCasa = 0;
@@ -1813,6 +1834,95 @@
     }));
     renderMonthlyCharts(sumIngReal, sumFijosReal, sumVarCasa, sumAhorro, sumInversion, sumVarPersonal, breakdown);
     pintarEstadoCierre();
+  }
+
+  function cambiarVistaVariables(modo) {
+    state.vistaVariables = modo;
+    try { localStorage.setItem('finanzas_vista_variables', modo); } catch (e) {}
+    renderMonthlyView();
+  }
+
+  // Vista de tablero: una columna por grupo para ver de un vistazo todo lo
+  // apuntado en cada uno y comprobar si un gasto ya está metido en otro sitio.
+  function renderColumnasVariables(data, searchVal, excluidas) {
+    const enColumnas = state.vistaVariables === 'columnas';
+    document.getElementById('vista-columnas').classList.toggle('hidden', !enColumnas);
+    document.getElementById('vista-lista').classList.toggle('hidden', enColumnas);
+
+    const btnL = document.getElementById('btn-vista-lista');
+    const btnC = document.getElementById('btn-vista-columnas');
+    const activo = 'px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1 bg-white text-amber-700 shadow-sm';
+    const apagado = 'px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1 text-slate-500 hover:text-slate-800';
+    btnL.className = enColumnas ? apagado : activo;
+    btnC.className = enColumnas ? activo : apagado;
+    if (!enColumnas) return;
+
+    const porCat = {};
+    data.categoriasVariables.forEach(c => { porCat[c.categoria] = []; });
+    data.registroVariables.forEach(item => {
+      if (!porCat[item.categoria]) porCat[item.categoria] = [];
+      porCat[item.categoria].push(item);
+    });
+
+    const cont = document.getElementById('container-variables-columnas');
+    cont.innerHTML = '';
+    let conCoincidencia = 0;
+
+    data.categoriasVariables.forEach(cat => {
+      const items = (porCat[cat.categoria] || [])
+        .slice()
+        .sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')));
+      const coincide = i => !searchVal ||
+        String(i.concepto).toLowerCase().includes(searchVal) ||
+        String(cat.categoria).toLowerCase().includes(searchVal);
+      const hayCoincidencia = searchVal && items.some(coincide);
+      if (hayCoincidencia) conCoincidencia++;
+
+      const personal = !!cat.excluirDelTotal;
+      const total = items.reduce((a, i) => a + Number(i.real || 0), 0);
+
+      const col = document.createElement('div');
+      col.className = 'shrink-0 w-44 rounded-2xl border flex flex-col max-h-80 transition-all ' +
+        (hayCoincidencia ? 'border-amber-400 bg-amber-50/70 ring-2 ring-amber-200'
+          : searchVal ? 'border-slate-200 bg-slate-50/60 opacity-50'
+          : personal ? 'border-blue-200 bg-blue-50/50' : 'border-slate-200 bg-slate-50/60');
+
+      col.innerHTML =
+        '<div class="px-2.5 py-2 border-b ' + (personal ? 'border-blue-200' : 'border-slate-200') + '">' +
+          '<div class="flex items-center gap-1 min-w-0">' +
+            '<span class="font-bold text-xs text-slate-800 truncate">' + escapeHTML(cat.categoria) + '</span>' +
+            (personal ? '<span class="text-[8px] font-bold text-blue-500 bg-blue-100 px-1 py-0.5 rounded shrink-0">P</span>' : '') +
+          '</div>' +
+          '<div class="flex items-center justify-between text-[10px] font-semibold mt-0.5">' +
+            '<span class="text-slate-400">' + items.length + (items.length === 1 ? ' apunte' : ' apuntes') + '</span>' +
+            '<span class="num ' + (total < 0 ? 'text-emerald-600' : 'text-slate-600') + '">' + formatEuro(total) + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="p-1.5 space-y-1 overflow-y-auto custom-scrollbar">' +
+          (items.length
+            ? items.map(i => {
+                const marca = searchVal && coincide(i);
+                return '<div class="rounded-xl px-2 py-1.5 border text-[11px] ' +
+                  (marca ? 'bg-amber-100 border-amber-300' : 'bg-white border-slate-100') + '">' +
+                  '<div class="flex justify-between gap-1">' +
+                    '<span class="font-medium text-slate-700 leading-tight break-words">' + escapeHTML(i.concepto || '(sin concepto)') + '</span>' +
+                    '<span class="font-bold num shrink-0 ' + (Number(i.real || 0) < 0 ? 'text-emerald-600' : 'text-slate-800') + '">' + formatEuro(Number(i.real || 0)) + '</span>' +
+                  '</div>' +
+                  '<span class="text-[9px] text-slate-400 font-semibold">' + (i.fecha ? i.fecha.slice(8, 10) + '/' + i.fecha.slice(5, 7) : '') + '</span>' +
+                  (i.porRevisar ? '<span class="text-[9px] text-amber-600 font-bold ml-1">por revisar</span>' : '') +
+                  '</div>';
+              }).join('')
+            : '<p class="text-[10px] text-slate-300 text-center py-3">Sin apuntes</p>') +
+        '</div>';
+      cont.appendChild(col);
+    });
+
+    const pista = document.getElementById('columnas-pista');
+    pista.innerHTML = searchVal
+      ? (conCoincidencia
+          ? '«<span class="font-bold text-slate-700">' + escapeHTML(searchVal) + '</span>» aparece en <span class="font-bold text-amber-700">' + conCoincidencia + (conCoincidencia === 1 ? '</span> grupo.' : '</span> grupos.')
+          : 'No hay ningún apunte que ponga «<span class="font-bold text-slate-700">' + escapeHTML(searchVal) + '</span>».')
+      : 'Todo lo apuntado este mes, grupo por grupo. Busca arriba para ver en qué grupos está un gasto.';
   }
 
   function renderCategoryPills(data, pendientes) {
@@ -2623,7 +2733,7 @@
   Object.assign(window, {
     changePeriod, switchTab, openQuickWindow, closeQuickWindow, submitQuickWindow,
     updateQuickTargetMonth, quickAddVariableExpense, copyPreviousMonth, copyFijoToNext, copyIngresoToNext,
-    toggleSignoImporte, sincronizarSignoImporte, guardarNotaMes,
+    toggleSignoImporte, sincronizarSignoImporte, guardarNotaMes, cambiarVistaVariables,
     abrirValoracionMes, abrirCierreMes, confirmarCierreMes, reabrirMes, abrirValoracionAnual,
     openAddObjetivoModal, confirmAddObjetivo, openAddIngresoModal, confirmAddIngreso,
     openAddAhorroModal, confirmAddAhorro, openAddGastoFijoModal, confirmAddGastoFijo,
