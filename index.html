@@ -1826,6 +1826,34 @@
     pintarEstadoCierre();
   }
 
+  // Cada grupo tiene su color, sacado de su nombre para que no se mueva al
+  // reordenar las columnas. Las clases van enteras: Tailwind las lee del DOM.
+  const PALETA_GRUPOS = [
+    { cab: 'bg-rose-100 border-rose-300', tit: 'text-rose-900', dato: 'text-rose-600', punto: 'bg-rose-400' },
+    { cab: 'bg-amber-100 border-amber-300', tit: 'text-amber-900', dato: 'text-amber-700', punto: 'bg-amber-400' },
+    { cab: 'bg-emerald-100 border-emerald-300', tit: 'text-emerald-900', dato: 'text-emerald-700', punto: 'bg-emerald-400' },
+    { cab: 'bg-sky-100 border-sky-300', tit: 'text-sky-900', dato: 'text-sky-700', punto: 'bg-sky-400' },
+    { cab: 'bg-violet-100 border-violet-300', tit: 'text-violet-900', dato: 'text-violet-700', punto: 'bg-violet-400' },
+    { cab: 'bg-orange-100 border-orange-300', tit: 'text-orange-900', dato: 'text-orange-700', punto: 'bg-orange-400' },
+    { cab: 'bg-teal-100 border-teal-300', tit: 'text-teal-900', dato: 'text-teal-700', punto: 'bg-teal-400' },
+    { cab: 'bg-fuchsia-100 border-fuchsia-300', tit: 'text-fuchsia-900', dato: 'text-fuchsia-700', punto: 'bg-fuchsia-400' }
+  ];
+
+  function colorGrupo(nombre) {
+    let h = 0;
+    for (let i = 0; i < nombre.length; i++) h = (h * 31 + nombre.charCodeAt(i)) >>> 0;
+    return PALETA_GRUPOS[h % PALETA_GRUPOS.length];
+  }
+
+  function moverGrupo(desde, hacia) {
+    const cats = month().categoriasVariables;
+    if (desde === hacia || hacia < 0 || hacia >= cats.length) return;
+    const [movido] = cats.splice(desde, 1);
+    cats.splice(hacia, 0, movido);
+    queueSave();
+    renderAll();
+  }
+
   function cambiarVistaVariables(modo) {
     state.vistaVariables = modo;
     try { localStorage.setItem('finanzas_vista_variables', modo); } catch (e) {}
@@ -1858,7 +1886,8 @@
     cont.innerHTML = '';
     let conCoincidencia = 0;
 
-    data.categoriasVariables.forEach(cat => {
+    const ultima = data.categoriasVariables.length - 1;
+    data.categoriasVariables.forEach((cat, idxCat) => {
       const items = (porCat[cat.categoria] || [])
         .slice()
         .sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')));
@@ -1877,15 +1906,23 @@
           : searchVal ? 'border-slate-200 bg-slate-50/60 opacity-50'
           : personal ? 'border-blue-200 bg-blue-50/50' : 'border-slate-200 bg-slate-50/60');
 
+      const c = colorGrupo(cat.categoria);
       col.innerHTML =
-        '<div class="px-2.5 py-2 border-b ' + (personal ? 'border-blue-200' : 'border-slate-200') + '">' +
+        '<div class="px-2.5 py-2 border-b rounded-t-2xl cursor-grab active:cursor-grabbing ' + c.cab + '">' +
           '<div class="flex items-center gap-1 min-w-0">' +
-            '<span class="font-bold text-xs text-slate-800 truncate">' + escapeHTML(cat.categoria) + '</span>' +
-            (personal ? '<span class="text-[8px] font-bold text-blue-500 bg-blue-100 px-1 py-0.5 rounded shrink-0">P</span>' : '') +
+            '<span class="' + c.punto + ' w-1.5 h-1.5 rounded-full shrink-0"></span>' +
+            '<span class="font-bold text-xs truncate ' + c.tit + '">' + escapeHTML(cat.categoria) + '</span>' +
+            (personal ? '<span class="text-[8px] font-bold text-blue-600 bg-blue-100 px-1 py-0.5 rounded shrink-0">P</span>' : '') +
+            '<span class="ml-auto flex items-center gap-0.5 shrink-0">' +
+              '<button onclick="moverGrupo(' + idxCat + ',' + (idxCat - 1) + ')" title="Mover a la izquierda"' +
+                (idxCat === 0 ? ' disabled class="w-4 h-4 text-[9px] rounded opacity-20"' : ' class="w-4 h-4 text-[9px] rounded ' + c.dato + ' hover:bg-white/70"') + '>&#9664;</button>' +
+              '<button onclick="moverGrupo(' + idxCat + ',' + (idxCat + 1) + ')" title="Mover a la derecha"' +
+                (idxCat === ultima ? ' disabled class="w-4 h-4 text-[9px] rounded opacity-20"' : ' class="w-4 h-4 text-[9px] rounded ' + c.dato + ' hover:bg-white/70"') + '>&#9654;</button>' +
+            '</span>' +
           '</div>' +
           '<div class="flex items-center justify-between text-[10px] font-semibold mt-0.5">' +
-            '<span class="text-slate-400">' + items.length + (items.length === 1 ? ' apunte' : ' apuntes') + '</span>' +
-            '<span class="num ' + (total < 0 ? 'text-emerald-600' : 'text-slate-600') + '">' + formatEuro(total) + '</span>' +
+            '<span class="' + c.dato + ' opacity-70">' + items.length + (items.length === 1 ? ' apunte' : ' apuntes') + '</span>' +
+            '<span class="num ' + (total < 0 ? 'text-emerald-700' : c.dato) + '">' + formatEuro(total) + '</span>' +
           '</div>' +
         '</div>' +
         '<div class="p-1.5 space-y-1 overflow-y-auto custom-scrollbar">' +
@@ -1904,6 +1941,28 @@
               }).join('')
             : '<p class="text-[10px] text-slate-300 text-center py-3">Sin apuntes</p>') +
         '</div>';
+      col.draggable = true;
+      col.addEventListener('dragstart', ev => {
+        ev.dataTransfer.effectAllowed = 'move';
+        ev.dataTransfer.setData('text/plain', String(idxCat));
+        col.classList.add('opacity-40');
+      });
+      col.addEventListener('dragend', () => {
+        col.classList.remove('opacity-40');
+        cont.querySelectorAll('.ring-4').forEach(e2 => e2.classList.remove('ring-4', 'ring-indigo-400'));
+      });
+      col.addEventListener('dragover', ev => {
+        ev.preventDefault();
+        ev.dataTransfer.dropEffect = 'move';
+        col.classList.add('ring-4', 'ring-indigo-400');
+      });
+      col.addEventListener('dragleave', () => col.classList.remove('ring-4', 'ring-indigo-400'));
+      col.addEventListener('drop', ev => {
+        ev.preventDefault();
+        col.classList.remove('ring-4', 'ring-indigo-400');
+        moverGrupo(Number(ev.dataTransfer.getData('text/plain')), idxCat);
+      });
+
       cont.appendChild(col);
     });
 
@@ -1912,7 +1971,7 @@
       ? (conCoincidencia
           ? '«<span class="font-bold text-slate-700">' + escapeHTML(searchVal) + '</span>» aparece en <span class="font-bold text-amber-700">' + conCoincidencia + (conCoincidencia === 1 ? '</span> grupo.' : '</span> grupos.')
           : 'No hay ningún apunte que ponga «<span class="font-bold text-slate-700">' + escapeHTML(searchVal) + '</span>».')
-      : 'Todo lo apuntado este mes, grupo por grupo. Busca arriba para ver en qué grupos está un gasto.';
+      : 'Todo lo apuntado este mes, grupo por grupo. Busca arriba para ver en qué grupos está un gasto, y arrastra una columna (o usa las flechas) para reordenarlas.';
   }
 
   function renderCategoryPills(data, pendientes) {
@@ -2723,7 +2782,7 @@
   Object.assign(window, {
     changePeriod, switchTab, openQuickWindow, closeQuickWindow, submitQuickWindow,
     updateQuickTargetMonth, quickAddVariableExpense, copyPreviousMonth, copyFijoToNext, copyIngresoToNext,
-    toggleSignoImporte, sincronizarSignoImporte, guardarNotaMes, cambiarVistaVariables,
+    toggleSignoImporte, sincronizarSignoImporte, guardarNotaMes, cambiarVistaVariables, moverGrupo,
     abrirValoracionMes, abrirCierreMes, confirmarCierreMes, reabrirMes, abrirValoracionAnual,
     openAddObjetivoModal, confirmAddObjetivo, openAddIngresoModal, confirmAddIngreso,
     openAddAhorroModal, confirmAddAhorro, openAddGastoFijoModal, confirmAddGastoFijo,
