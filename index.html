@@ -579,12 +579,12 @@
         <div class="px-4 py-2.5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2 bg-slate-50/50">
           <div id="container-category-pills" class="flex flex-wrap items-center gap-1.5 text-xs"></div>
           <div class="flex items-center gap-2 w-full sm:w-auto">
-            <div class="flex items-center bg-slate-100 p-0.5 rounded-xl text-[11px] font-bold shrink-0">
-              <button id="btn-vista-lista" onclick="cambiarVistaVariables('lista')" class="px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1">
-                <svg class="ic text-[10px]"><use href="#i-bars"></use></svg> Lista
+            <div class="flex items-center bg-amber-200/70 border border-amber-300 p-1 rounded-xl text-xs font-bold shrink-0">
+              <button id="btn-vista-lista" onclick="cambiarVistaVariables('lista')" class="px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
+                <svg class="ic"><use href="#i-bars"></use></svg> Lista
               </button>
-              <button id="btn-vista-columnas" onclick="cambiarVistaVariables('columnas')" class="px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1">
-                <svg class="ic text-[10px]"><use href="#i-tag"></use></svg> Columnas
+              <button id="btn-vista-columnas" onclick="cambiarVistaVariables('columnas')" class="px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
+                <svg class="ic"><use href="#i-tag"></use></svg> Columnas
               </button>
             </div>
             <div class="relative flex-1 sm:w-48 sm:flex-none">
@@ -1869,8 +1869,8 @@
 
     const btnL = document.getElementById('btn-vista-lista');
     const btnC = document.getElementById('btn-vista-columnas');
-    const activo = 'px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1 bg-white text-amber-700 shadow-sm';
-    const apagado = 'px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1 text-slate-500 hover:text-slate-800';
+    const activo = 'px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 bg-amber-600 text-white shadow-sm';
+    const apagado = 'px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-amber-900/70 hover:text-amber-900 hover:bg-white/60';
     btnL.className = enColumnas ? apagado : activo;
     btnC.className = enColumnas ? activo : apagado;
     if (!enColumnas) return;
