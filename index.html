@@ -1120,9 +1120,11 @@
     const otra = remotoManda ? local : remoto;
     const flagsLocales = {};
     const notasLocales = {};
+    const notasOtra = {};
     (otra.categoriasVariables || []).forEach(c => {
       if (c.excluirDelTotal !== undefined) flagsLocales[c.categoria] = c.excluirDelTotal;
       if (c.nota) notasLocales[c.categoria] = c.nota;
+      notasOtra[c.categoria] = { nota: c.nota || '', el: c.notaEl || '' };
     });
     const catsMerged = (base.categoriasVariables || []).map(c => {
       const extra = {};
@@ -1130,8 +1132,16 @@
       // Solo se rescata la nota del otro lado si aquí ni siquiera existe el campo
       // (dato guardado antes de esta función); una nota vacía es un borrado a propósito.
       if (c.nota === undefined && notasLocales[c.categoria]) extra.nota = notasLocales[c.categoria];
+      const o = notasOtra[c.categoria];
+      if (o && o.el && o.el > (c.notaEl || '')) { extra.nota = o.nota; extra.notaEl = o.el; }
       return Object.keys(extra).length ? Object.assign({}, c, extra) : c;
     });
+    const notaMes = (() => {
+      const hB = base.notaEl || '', hO = otra.notaEl || '';
+      if (!hB && !hO) return { nota: base.nota !== undefined ? base.nota : (otra.nota || ''), notaEl: '' };
+      return hO > hB ? { nota: otra.nota || '', notaEl: hO } : { nota: base.nota || '', notaEl: hB };
+    })();
+
     const fundido = {
       objetivos: base.objetivos || [],
       ingresos: base.ingresos || [],
@@ -1140,9 +1150,11 @@
       categoriasVariables: catsMerged,
       registroVariables: [],
       borrados: [],
-      // Si el lado que manda trae el campo se respeta (aunque esté vacío: puede
-      // ser un borrado); si ni siquiera existe, se rescata del otro lado.
-      nota: base.nota !== undefined ? base.nota : (otra.nota || ''),
+      // Gana la nota escrita más tarde, mirando su marca de hora: si no, el
+      // dispositivo que guarde el último pisa con su copia vieja lo que
+      // acabas de escribir en el otro.
+      nota: notaMes.nota,
+      notaEl: notaMes.notaEl,
       cerrado: base.cerrado !== undefined ? base.cerrado : !!otra.cerrado,
       cerradoEl: base.cerradoEl !== undefined ? base.cerradoEl : (otra.cerradoEl || '')
     };
@@ -1394,7 +1406,9 @@
   }
 
   function guardarNotaMes(valor) {
-    month().nota = valor;
+    const m = month();
+    m.nota = valor;
+    m.notaEl = new Date().toISOString();
     queueSave();
   }
 
@@ -2202,6 +2216,7 @@
     const row = month()[list][Number(el.dataset.idx)];
     if (!row) return;
     row[field] = numericFields.has(field) ? Number(el.value) || 0 : el.value;
+    if (field === 'nota') row.notaEl = new Date().toISOString();
     queueSave();
     renderAll();
   });
