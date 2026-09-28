@@ -587,6 +587,7 @@
                 <svg class="ic"><use href="#i-tag"></use></svg> Columnas
               </button>
             </div>
+                <button onclick="abrirColumnasAmpliado()" title="Ver todos los gastos en grande, grupo por grupo" class="btn-pop shrink-0 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5"><svg class="ic"><use href="#i-eye"></use></svg><span class="hidden sm:inline">Ver en grande</span></button>
             <div class="relative flex-1 sm:w-48 sm:flex-none">
               <svg class="ic absolute left-3 top-2 text-slate-400"><use href="#i-search"></use></svg>
               <input type="text" id="search-expenses" oninput="renderMonthlyView()" placeholder="Buscar gasto…" class="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-3 py-1.5 text-xs focus:ring-2 focus:ring-amber-300 outline-none shadow-sm">
@@ -595,7 +596,7 @@
         </div>
 
         <div id="vista-columnas" class="hidden p-4">
-          <div class="flex items-start justify-between gap-3 mb-2"><p id="columnas-pista" class="text-[11px] text-slate-500"></p><button onclick="abrirColumnasAmpliado()" class="btn-pop shrink-0 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold rounded-xl shadow-sm flex items-center gap-1.5"><svg class="ic"><use href="#i-eye"></use></svg> Ver en grande</button></div>
+          <p id="columnas-pista" class="text-[11px] text-slate-500 mb-2"></p>
           <div id="container-variables-columnas" class="flex gap-3 overflow-x-auto custom-scrollbar pb-2 items-start"></div>
         </div>
 
@@ -2059,12 +2060,9 @@
     const apagado = 'px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-amber-900/70 hover:text-amber-900 hover:bg-white/60';
     btnL.className = enColumnas ? apagado : activo;
     btnC.className = enColumnas ? activo : apagado;
-    if (!enColumnas) return;
 
-    const n = construirColumnas(data, searchVal, document.getElementById('container-variables-columnas'),
-      { ancho: 'w-44', alto: 'max-h-80', texto: 'text-[11px]' });
-    document.getElementById('columnas-pista').innerHTML = textoPista(searchVal, n);
-
+    // El tablero grande se abre desde cualquiera de las dos vistas, así que se
+    // pinta siempre que el modal esté abierto, no solo estando en Columnas.
     const modal = document.getElementById('modal-columnas');
     if (!modal.classList.contains('hidden')) {
       const m = construirColumnas(data, searchVal, document.getElementById('container-columnas-modal'),
@@ -2072,6 +2070,12 @@
       document.getElementById('columnas-modal-pista').innerHTML = textoPista(searchVal, m);
       document.getElementById('columnas-modal-titulo').innerText = 'Gastos variables de ' + labelForKey(currentKey());
     }
+
+    if (!enColumnas) return;
+
+    const n = construirColumnas(data, searchVal, document.getElementById('container-variables-columnas'),
+      { ancho: 'w-44', alto: 'max-h-80', texto: 'text-[11px]' });
+    document.getElementById('columnas-pista').innerHTML = textoPista(searchVal, n);
   }
 
   function buscarDesdeAmpliado(valor) {
