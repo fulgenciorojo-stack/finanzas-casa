@@ -595,7 +595,7 @@
         </div>
 
         <div id="vista-columnas" class="hidden p-4">
-          <p id="columnas-pista" class="text-[11px] text-slate-500 mb-2"></p>
+          <div class="flex items-start justify-between gap-3 mb-2"><p id="columnas-pista" class="text-[11px] text-slate-500"></p><button onclick="abrirColumnasAmpliado()" class="btn-pop shrink-0 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold rounded-xl shadow-sm flex items-center gap-1.5"><svg class="ic"><use href="#i-eye"></use></svg> Ver en grande</button></div>
           <div id="container-variables-columnas" class="flex gap-3 overflow-x-auto custom-scrollbar pb-2 items-start"></div>
         </div>
 
@@ -944,6 +944,33 @@
         <p id="puerta-error" class="hidden text-xs font-semibold text-red-600">Ese código no vale. Copia el que te pasaron, entero y sin espacios.</p>
         <button type="submit" class="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-2xl shadow-lg font-bold text-sm transition-all">Entrar</button>
       </form>
+    </div>
+  </div>
+
+  <div id="modal-columnas" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-3">
+    <div class="bg-white rounded-3xl w-full max-w-[96rem] shadow-2xl overflow-hidden flex flex-col max-h-[95vh]">
+      <div class="px-5 py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center gap-3">
+        <div class="bg-white/20 w-9 h-9 rounded-xl flex items-center justify-center shrink-0">
+          <svg class="ic"><use href="#i-receipt"></use></svg>
+        </div>
+        <div class="min-w-0">
+          <h3 id="columnas-modal-titulo" class="title-font text-lg font-bold leading-tight">Gastos variables</h3>
+          <p id="columnas-modal-pista" class="text-[11px] font-medium text-white/85"></p>
+        </div>
+        <div class="ml-auto flex items-center gap-2 shrink-0">
+          <div class="relative hidden sm:block">
+            <svg class="ic absolute left-2.5 top-2 text-white/70"><use href="#i-search"></use></svg>
+            <input type="text" id="buscar-columnas-modal" oninput="buscarDesdeAmpliado(this.value)" placeholder="Buscar gasto…"
+              class="w-48 bg-white/20 placeholder:text-white/60 text-white border border-white/30 rounded-xl pl-8 pr-3 py-1.5 text-xs outline-none focus:bg-white/30">
+          </div>
+          <button onclick="closeModal('modal-columnas')" aria-label="Cerrar" class="w-9 h-9 rounded-xl bg-white/20 hover:bg-white/30 flex items-center justify-center transition-all">
+            <svg class="ic"><use href="#i-x"></use></svg>
+          </button>
+        </div>
+      </div>
+      <div class="p-4 overflow-auto custom-scrollbar">
+        <div id="container-columnas-modal" class="flex gap-3 items-start"></div>
+      </div>
     </div>
   </div>
 
@@ -1862,19 +1889,31 @@
 
   // Vista de tablero: una columna por grupo para ver de un vistazo todo lo
   // apuntado en cada uno y comprobar si un gasto ya está metido en otro sitio.
-  function renderColumnasVariables(data, searchVal, excluidas) {
-    const enColumnas = state.vistaVariables === 'columnas';
-    document.getElementById('vista-columnas').classList.toggle('hidden', !enColumnas);
-    document.getElementById('vista-lista').classList.toggle('hidden', enColumnas);
+  // Semana ISO: así la misma semana real recibe el mismo sombreado en todas
+  // las columnas, que es lo que permite compararlas de un vistazo.
+  function semanaISO(fechaISO) {
+    if (!fechaISO) return null;
+    const d = new Date(fechaISO + 'T00:00:00');
+    if (isNaN(d.getTime())) return null;
+    const jue = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    jue.setDate(jue.getDate() - ((jue.getDay() + 6) % 7) + 3);
+    const primero = new Date(jue.getFullYear(), 0, 4);
+    primero.setDate(primero.getDate() - ((primero.getDay() + 6) % 7) + 3);
+    return 1 + Math.round((jue - primero) / 604800000);
+  }
 
-    const btnL = document.getElementById('btn-vista-lista');
-    const btnC = document.getElementById('btn-vista-columnas');
-    const activo = 'px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 bg-amber-600 text-white shadow-sm';
-    const apagado = 'px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-amber-900/70 hover:text-amber-900 hover:bg-white/60';
-    btnL.className = enColumnas ? apagado : activo;
-    btnC.className = enColumnas ? activo : apagado;
-    if (!enColumnas) return;
+  function etiquetaSemana(fechaISO) {
+    const d = new Date(fechaISO + 'T00:00:00');
+    const lun = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    lun.setDate(lun.getDate() - ((lun.getDay() + 6) % 7));
+    const dom = new Date(lun.getFullYear(), lun.getMonth(), lun.getDate() + 6);
+    const mes = f => MONTH_NAMES[f.getMonth()].slice(0, 3).toLowerCase();
+    return lun.getMonth() === dom.getMonth()
+      ? lun.getDate() + '–' + dom.getDate() + ' ' + mes(lun)
+      : lun.getDate() + ' ' + mes(lun) + '–' + dom.getDate() + ' ' + mes(dom);
+  }
 
+  function construirColumnas(data, searchVal, cont, opc) {
     const porCat = {};
     data.categoriasVariables.forEach(c => { porCat[c.categoria] = []; });
     data.registroVariables.forEach(item => {
@@ -1882,11 +1921,10 @@
       porCat[item.categoria].push(item);
     });
 
-    const cont = document.getElementById('container-variables-columnas');
     cont.innerHTML = '';
     let conCoincidencia = 0;
-
     const ultima = data.categoriasVariables.length - 1;
+
     data.categoriasVariables.forEach((cat, idxCat) => {
       const items = (porCat[cat.categoria] || [])
         .slice()
@@ -1899,14 +1937,46 @@
 
       const personal = !!cat.excluirDelTotal;
       const total = items.reduce((a, i) => a + Number(i.real || 0), 0);
+      const c = colorGrupo(cat.categoria);
 
       const col = document.createElement('div');
-      col.className = 'shrink-0 w-44 rounded-2xl border flex flex-col max-h-80 transition-all ' +
+      col.className = 'shrink-0 ' + opc.ancho + ' rounded-2xl border flex flex-col ' + opc.alto + ' transition-all ' +
         (hayCoincidencia ? 'border-amber-400 bg-amber-50/70 ring-2 ring-amber-200'
           : searchVal ? 'border-slate-200 bg-slate-50/60 opacity-50'
           : personal ? 'border-blue-200 bg-blue-50/50' : 'border-slate-200 bg-slate-50/60');
 
-      const c = colorGrupo(cat.categoria);
+      let semanaPrevia = null;
+      const cuerpo = items.length
+        ? items.map(i => {
+            const sem = semanaISO(i.fecha);
+            const nuevaSemana = sem !== null && sem !== semanaPrevia;
+            const separador = nuevaSemana && semanaPrevia !== null
+              ? '<div class="flex items-center gap-1 pt-1.5 pb-0.5">' +
+                  '<span class="h-px flex-1 bg-slate-300"></span>' +
+                  '<span class="text-[8px] font-bold text-slate-400 uppercase tracking-wide">' + etiquetaSemana(i.fecha) + '</span>' +
+                  '<span class="h-px flex-1 bg-slate-300"></span></div>'
+              : '';
+            if (nuevaSemana) semanaPrevia = sem;
+            const marca = searchVal && coincide(i);
+            const fondo = marca ? 'bg-amber-100 border-amber-300'
+              : (sem !== null && sem % 2 === 0) ? 'bg-slate-200/60 border-slate-300/70'
+              : 'bg-white border-slate-100';
+            return separador +
+              '<div class="rounded-xl px-2 py-1.5 border ' + opc.texto + ' ' + fondo + '">' +
+                '<div class="flex justify-between gap-1">' +
+                  '<span class="font-medium text-slate-700 leading-tight break-words">' + escapeHTML(i.concepto || '(sin concepto)') + '</span>' +
+                  '<span class="font-bold num shrink-0 ' + (Number(i.real || 0) < 0 ? 'text-emerald-600' : 'text-slate-800') + '">' + formatEuro(Number(i.real || 0)) + '</span>' +
+                '</div>' +
+                '<span class="text-[9px] text-slate-400 font-semibold">' + (i.fecha ? i.fecha.slice(8, 10) + '/' + i.fecha.slice(5, 7) : '') + '</span>' +
+                (i.porRevisar ? '<span class="text-[9px] text-amber-600 font-bold ml-1">por revisar</span>' : '') +
+              '</div>';
+          }).join('')
+        : '<p class="text-[10px] text-slate-300 text-center py-3">Sin apuntes</p>';
+
+      const primeraSemana = items.length && items[0].fecha
+        ? '<div class="text-[8px] font-bold text-slate-400 uppercase tracking-wide text-center pt-1">' + etiquetaSemana(items[0].fecha) + '</div>'
+        : '';
+
       col.innerHTML =
         '<div class="px-2.5 py-2 border-b rounded-t-2xl cursor-grab active:cursor-grabbing ' + c.cab + '">' +
           '<div class="flex items-center gap-1 min-w-0">' +
@@ -1925,22 +1995,9 @@
             '<span class="num ' + (total < 0 ? 'text-emerald-700' : c.dato) + '">' + formatEuro(total) + '</span>' +
           '</div>' +
         '</div>' +
-        '<div class="p-1.5 space-y-1 overflow-y-auto custom-scrollbar">' +
-          (items.length
-            ? items.map(i => {
-                const marca = searchVal && coincide(i);
-                return '<div class="rounded-xl px-2 py-1.5 border text-[11px] ' +
-                  (marca ? 'bg-amber-100 border-amber-300' : 'bg-white border-slate-100') + '">' +
-                  '<div class="flex justify-between gap-1">' +
-                    '<span class="font-medium text-slate-700 leading-tight break-words">' + escapeHTML(i.concepto || '(sin concepto)') + '</span>' +
-                    '<span class="font-bold num shrink-0 ' + (Number(i.real || 0) < 0 ? 'text-emerald-600' : 'text-slate-800') + '">' + formatEuro(Number(i.real || 0)) + '</span>' +
-                  '</div>' +
-                  '<span class="text-[9px] text-slate-400 font-semibold">' + (i.fecha ? i.fecha.slice(8, 10) + '/' + i.fecha.slice(5, 7) : '') + '</span>' +
-                  (i.porRevisar ? '<span class="text-[9px] text-amber-600 font-bold ml-1">por revisar</span>' : '') +
-                  '</div>';
-              }).join('')
-            : '<p class="text-[10px] text-slate-300 text-center py-3">Sin apuntes</p>') +
-        '</div>';
+        primeraSemana +
+        '<div class="p-1.5 space-y-1 overflow-y-auto custom-scrollbar">' + cuerpo + '</div>';
+
       col.draggable = true;
       col.addEventListener('dragstart', ev => {
         ev.dataTransfer.effectAllowed = 'move';
@@ -1966,12 +2023,51 @@
       cont.appendChild(col);
     });
 
-    const pista = document.getElementById('columnas-pista');
-    pista.innerHTML = searchVal
+    return conCoincidencia;
+  }
+
+  function textoPista(searchVal, conCoincidencia) {
+    return searchVal
       ? (conCoincidencia
           ? '«<span class="font-bold text-slate-700">' + escapeHTML(searchVal) + '</span>» aparece en <span class="font-bold text-amber-700">' + conCoincidencia + (conCoincidencia === 1 ? '</span> grupo.' : '</span> grupos.')
           : 'No hay ningún apunte que ponga «<span class="font-bold text-slate-700">' + escapeHTML(searchVal) + '</span>».')
-      : 'Todo lo apuntado este mes, grupo por grupo. Busca arriba para ver en qué grupos está un gasto, y arrastra una columna (o usa las flechas) para reordenarlas.';
+      : 'Cada semana va con un sombreado distinto. Busca arriba para ver en qué grupos está un gasto, y arrastra una columna (o usa las flechas) para reordenarlas.';
+  }
+
+  function renderColumnasVariables(data, searchVal, excluidas) {
+    const enColumnas = state.vistaVariables === 'columnas';
+    document.getElementById('vista-columnas').classList.toggle('hidden', !enColumnas);
+    document.getElementById('vista-lista').classList.toggle('hidden', enColumnas);
+
+    const btnL = document.getElementById('btn-vista-lista');
+    const btnC = document.getElementById('btn-vista-columnas');
+    const activo = 'px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 bg-amber-600 text-white shadow-sm';
+    const apagado = 'px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-amber-900/70 hover:text-amber-900 hover:bg-white/60';
+    btnL.className = enColumnas ? apagado : activo;
+    btnC.className = enColumnas ? activo : apagado;
+    if (!enColumnas) return;
+
+    const n = construirColumnas(data, searchVal, document.getElementById('container-variables-columnas'),
+      { ancho: 'w-44', alto: 'max-h-80', texto: 'text-[11px]' });
+    document.getElementById('columnas-pista').innerHTML = textoPista(searchVal, n);
+
+    const modal = document.getElementById('modal-columnas');
+    if (!modal.classList.contains('hidden')) {
+      const m = construirColumnas(data, searchVal, document.getElementById('container-columnas-modal'),
+        { ancho: 'w-60', alto: 'max-h-[70vh]', texto: 'text-xs' });
+      document.getElementById('columnas-modal-pista').innerHTML = textoPista(searchVal, m);
+      document.getElementById('columnas-modal-titulo').innerText = 'Gastos variables de ' + labelForKey(currentKey());
+    }
+  }
+
+  function buscarDesdeAmpliado(valor) {
+    document.getElementById('search-expenses').value = valor;
+    renderMonthlyView();
+  }
+
+  function abrirColumnasAmpliado() {
+    openModal('modal-columnas');
+    renderMonthlyView();
   }
 
   function renderCategoryPills(data, pendientes) {
@@ -2782,7 +2878,7 @@
   Object.assign(window, {
     changePeriod, switchTab, openQuickWindow, closeQuickWindow, submitQuickWindow,
     updateQuickTargetMonth, quickAddVariableExpense, copyPreviousMonth, copyFijoToNext, copyIngresoToNext,
-    toggleSignoImporte, sincronizarSignoImporte, guardarNotaMes, cambiarVistaVariables, moverGrupo,
+    toggleSignoImporte, sincronizarSignoImporte, guardarNotaMes, cambiarVistaVariables, moverGrupo, abrirColumnasAmpliado, buscarDesdeAmpliado,
     abrirValoracionMes, abrirCierreMes, confirmarCierreMes, reabrirMes, abrirValoracionAnual,
     openAddObjetivoModal, confirmAddObjetivo, openAddIngresoModal, confirmAddIngreso,
     openAddAhorroModal, confirmAddAhorro, openAddGastoFijoModal, confirmAddGastoFijo,
