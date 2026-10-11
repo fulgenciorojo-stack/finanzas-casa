@@ -1431,16 +1431,20 @@
     const det = document.getElementById('bloque-extracto');
     if (!det) return;
     det.open = true;
-    // La cabecera es sticky, así que hay que dejarle su hueco o tapa el título.
-    const cab = document.querySelector('header');
-    det.style.scrollMarginTop = ((cab ? cab.getBoundingClientRect().height : 0) + 10) + 'px';
     det.classList.add('ring-4', 'ring-pink-300');
-    // Al abrirse crecen las gráficas de arriba y la página se mueve sola,
-    // así que repetimos el salto cuando ya ha asentado.
-    const saltar = suave => det.scrollIntoView({ behavior: suave ? 'smooth' : 'auto', block: 'start' });
+    // La cabecera es sticky y cambia de alto segun el ancho, asi que se mide
+    // justo antes de cada salto o acaba tapando el titulo. Ademas, al abrirse
+    // el bloque crecen las graficas de arriba y la pagina se mueve sola, de
+    // modo que repetimos el salto cuando ya ha asentado.
+    const saltar = suave => {
+      const cab = document.querySelector('header');
+      det.style.scrollMarginTop = ((cab ? cab.getBoundingClientRect().height : 0) + 20) + 'px';
+      det.scrollIntoView({ behavior: suave ? 'smooth' : 'auto', block: 'start' });
+    };
     setTimeout(() => saltar(true), 60);
-    setTimeout(() => saltar(false), 700);
-    setTimeout(() => det.classList.remove('ring-4', 'ring-pink-300'), 2200);
+    setTimeout(() => saltar(false), 800);
+    setTimeout(() => saltar(false), 1500);
+    setTimeout(() => det.classList.remove('ring-4', 'ring-pink-300'), 2600);
   }
 
   function openQuickWindow() {
