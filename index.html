@@ -63,6 +63,10 @@
   @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(244,143,177,.4); } 50% { box-shadow: 0 0 0 6px rgba(244,143,177,0); } }
   /* Botones de acción de cada fila. En el móvil no hay ratón, así que no pueden
      depender del hover para verse: llevan color y fondo propios de partida. */
+  /* El corazón del extracto late despacito, sin marear. */
+  @keyframes latido { 0%,100% { transform: scale(1); } 15% { transform: scale(1.22); } 30% { transform: scale(1); } 45% { transform: scale(1.14); } }
+  .latido { animation: latido 2.4s ease-in-out infinite; transform-origin: center; }
+  @media (prefers-reduced-motion: reduce) { .latido { animation: none; } }
   .row-btn {
     width: 1.75rem; height: 1.75rem; border-radius: .5rem; flex-shrink: 0;
     display: inline-flex; align-items: center; justify-content: center;
@@ -115,6 +119,7 @@
   <symbol id="i-tag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12.5V4a1 1 0 0 1 1-1h8.5L21 11.5 12.5 20z"/><circle cx="7.5" cy="7.5" r="1.3" fill="currentColor" stroke="none"/></symbol>
   <symbol id="i-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 17H3z"/><path d="M12 9v5M12 17.2v.1"/></symbol>
   <symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="2.6"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24" fill="currentColor"><path d="M12 20.7l-1.4-1.3C6 15.4 3 12.6 3 9.2 3 6.6 5 4.7 7.5 4.7c1.4 0 2.8.7 3.6 1.8l.9 1.2.9-1.2c.8-1.1 2.2-1.8 3.6-1.8C19 4.7 21 6.6 21 9.2c0 3.4-3 6.2-7.6 10.2z"/></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></symbol>
 </svg>
 
@@ -524,7 +529,7 @@
         </div>
       </details>
 
-<details class="group hover-lift bg-white border border-amber-200 rounded-3xl shadow-md hover:shadow-lg overflow-hidden">
+<details id="bloque-extracto" class="group hover-lift bg-white border border-amber-200 rounded-3xl shadow-md hover:shadow-lg overflow-hidden">
 
         <summary class="bg-gradient-to-r from-amber-100 via-orange-100 to-amber-50 hover:from-amber-200 hover:via-orange-200 hover:to-amber-100 px-5 py-3.5 hover:pl-6 border-b border-amber-200 flex flex-wrap items-center justify-between gap-2 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden transition-all duration-200">
           <div class="flex items-center space-x-2">
@@ -532,7 +537,7 @@
               <svg class="ic"><use href="#i-receipt"></use></svg>
             </div>
             <div>
-              <h3 class="font-bold text-sm text-amber-950 uppercase tracking-wider title-font">Registro de gastos variables</h3>
+              <h3 class="font-bold text-sm text-amber-950 uppercase tracking-wider title-font flex items-center gap-1.5">Extracto de gastos variables <svg class="ic text-pink-500 latido" aria-hidden="true"><use href="#i-heart"></use></svg></h3>
               <p class="text-[11px] text-amber-800 font-medium">Lo que apuntas desde el móvil aparece aquí</p>
             </div>
           </div>
@@ -804,6 +809,12 @@
           <svg class="ic"><use href="#i-check"></use></svg>
           <span>Guardar gasto</span>
         </button>
+
+        <button type="button" onclick="irAlExtracto()" class="btn-pop w-full py-3.5 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white rounded-2xl shadow-lg font-bold text-sm transition-all flex items-center justify-center gap-2">
+          <svg class="ic latido"><use href="#i-heart"></use></svg>
+          <span>Para ti Aida</span>
+        </button>
+        <p class="text-[10px] text-slate-400 text-center -mt-2">Te lleva al extracto de gastos variables</p>
 
         <div id="qw-recent-wrap" class="hidden pt-2 border-t border-slate-100">
           <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Apuntados hoy en esta sesión</span>
@@ -1411,6 +1422,25 @@
     m.nota = valor;
     m.notaEl = new Date().toISOString();
     queueSave();
+  }
+
+  // "Para ti Aida": desde la ventana de apuntar gasto, al extracto, abierto y a la vista.
+  function irAlExtracto() {
+    closeQuickWindow();
+    switchTab('monthly');
+    const det = document.getElementById('bloque-extracto');
+    if (!det) return;
+    det.open = true;
+    // La cabecera es sticky, así que hay que dejarle su hueco o tapa el título.
+    const cab = document.querySelector('header');
+    det.style.scrollMarginTop = ((cab ? cab.getBoundingClientRect().height : 0) + 10) + 'px';
+    det.classList.add('ring-4', 'ring-pink-300');
+    // Al abrirse crecen las gráficas de arriba y la página se mueve sola,
+    // así que repetimos el salto cuando ya ha asentado.
+    const saltar = suave => det.scrollIntoView({ behavior: suave ? 'smooth' : 'auto', block: 'start' });
+    setTimeout(() => saltar(true), 60);
+    setTimeout(() => saltar(false), 700);
+    setTimeout(() => det.classList.remove('ring-4', 'ring-pink-300'), 2200);
   }
 
   function openQuickWindow() {
@@ -2895,7 +2925,7 @@
   });
 
   Object.assign(window, {
-    changePeriod, switchTab, openQuickWindow, closeQuickWindow, submitQuickWindow,
+    changePeriod, switchTab, openQuickWindow, closeQuickWindow, submitQuickWindow, irAlExtracto,
     updateQuickTargetMonth, quickAddVariableExpense, copyPreviousMonth, copyFijoToNext, copyIngresoToNext,
     toggleSignoImporte, sincronizarSignoImporte, guardarNotaMes, cambiarVistaVariables, moverGrupo, abrirColumnasAmpliado, buscarDesdeAmpliado,
     abrirValoracionMes, abrirCierreMes, confirmarCierreMes, reabrirMes, abrirValoracionAnual,
