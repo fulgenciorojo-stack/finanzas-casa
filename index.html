@@ -2587,6 +2587,14 @@
       presupuesto: a.presupuesto + x.m.presupuesto
     }), { ingresos: 0, gastos: 0, ahorro: 0, personal: 0, presupuesto: 0 });
 
+    // El presupuesto solo se compara con los meses que lo tienen puesto: si no,
+    // se enfrenta el gasto de todo el año al presupuesto de los pocos meses
+    // rellenados y siempre parece que se ha pasado.
+    const conPresu = meses.filter(x => x.m.presupuesto > 0);
+    const presu = conPresu.reduce((a, x) => a + x.m.presupuesto, 0);
+    const gastoConPresu = conPresu.reduce((a, x) => a + x.m.gastos, 0);
+    const faltanPresu = meses.length - conPresu.length;
+
     const balance = tot.ingresos - tot.gastos;
     const tasa = tot.ingresos > 0 ? (balance / tot.ingresos) * 100 : 0;
     const v = veredictoMes({ sinDatos: false, balance, tasaAhorro: tasa });
@@ -2601,12 +2609,16 @@
     cuerpo += '<div class="text-xs">' +
       filaValor('Meses con movimientos', meses.length + ' de 12' + (cerrados ? ' (' + cerrados + ' cerrados)' : ''), 'text-slate-700') +
       filaValor('Ha entrado en el año', formatEuro(tot.ingresos), 'text-amber-700') +
-      filaValor('Presupuestado en el año', formatEuro(tot.presupuesto), 'text-indigo-600') +
+      (presu > 0 ? filaValor(
+        'Presupuestado' + (faltanPresu ? ' (en ' + conPresu.length + ' ' + (conPresu.length === 1 ? 'mes' : 'meses') + ')' : ' en el año'),
+        formatEuro(presu), 'text-indigo-600') : '') +
       filaValor('Gastado en el año', formatEuro(tot.gastos), 'text-pink-600') +
-      (tot.presupuesto > 0 ? filaValor(
-        tot.presupuesto - tot.gastos >= 0 ? 'Ha sobrado del presupuesto' : 'Se ha pasado del presupuesto',
-        formatEuro(Math.abs(tot.presupuesto - tot.gastos)),
-        tot.presupuesto - tot.gastos >= 0 ? 'text-emerald-600' : 'text-red-600') : '') +
+      (presu > 0 && faltanPresu ? filaValor(
+        conPresu.length === 1 ? 'Gastado en ese mes' : 'Gastado en esos meses', formatEuro(gastoConPresu), 'text-pink-600') : '') +
+      (presu > 0 ? filaValor(
+        presu - gastoConPresu >= 0 ? 'Ha sobrado del presupuesto' : 'Se ha pasado del presupuesto',
+        formatEuro(Math.abs(presu - gastoConPresu)),
+        presu - gastoConPresu >= 0 ? 'text-emerald-600' : 'text-red-600') : '') +
       filaValor('Diferencia', formatEuro(balance), balance >= 0 ? 'text-emerald-600' : 'text-red-600') +
       filaValor('Media de gasto al mes', formatEuro(tot.gastos / meses.length), 'text-slate-700') +
       (tot.ahorro ? filaValor('Ahorro e inversión', formatEuro(tot.ahorro), 'text-emerald-600') : '') +
@@ -2623,6 +2635,12 @@
         '<p class="text-sm font-bold text-slate-800">' + peor.nombre + '</p>' +
         '<p class="text-xs font-bold text-red-600 num">' + formatEuro(peor.m.balance) + '</p></div>' +
       '</div>';
+
+    if (faltanPresu) cuerpo += bloqueAviso(
+      faltanPresu === 1
+        ? 'Hay 1 mes con movimientos y sin presupuesto puesto, así que no entra en esta comparación.'
+        : 'Hay ' + faltanPresu + ' meses con movimientos y sin presupuesto puesto, así que no entran en esta comparación.',
+      'aviso');
 
     const enRojo = meses.filter(x => x.m.balance < 0);
     cuerpo += enRojo.length
