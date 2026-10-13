@@ -1067,6 +1067,7 @@
     activeCategoryFilter: 'Todos',
     vistaVariables: 'lista',
     panelFoco: null,
+    panelGrupo: 0,
     panelSucio: false,
     monthsData: {}
   };
@@ -2127,14 +2128,14 @@
 
   // Panel tipo hoja de cálculo: una columna por grupo, una fila por semana,
   // los totales abajo y todo editable sin salir de aquí.
-  function construirPanel(data, searchVal, cont, opc) {
-    const key = currentKey();
-    const semanas = semanasDelMes(key);
+  // Preparación común a las dos presentaciones del panel (tabla y fichas).
+  function datosPanel(data, searchVal) {
+    const semanas = semanasDelMes(currentKey());
     const cats = data.categoriasVariables;
     const idxDe = new Map();
     data.registroVariables.forEach((it, i) => idxDe.set(it, i));
 
-    const coincide = it => searchVal && (
+    const coincide = it => !!searchVal && (
       String(it.concepto || '').toLowerCase().includes(searchVal) ||
       String(it.categoria || '').toLowerCase().includes(searchVal));
 
@@ -2158,6 +2159,40 @@
       if (sem) totalSemana[sem.n] = (totalSemana[sem.n] || 0) + v;
     });
 
+    cats.forEach(cat => {
+      if (!cat.excluirDelTotal) {
+        previstoCasa += Number(cat.esperado || 0);
+        gastadoCasa += gastadoCat[cat.categoria] || 0;
+      }
+      if (searchVal && data.registroVariables.some(it => it.categoria === cat.categoria && coincide(it))) grupoConCoincidencia++;
+    });
+
+    return { semanas, cats, idxDe, coincide, apuntes, sueltos, gastadoCat, totalSemana, gastadoCasa, previstoCasa, grupoConCoincidencia };
+  }
+
+  // En el móvil la tabla no cabe: 8 columnas son cinco pantallas de arrastre y
+  // la cabecera del grupo se pierde al bajar. Allí se enseña un grupo entero a
+  // lo ancho y se salta de uno a otro con la barra de arriba.
+  function panelEnFichas() { return window.innerWidth < 768; }
+
+  function cambiarGrupoPanel(i) {
+    state.panelGrupo = i;
+    renderMonthlyView();
+  }
+
+  function construirPanel(data, searchVal, cont, opc) {
+    const d = datosPanel(data, searchVal);
+    if (panelEnFichas()) construirPanelFichas(data, searchVal, cont, d);
+    else construirPanelTabla(data, searchVal, cont, opc, d);
+    cont.setAttribute('data-panel-raiz', '');
+    const foco = cont.querySelector('[data-panel-foco]');
+    if (foco) { foco.focus(); state.panelFoco = null; }
+    return d.grupoConCoincidencia;
+  }
+
+  function construirPanelTabla(data, searchVal, cont, opc, d) {
+    const { semanas, cats, idxDe, coincide, apuntes, sueltos, gastadoCat, totalSemana } = d;
+    const gastadoCasa = d.gastadoCasa, previstoCasa = d.previstoCasa;
     const esc = escapeHTML;
     const tam = opc.compacto
       ? { txt: 'text-[10px]', imp: 'text-[10px] w-14', celda: 'min-w-[8.5rem]' }
@@ -2172,9 +2207,6 @@
       const real = gastadoCat[cat.categoria] || 0;
       const queda = esp - real;
       const personal = !!cat.excluirDelTotal;
-      if (!personal) { previstoCasa += esp; gastadoCasa += real; }
-      const items = data.registroVariables.filter(it => it.categoria === cat.categoria);
-      if (searchVal && items.some(coincide)) grupoConCoincidencia++;
       const pct = esp > 0 ? Math.min(100, Math.round((real / esp) * 100)) : 0;
       cabecera +=
         '<th class="border-b-2 border-slate-200 border-l border-slate-100 p-0 align-top ' + tam.celda + '">' +
@@ -2300,13 +2332,121 @@
       '<div data-panel-resumen class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mt-2 text-[11px] font-bold">' +
         resumenPanelHTML(previsto, gastadoCasa) +
       '</div>';
-    cont.setAttribute('data-panel-raiz', '');
+  }
 
-    // devolvemos el foco al concepto recién creado, que si no se pierde al repintar
-    const foco = cont.querySelector('[data-panel-foco]');
-    if (foco) { foco.focus(); state.panelFoco = null; }
+  // Presentación de móvil: un grupo a pantalla completa, semana a semana,
+  // con botones del tamaño de un dedo y una barra para cambiar de grupo.
+  function construirPanelFichas(data, searchVal, cont, d) {
+    const { semanas, cats, idxDe, coincide, apuntes, sueltos, gastadoCat } = d;
+    const esc = escapeHTML;
+    if (!cats.length) { cont.innerHTML = '<p class="text-xs text-slate-400 text-center py-6">Todavía no hay grupos de gasto.</p>'; return; }
 
-    return grupoConCoincidencia;
+    const sel = Math.min(Math.max(state.panelGrupo || 0, 0), cats.length - 1);
+    state.panelGrupo = sel;
+    const cat = cats[sel];
+    const c = colorGrupo(cat.categoria);
+    const esp = Number(cat.esperado || 0);
+    const real = gastadoCat[cat.categoria] || 0;
+    const queda = esp - real;
+    const pct = esp > 0 ? Math.min(100, Math.round((real / esp) * 100)) : 0;
+
+    /* --- barra de grupos: de un vistazo cuánto queda en cada uno --- */
+    const chips = cats.map((ct, i) => {
+      const cc = colorGrupo(ct.categoria);
+      const e = Number(ct.esperado || 0), r = gastadoCat[ct.categoria] || 0;
+      const hayCoincidencia = searchVal && data.registroVariables.some(it => it.categoria === ct.categoria && coincide(it));
+      return '<button onclick="cambiarGrupoPanel(' + i + ')" class="shrink-0 snap-start px-3 py-2 rounded-xl border text-left transition-all ' +
+        (i === sel ? cc.cab + ' border-current shadow-sm ring-2 ring-slate-400/40'
+                   : hayCoincidencia ? 'bg-amber-100 border-amber-300' : 'bg-white border-slate-200') + '">' +
+        '<span class="flex items-center gap-1">' +
+          '<span class="' + cc.punto + ' w-1.5 h-1.5 rounded-full"></span>' +
+          '<span class="text-[11px] font-bold whitespace-nowrap ' + (i === sel ? cc.tit : 'text-slate-600') + '">' + esc(ct.categoria) + '</span>' +
+          (hayCoincidencia ? '<span class="text-[9px]">🔎</span>' : '') +
+        '</span>' +
+        '<span class="block text-[9px] font-bold num mt-0.5 ' +
+          (e === 0 ? 'text-slate-400' : e - r < 0 ? 'text-red-600' : 'text-emerald-600') + '">' +
+          (e === 0 ? formatEuro(r) : (e - r >= 0 ? formatEuro(e - r) : '-' + formatEuro(r - e))) + '</span>' +
+      '</button>';
+    }).join('');
+
+    /* --- cabecera del grupo elegido --- */
+    const cabecera =
+      '<div class="' + c.cab + ' border rounded-2xl px-3 py-2.5">' +
+        '<div class="flex items-center gap-1.5">' +
+          '<span class="' + c.punto + ' w-2 h-2 rounded-full shrink-0"></span>' +
+          '<span class="font-bold text-sm ' + c.tit + '">' + esc(cat.categoria) + '</span>' +
+          (cat.excluirDelTotal ? '<span class="text-[9px] font-bold text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded">Personal</span>' : '') +
+          '<span class="ml-auto flex items-center gap-1 shrink-0">' +
+            '<button onclick="cambiarGrupoPanel(' + (sel - 1) + ')" aria-label="Grupo anterior"' +
+              (sel === 0 ? ' disabled class="w-8 h-8 rounded-lg opacity-20"' : ' class="w-8 h-8 rounded-lg bg-white/70 ' + c.dato + '"') + '>&#9664;</button>' +
+            '<button onclick="cambiarGrupoPanel(' + (sel + 1) + ')" aria-label="Grupo siguiente"' +
+              (sel === cats.length - 1 ? ' disabled class="w-8 h-8 rounded-lg opacity-20"' : ' class="w-8 h-8 rounded-lg bg-white/70 ' + c.dato + '"') + '>&#9654;</button>' +
+          '</span>' +
+        '</div>' +
+        '<div class="flex items-center justify-between gap-2 mt-2">' +
+          '<span class="text-[10px] font-bold uppercase ' + c.dato + ' opacity-75">Previsto</span>' +
+          '<span class="flex items-center gap-1">' +
+            '<input type="number" step="0.01" inputmode="decimal" value="' + esp + '" data-panel="esperado" data-cat="' + sel + '" ' +
+              'class="w-24 text-right font-bold text-sm bg-white border border-white rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-slate-400 num">' +
+            '<span class="text-xs font-bold ' + c.dato + '">€</span>' +
+          '</span>' +
+        '</div>' +
+        '<div class="mt-2 h-1.5 w-full bg-white/60 rounded-full overflow-hidden">' +
+          '<div data-barra-grupo="' + sel + '" class="h-full rounded-full ' + (queda < 0 ? 'bg-red-500' : pct > 85 ? 'bg-amber-500' : 'bg-emerald-500') + '" style="width:' + pct + '%"></div>' +
+        '</div>' +
+        '<div class="flex justify-between text-[11px] font-bold mt-1">' +
+          '<span class="' + c.dato + ' num">Gastado <span data-tot-grupo="' + sel + '">' + formatEuro(real) + '</span></span>' +
+          '<span data-queda-grupo="' + sel + '" class="num ' + (queda < 0 ? 'text-red-700' : 'text-emerald-700') + '">' + textoQueda(esp, real) + '</span>' +
+        '</div>' +
+      '</div>';
+
+    /* --- una ficha por semana --- */
+    const hoy = todayISO();
+    const ficha = (titulo, subtitulo, lista, fechaNueva, nSem, destacar) => {
+      const suma = lista.reduce((a, it) => a + Number(it.real || 0), 0);
+      const filas = lista.map(it => {
+        const i = idxDe.get(it);
+        const neg = Number(it.real || 0) < 0;
+        return '<div class="flex items-center gap-1.5 py-1 ' + (coincide(it) ? 'bg-amber-100 rounded-lg px-1' : '') + '">' +
+          '<input type="text" value="' + esc(it.concepto || '') + '" placeholder="¿en qué?" data-panel="concepto" data-id="' + esc(it.id) + '"' +
+            (state.panelFoco === it.id ? ' data-panel-foco="1"' : '') +
+            ' class="flex-1 min-w-0 bg-slate-50 rounded-lg px-2 py-2 text-xs font-medium text-slate-700 outline-none focus:ring-2 focus:ring-amber-300 placeholder:text-slate-300">' +
+          '<input type="number" step="0.01" value="' + Number(it.real || 0) + '" data-panel="real" data-id="' + esc(it.id) + '"' +
+            ' class="w-20 bg-slate-50 rounded-lg px-2 py-2 text-xs text-right font-bold num outline-none focus:ring-2 focus:ring-amber-300 ' + (neg ? 'text-emerald-600' : 'text-slate-800') + '">' +
+          '<button data-act="reg-remove" data-idx="' + i + '" aria-label="Borrar este gasto"' +
+            ' class="w-9 h-9 shrink-0 rounded-lg bg-slate-100 text-slate-400 active:bg-red-500 active:text-white flex items-center justify-center text-base leading-none">&times;</button>' +
+        '</div>';
+      }).join('');
+      return '<div class="rounded-2xl border ' + (destacar ? 'border-amber-300 bg-amber-50/60' : 'border-slate-200 bg-white') + ' overflow-hidden">' +
+        '<div class="flex items-center justify-between px-3 py-1.5 ' + (destacar ? 'bg-amber-100' : 'bg-slate-50') + ' border-b border-slate-100">' +
+          '<span class="text-[10px] font-bold uppercase tracking-wider ' + (destacar ? 'text-amber-800' : 'text-slate-500') + '">' + titulo +
+            '<span class="font-semibold normal-case tracking-normal opacity-70"> · ' + subtitulo + '</span></span>' +
+          '<span data-tot-celda="' + sel + '|' + nSem + '" class="text-[11px] font-bold text-slate-600 num">' + formatEuro(suma) + '</span>' +
+        '</div>' +
+        '<div class="px-2 py-1.5">' + filas +
+          '<button onclick="nuevoGastoEnCelda(' + sel + ',\'' + fechaNueva + '\')" ' +
+            'class="w-full mt-1 py-2 rounded-lg border border-dashed border-slate-300 text-[11px] font-bold text-slate-400 active:bg-emerald-50 active:text-emerald-700 active:border-emerald-400">' +
+            '+ Añadir gasto</button>' +
+        '</div>' +
+      '</div>';
+    };
+
+    let fichas = semanas.map(sem => {
+      const esActual = hoy >= sem.desde && hoy <= sem.hasta;
+      const lista = (apuntes[cat.categoria] && apuntes[cat.categoria][sem.n]) || [];
+      return ficha('Semana ' + sem.n + (esActual ? ' · ahora' : ''), 'días ' + sem.rango, lista, diaParaSemana(sem), sem.n, esActual);
+    }).join('');
+
+    const fuera = sueltos[cat.categoria] || [];
+    if (fuera.length) fichas += ficha('Fuera del mes', 'revisa la fecha', fuera, semanas[0].desde, 0, true);
+
+    cont.innerHTML =
+      '<div class="flex gap-2 overflow-x-auto custom-scrollbar snap-x pb-2 -mx-1 px-1">' + chips + '</div>' +
+      cabecera +
+      '<div class="space-y-2 mt-2">' + fichas + '</div>' +
+      '<div data-panel-resumen class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 mt-3 text-[11px] font-bold">' +
+        resumenPanelHTML(d.previstoCasa, d.gastadoCasa) +
+      '</div>';
   }
 
   function textoPista(searchVal, conCoincidencia) {
@@ -2493,6 +2633,14 @@
 
   // Edición en vivo dentro del panel: actualiza el dato y los totales sin
   // reconstruir la tabla, que es lo que permite ir tecleando de celda en celda.
+  // Girar el móvil o cambiar el tamaño de la ventana puede cruzar el umbral
+  // entre tabla y fichas, así que hay que repintar el panel.
+  let modoPanelPrevio = panelEnFichas();
+  window.addEventListener('resize', () => {
+    const ahora = panelEnFichas();
+    if (ahora !== modoPanelPrevio) { modoPanelPrevio = ahora; renderMonthlyView(); }
+  });
+
   document.getElementById('app').addEventListener('input', e => {
     const el = e.target.closest('[data-panel]');
     if (el) editarCeldaPanel(el);
@@ -3215,7 +3363,7 @@
   Object.assign(window, {
     changePeriod, switchTab, openQuickWindow, closeQuickWindow, submitQuickWindow, irAlExtracto,
     updateQuickTargetMonth, quickAddVariableExpense, copyPreviousMonth, copyFijoToNext, copyIngresoToNext,
-    toggleSignoImporte, sincronizarSignoImporte, guardarNotaMes, cambiarVistaVariables, moverGrupo, nuevoGastoEnCelda, abrirColumnasAmpliado, buscarDesdeAmpliado,
+    toggleSignoImporte, sincronizarSignoImporte, guardarNotaMes, cambiarVistaVariables, moverGrupo, nuevoGastoEnCelda, cambiarGrupoPanel, abrirColumnasAmpliado, buscarDesdeAmpliado,
     abrirValoracionMes, abrirCierreMes, confirmarCierreMes, reabrirMes, abrirValoracionAnual,
     openAddObjetivoModal, confirmAddObjetivo, openAddIngresoModal, confirmAddIngreso,
     openAddAhorroModal, confirmAddAhorro, openAddGastoFijoModal, confirmAddGastoFijo,
