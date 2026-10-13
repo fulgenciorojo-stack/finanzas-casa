@@ -119,6 +119,7 @@
   <symbol id="i-tag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12.5V4a1 1 0 0 1 1-1h8.5L21 11.5 12.5 20z"/><circle cx="7.5" cy="7.5" r="1.3" fill="currentColor" stroke="none"/></symbol>
   <symbol id="i-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 17H3z"/><path d="M12 9v5M12 17.2v.1"/></symbol>
   <symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="2.6"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></symbol>
   <symbol id="i-heart" viewBox="0 0 24 24" fill="currentColor"><path d="M12 20.7l-1.4-1.3C6 15.4 3 12.6 3 9.2 3 6.6 5 4.7 7.5 4.7c1.4 0 2.8.7 3.6 1.8l.9 1.2.9-1.2c.8-1.1 2.2-1.8 3.6-1.8C19 4.7 21 6.6 21 9.2c0 3.4-3 6.2-7.6 10.2z"/></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></symbol>
 </svg>
@@ -210,24 +211,55 @@
             <span>DISPONIBLE PARA GASTAR</span>
             <svg class="ic ml-auto transition-transform duration-200 group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" style="width:14px;height:14px"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"/></svg>
           </summary>
-          <div class="grid grid-cols-3 gap-2 text-center p-5 pt-3 fade-in-up my-auto">
-            <div class="kpi-tile bg-white/90 p-2.5 rounded-2xl border border-blue-100 shadow-sm cursor-default hover:border-blue-300">
-              <span class="text-[10px] uppercase font-bold text-slate-500 block">Ingresos</span>
-              <span id="kpi-ingresos" class="text-xs sm:text-sm font-bold text-slate-800 num">0,00 €</span>
+          <div class="p-5 pt-3 fade-in-up space-y-2.5">
+
+            <div class="kpi-tile bg-white/90 rounded-2xl border border-blue-100 shadow-sm px-3.5 py-2.5 flex items-center justify-between cursor-default hover:border-blue-300">
+              <span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Ingresos del mes</span>
+              <span id="kpi-ingresos" class="text-base font-extrabold text-slate-800 num">0,00 €</span>
             </div>
-            <div id="kpi-presupuestado-box" class="kpi-tile bg-white/90 p-2.5 rounded-2xl border border-blue-100 shadow-sm cursor-default hover:border-indigo-300" title="Lo estimado que queda por gastar (fijos + variables de casa), descontando lo ya gastado">
-              <span class="text-[10px] uppercase font-bold text-slate-500 block whitespace-nowrap">Estimado</span>
-              <span id="kpi-presupuestado" class="text-xs sm:text-sm font-bold text-indigo-600 num">0,00 €</span>
+
+            <div class="bg-white/90 rounded-2xl border border-blue-100 shadow-sm overflow-hidden">
+              <div class="px-3.5 py-1.5 bg-slate-50/80 border-b border-slate-100 text-[10px] uppercase font-bold text-slate-400 tracking-wider">Se va en</div>
+              <div class="px-3.5 py-2.5 space-y-1.5">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-semibold text-slate-600">Gastos fijos</span>
+                  <span id="kpi-disp-fijos" class="font-bold text-slate-700 num">0,00 €</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-semibold text-slate-600">Gastos variables</span>
+                  <span id="kpi-disp-variables" class="font-bold text-slate-700 num">0,00 €</span>
+                </div>
+                <div class="flex items-center justify-between text-xs pt-1.5 border-t border-slate-100">
+                  <span class="font-bold text-slate-700">Total gastado</span>
+                  <span id="kpi-gastos" class="font-extrabold text-pink-600 num">0,00 €</span>
+                </div>
+                <div class="flex items-center justify-between text-xs" title="Lo que aún se espera gastar: fijos sin pagar y presupuesto que queda en los grupos">
+                  <span class="font-semibold text-indigo-600">+ Estimado por gastar</span>
+                  <span id="kpi-presupuestado" class="font-bold text-indigo-600 num">0,00 €</span>
+                </div>
+                <div class="flex items-center justify-between text-sm pt-1.5 border-t-2 border-slate-200">
+                  <span class="font-bold text-slate-800">Previsión del mes</span>
+                  <span id="kpi-prevision" class="font-extrabold text-slate-900 num">0,00 €</span>
+                </div>
+              </div>
             </div>
-            <div class="kpi-tile bg-white/90 p-2.5 rounded-2xl border border-blue-100 shadow-sm cursor-default hover:border-pink-300">
-              <span class="text-[10px] uppercase font-bold text-slate-500 block">Gastos</span>
-              <span id="kpi-gastos" class="text-xs sm:text-sm font-bold text-pink-600 num">0,00 €</span>
+
+            <div>
+              <div class="h-3.5 w-full bg-slate-200 rounded-full overflow-hidden flex shadow-inner">
+                <div id="barra-gastado" class="h-full bg-gradient-to-r from-pink-500 to-rose-500 transition-all duration-700" style="width:0%"></div>
+                <div id="barra-estimado" class="h-full bg-indigo-300 transition-all duration-700" style="width:0%"></div>
+              </div>
+              <p id="barra-pie" class="text-[10px] font-semibold text-slate-500 mt-1 text-center">&nbsp;</p>
             </div>
-            <div id="kpi-margen-box" class="col-span-3 kpi-tile bg-white/90 p-2 rounded-2xl border border-blue-100 shadow-sm cursor-default flex items-center justify-center gap-1.5" title="Todo lo que se espera gastar este mes (fijos + variables) frente a los ingresos">
-              <span class="text-[10px] uppercase font-bold text-slate-500 whitespace-nowrap">Margen sobre ingresos</span>
-              <span id="kpi-margen" class="text-xs sm:text-sm font-extrabold num">0,00 €</span>
-              <span id="kpi-margen-emoji" class="text-sm leading-none"></span>
+
+            <div id="kpi-margen-box" class="rounded-2xl px-4 py-3 border-2 shadow-sm flex items-center gap-3 transition-all duration-300">
+              <span id="kpi-margen-emoji" class="text-3xl leading-none shrink-0"></span>
+              <div class="min-w-0 flex-1">
+                <span id="kpi-margen-label" class="block text-[10px] uppercase font-bold tracking-wider leading-tight"></span>
+                <span id="kpi-margen" class="block text-xl font-extrabold num leading-tight"></span>
+              </div>
             </div>
+
           </div>
         </details>
 
@@ -588,11 +620,11 @@
               <button id="btn-vista-lista" onclick="cambiarVistaVariables('lista')" class="px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
                 <svg class="ic"><use href="#i-bars"></use></svg> Lista
               </button>
-              <button id="btn-vista-columnas" onclick="cambiarVistaVariables('columnas')" class="px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
-                <svg class="ic"><use href="#i-tag"></use></svg> Columnas
+              <button id="btn-vista-panel" onclick="cambiarVistaVariables('panel')" class="px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
+                <svg class="ic"><use href="#i-grid"></use></svg> Panel
               </button>
             </div>
-                <button onclick="abrirColumnasAmpliado()" title="Ver todos los gastos en grande, grupo por grupo" class="btn-pop shrink-0 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5"><svg class="ic"><use href="#i-eye"></use></svg><span class="hidden sm:inline">Ver en grande</span></button>
+                <button onclick="abrirColumnasAmpliado()" title="Abrir el panel completo en grande" class="btn-pop shrink-0 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5"><svg class="ic"><use href="#i-eye"></use></svg><span class="hidden sm:inline">Ver en grande</span></button>
             <div class="relative flex-1 sm:w-48 sm:flex-none">
               <svg class="ic absolute left-3 top-2 text-slate-400"><use href="#i-search"></use></svg>
               <input type="text" id="search-expenses" oninput="renderMonthlyView()" placeholder="Buscar gasto…" class="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-3 py-1.5 text-xs focus:ring-2 focus:ring-amber-300 outline-none shadow-sm">
@@ -600,9 +632,9 @@
           </div>
         </div>
 
-        <div id="vista-columnas" class="hidden p-4">
+        <div id="vista-panel" class="hidden p-4">
           <p id="columnas-pista" class="text-[11px] text-slate-500 mb-2"></p>
-          <div id="container-variables-columnas" class="flex gap-3 overflow-x-auto custom-scrollbar pb-2 items-start"></div>
+          <div id="container-variables-panel"></div>
         </div>
 
         <div id="vista-lista" class="p-4 max-h-80 overflow-y-auto custom-scrollbar">
@@ -981,7 +1013,7 @@
         </div>
       </div>
       <div class="p-4 overflow-auto custom-scrollbar">
-        <div id="container-columnas-modal" class="flex gap-3 items-start"></div>
+        <div id="container-columnas-modal"></div>
       </div>
     </div>
   </div>
@@ -1034,6 +1066,8 @@
     currentMonth: today.getMonth(),
     activeCategoryFilter: 'Todos',
     vistaVariables: 'lista',
+    panelFoco: null,
+    panelSucio: false,
     monthsData: {}
   };
 
@@ -1273,7 +1307,7 @@
   function loadLocal() {
     try {
       const vista = localStorage.getItem('finanzas_vista_variables');
-      if (vista === 'columnas' || vista === 'lista') state.vistaVariables = vista;
+      if (vista === 'panel' || vista === 'lista') state.vistaVariables = vista;
     } catch (e) {}
     try {
       const raw = localStorage.getItem('finanzas_' + hogar);
@@ -1704,7 +1738,7 @@
     renderCategoryPills(data, pendientes);
 
     const searchVal = (document.getElementById('search-expenses').value || '').toLowerCase().trim();
-    renderColumnasVariables(data, searchVal, excluidas);
+    renderPanelVariables(data, searchVal);
     const tbodyReg = document.getElementById('tbody-registro-variables');
     tbodyReg.innerHTML = '';
     let filteredCount = 0, filteredSum = 0, filteredSumCasa = 0;
@@ -1825,25 +1859,46 @@
     /* indicadores */
     const totalGastosReal = sumFijosReal + sumVarCasa;
     const presupuestoRestante = sumFijosPendiente + sumVarPendienteCasa;
-    const margenPresupuesto = presupuestoRestante + totalGastosReal - sumIngReal;
+    const prevision = totalGastosReal + presupuestoRestante;
+    const margen = sumIngReal - prevision;   // en positivo cuando sobra
     document.getElementById('kpi-ingresos').innerText = formatEuro(sumIngReal);
+    document.getElementById('kpi-disp-fijos').innerText = formatEuro(sumFijosReal);
+    document.getElementById('kpi-disp-variables').innerText = formatEuro(sumVarCasa);
     document.getElementById('kpi-gastos').innerText = formatEuro(totalGastosReal);
     document.getElementById('kpi-presupuestado').innerText = formatEuro(presupuestoRestante);
+    document.getElementById('kpi-prevision').innerText = formatEuro(prevision);
+
+    // La barra se mide sobre lo que entra; si la previsión se pasa, la
+    // referencia pasa a ser la propia previsión para que siga cabiendo.
+    const refBarra = Math.max(sumIngReal, prevision, 1);
+    const pctGastado = Math.max(0, Math.min(100, (totalGastosReal / refBarra) * 100));
+    const pctEstimado = Math.max(0, Math.min(100 - pctGastado, (presupuestoRestante / refBarra) * 100));
+    document.getElementById('barra-gastado').style.width = pctGastado + '%';
+    document.getElementById('barra-estimado').style.width = pctEstimado + '%';
+    document.getElementById('barra-pie').innerHTML = sumIngReal > 0
+      ? '<span class="text-pink-600">Gastado ' + Math.round((totalGastosReal / sumIngReal) * 100) + '%</span>' +
+        ' · <span class="text-indigo-500">estimado ' + Math.round((presupuestoRestante / sumIngReal) * 100) + '%</span>' +
+        ' de los ingresos'
+      : 'Aún no hay ingresos apuntados este mes';
+
     const elMargen = document.getElementById('kpi-margen');
     const elMargenEmoji = document.getElementById('kpi-margen-emoji');
     const elMargenBox = document.getElementById('kpi-margen-box');
-    if (margenPresupuesto > 0) {
-      elMargen.innerText = 'Excede en ' + formatEuro(margenPresupuesto);
-      elMargen.className = 'text-xs sm:text-sm font-extrabold num text-red-600';
+    const elMargenLabel = document.getElementById('kpi-margen-label');
+    if (margen < 0) {
+      elMargenLabel.innerText = 'Te pasas de lo que entra';
+      elMargenLabel.className = 'block text-[10px] uppercase font-bold tracking-wider leading-tight text-red-700';
+      elMargen.innerText = formatEuro(-margen) + ' de más';
+      elMargen.className = 'block text-xl font-extrabold num leading-tight text-red-600';
       elMargenEmoji.innerText = '😢';
-      elMargenBox.classList.remove('border-blue-100');
-      elMargenBox.classList.add('border-red-300', 'bg-red-50/60');
+      elMargenBox.className = 'rounded-2xl px-4 py-3 border-2 shadow-sm flex items-center gap-3 transition-all duration-300 border-red-300 bg-red-50';
     } else {
-      elMargen.innerText = 'Con margen de ' + formatEuro(-margenPresupuesto);
-      elMargen.className = 'text-xs sm:text-sm font-extrabold num text-emerald-600';
-      elMargenEmoji.innerText = '😊';
-      elMargenBox.classList.remove('border-red-300', 'bg-red-50/60');
-      elMargenBox.classList.add('border-blue-100');
+      elMargenLabel.innerText = 'Margen que te queda';
+      elMargenLabel.className = 'block text-[10px] uppercase font-bold tracking-wider leading-tight text-emerald-700';
+      elMargen.innerText = formatEuro(margen);
+      elMargen.className = 'block text-xl font-extrabold num leading-tight text-emerald-600';
+      elMargenEmoji.innerText = margen > sumIngReal * 0.2 ? '🤩' : '😊';
+      elMargenBox.className = 'rounded-2xl px-4 py-3 border-2 shadow-sm flex items-center gap-3 transition-all duration-300 border-emerald-300 bg-emerald-50';
     }
     document.getElementById('kpi-fijos').innerText = formatEuro(sumFijosReal);
     document.getElementById('kpi-variables').innerText = formatEuro(sumVarCasa);
@@ -1936,143 +1991,322 @@
     renderMonthlyView();
   }
 
-  // Vista de tablero: una columna por grupo para ver de un vistazo todo lo
-  // apuntado en cada uno y comprobar si un gasto ya está metido en otro sitio.
-  // Semana ISO: así la misma semana real recibe el mismo sombreado en todas
-  // las columnas, que es lo que permite compararlas de un vistazo.
-  function semanaISO(fechaISO) {
-    if (!fechaISO) return null;
-    const d = new Date(fechaISO + 'T00:00:00');
-    if (isNaN(d.getTime())) return null;
-    const jue = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-    jue.setDate(jue.getDate() - ((jue.getDay() + 6) % 7) + 3);
-    const primero = new Date(jue.getFullYear(), 0, 4);
-    primero.setDate(primero.getDate() - ((primero.getDay() + 6) % 7) + 3);
-    return 1 + Math.round((jue - primero) / 604800000);
+  // Semanas naturales (lunes a domingo) recortadas al mes: es como se mira el
+  // gasto de casa, "lo que llevamos esta semana", y permite comparar grupos
+  // en horizontal dentro del mismo tramo de días.
+  function semanasDelMes(key) {
+    const [y, m] = key.split('-').map(Number);
+    const ultimoDia = new Date(y, m, 0).getDate();
+    const dd = n => String(n).padStart(2, '0');
+    const semanas = [];
+    let dia = 1;
+    while (dia <= ultimoDia) {
+      const d = new Date(y, m - 1, dia);
+      const fin = Math.min(dia + (6 - ((d.getDay() + 6) % 7)), ultimoDia);
+      semanas.push({
+        n: semanas.length + 1,
+        desde: key + '-' + dd(dia),
+        hasta: key + '-' + dd(fin),
+        rango: dia === fin ? String(dia) : dia + '–' + fin
+      });
+      dia = fin + 1;
+    }
+    return semanas;
   }
 
-  function etiquetaSemana(fechaISO) {
-    const d = new Date(fechaISO + 'T00:00:00');
-    const lun = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-    lun.setDate(lun.getDate() - ((lun.getDay() + 6) % 7));
-    const dom = new Date(lun.getFullYear(), lun.getMonth(), lun.getDate() + 6);
-    const mes = f => MONTH_NAMES[f.getMonth()].slice(0, 3).toLowerCase();
-    return lun.getMonth() === dom.getMonth()
-      ? lun.getDate() + '–' + dom.getDate() + ' ' + mes(lun)
-      : lun.getDate() + ' ' + mes(lun) + '–' + dom.getDate() + ' ' + mes(dom);
+  // Día que se le pone a un gasto nuevo creado dentro de una semana: hoy si
+  // cae en ella, y si no el primer día de esa semana.
+  function diaParaSemana(sem) {
+    const hoy = todayISO();
+    return hoy >= sem.desde && hoy <= sem.hasta ? hoy : sem.desde;
   }
 
-  function construirColumnas(data, searchVal, cont, opc) {
-    const porCat = {};
-    data.categoriasVariables.forEach(c => { porCat[c.categoria] = []; });
-    data.registroVariables.forEach(item => {
-      if (!porCat[item.categoria]) porCat[item.categoria] = [];
-      porCat[item.categoria].push(item);
+  function nuevoGastoEnCelda(idxCat, fecha) {
+    const data = month();
+    const cat = data.categoriasVariables[idxCat];
+    if (!cat) return;
+    const id = nuevoId();
+    data.registroVariables.push({ id, fecha, concepto: '', categoria: cat.categoria, real: 0, porRevisar: false });
+    state.panelFoco = id;
+    state.panelSucio = false;
+    queueSave();
+    renderAll();
+  }
+
+  function textoQueda(esperado, real) {
+    if (!esperado) return '<span class="opacity-60 font-semibold">sin previsión</span>';
+    const q = esperado - real;
+    return q >= 0 ? 'quedan ' + formatEuro(q) : 'pasado ' + formatEuro(-q);
+  }
+
+  function resumenPanelHTML(previsto, gastado) {
+    const queda = previsto - gastado;
+    return '<span class="text-slate-500">Previsto casa: <span class="text-indigo-600 num">' + formatEuro(previsto) + '</span></span>' +
+      '<span class="text-slate-500">Gastado: <span class="text-pink-600 num">' + formatEuro(gastado) + '</span></span>' +
+      '<span class="text-slate-500">' + (queda >= 0 ? 'Queda: ' : 'Pasado: ') +
+        '<span class="num ' + (queda >= 0 ? 'text-emerald-600' : 'text-red-600') + '">' + formatEuro(Math.abs(queda)) + '</span></span>';
+  }
+
+  // Escribir en una celda NO puede repintar la tabla: te quedarías sin el sitio
+  // donde estabas escribiendo y el siguiente dato se perdería. Así que mientras
+  // se teclea solo se refrescan los números, y el repintado completo espera a
+  // que salgas del panel.
+  function editarCeldaPanel(el) {
+    const data = month();
+    if (el.dataset.panel === 'esperado') {
+      const cat = data.categoriasVariables[Number(el.dataset.cat)];
+      if (!cat) return;
+      cat.esperado = Number(el.value) || 0;
+    } else {
+      const it = data.registroVariables.find(r => r.id === el.dataset.id);
+      if (!it) return;
+      if (el.dataset.panel === 'real') it.real = Number(el.value) || 0;
+      else it.concepto = el.value;
+    }
+    state.panelSucio = true;
+    queueSave();
+    refrescarTotalesPanel(el.closest('[data-panel-raiz]'));
+  }
+
+  function refrescarTotalesPanel(raiz) {
+    if (!raiz) return;
+    const data = month();
+    const semanas = semanasDelMes(currentKey());
+    const porCat = {}, porSemana = {}, porCelda = {};
+    data.categoriasVariables.forEach(c => { porCat[c.categoria] = 0; });
+    data.registroVariables.forEach(it => {
+      const v = Number(it.real || 0);
+      if (porCat[it.categoria] !== undefined) porCat[it.categoria] += v;
+      const sem = semanas.find(w => it.fecha >= w.desde && it.fecha <= w.hasta);
+      const n = sem ? sem.n : 0;
+      porSemana[n] = (porSemana[n] || 0) + v;
+      porCelda[it.categoria + '|' + n] = (porCelda[it.categoria + '|' + n] || 0) + v;
     });
 
-    cont.innerHTML = '';
-    let conCoincidencia = 0;
-    const ultima = data.categoriasVariables.length - 1;
+    let previsto = 0, gastado = 0;
+    data.categoriasVariables.forEach((cat, i) => {
+      const esp = Number(cat.esperado || 0);
+      const real = porCat[cat.categoria] || 0;
+      const queda = esp - real;
+      if (!cat.excluirDelTotal) { previsto += esp; gastado += real; }
 
-    data.categoriasVariables.forEach((cat, idxCat) => {
-      const items = (porCat[cat.categoria] || [])
-        .slice()
-        .sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')));
-      const coincide = i => !searchVal ||
-        String(i.concepto).toLowerCase().includes(searchVal) ||
-        String(cat.categoria).toLowerCase().includes(searchVal);
-      const hayCoincidencia = searchVal && items.some(coincide);
-      if (hayCoincidencia) conCoincidencia++;
+      const barra = raiz.querySelector('[data-barra-grupo="' + i + '"]');
+      if (barra) {
+        barra.style.width = (esp > 0 ? Math.min(100, Math.round((real / esp) * 100)) : 0) + '%';
+        barra.className = 'h-full rounded-full ' +
+          (queda < 0 ? 'bg-red-500' : esp > 0 && real / esp > 0.85 ? 'bg-amber-500' : 'bg-emerald-500');
+      }
+      const cab = raiz.querySelector('[data-queda-grupo="' + i + '"]');
+      if (cab) {
+        cab.innerHTML = textoQueda(esp, real);
+        cab.className = 'text-[9px] font-bold mt-0.5 text-right num ' + (queda < 0 ? 'text-red-700' : 'text-emerald-700');
+      }
+      const tot = raiz.querySelector('[data-tot-grupo="' + i + '"]');
+      if (tot) tot.innerText = formatEuro(real);
+      const pq = raiz.querySelector('[data-pie-queda="' + i + '"]');
+      if (pq) {
+        pq.innerHTML = textoQueda(esp, real);
+        pq.className = 'block text-[9px] font-bold num ' +
+          (esp === 0 ? 'text-slate-500' : queda < 0 ? 'text-red-300' : 'text-emerald-300');
+      }
+      semanas.concat([{ n: 0 }]).forEach(sem => {
+        const c = raiz.querySelector('[data-tot-celda="' + i + '|' + sem.n + '"]');
+        if (c) c.innerText = formatEuro(porCelda[cat.categoria + '|' + sem.n] || 0);
+      });
+    });
 
-      const personal = !!cat.excluirDelTotal;
-      const total = items.reduce((a, i) => a + Number(i.real || 0), 0);
+    semanas.forEach(sem => {
+      const e = raiz.querySelector('[data-tot-semana="' + sem.n + '"]');
+      if (e) e.innerText = formatEuro(porSemana[sem.n] || 0);
+    });
+    const casa = raiz.querySelector('[data-tot-casa]');
+    if (casa) casa.innerText = formatEuro(gastado);
+    const res = raiz.querySelector('[data-panel-resumen]');
+    if (res) res.innerHTML = resumenPanelHTML(previsto, gastado);
+  }
+
+  // Panel tipo hoja de cálculo: una columna por grupo, una fila por semana,
+  // los totales abajo y todo editable sin salir de aquí.
+  function construirPanel(data, searchVal, cont, opc) {
+    const key = currentKey();
+    const semanas = semanasDelMes(key);
+    const cats = data.categoriasVariables;
+    const idxDe = new Map();
+    data.registroVariables.forEach((it, i) => idxDe.set(it, i));
+
+    const coincide = it => searchVal && (
+      String(it.concepto || '').toLowerCase().includes(searchVal) ||
+      String(it.categoria || '').toLowerCase().includes(searchVal));
+
+    // apuntes[categoria][nSemana], más un cajón para los que no caen en el mes
+    const apuntes = {}, sueltos = {};
+    cats.forEach(c => { apuntes[c.categoria] = {}; sueltos[c.categoria] = []; });
+    data.registroVariables.forEach(it => {
+      if (!apuntes[it.categoria]) { apuntes[it.categoria] = {}; sueltos[it.categoria] = []; }
+      const sem = semanas.find(w => it.fecha >= w.desde && it.fecha <= w.hasta);
+      if (sem) (apuntes[it.categoria][sem.n] = apuntes[it.categoria][sem.n] || []).push(it);
+      else sueltos[it.categoria].push(it);
+    });
+
+    const gastadoCat = {}, totalSemana = {};
+    let gastadoCasa = 0, previstoCasa = 0, grupoConCoincidencia = 0;
+    cats.forEach(c => { gastadoCat[c.categoria] = 0; });
+    data.registroVariables.forEach(it => {
+      const v = Number(it.real || 0);
+      if (gastadoCat[it.categoria] !== undefined) gastadoCat[it.categoria] += v;
+      const sem = semanas.find(w => it.fecha >= w.desde && it.fecha <= w.hasta);
+      if (sem) totalSemana[sem.n] = (totalSemana[sem.n] || 0) + v;
+    });
+
+    const esc = escapeHTML;
+    const tam = opc.compacto
+      ? { txt: 'text-[10px]', imp: 'text-[10px] w-14', celda: 'min-w-[8.5rem]' }
+      : { txt: 'text-[11px]', imp: 'text-[11px] w-16', celda: 'min-w-[10rem]' };
+
+    /* ---- cabecera: grupo, previsto editable y lo que queda ---- */
+    let cabecera = '<th class="sticky left-0 z-20 bg-white border-b-2 border-r border-slate-200 px-2 py-1.5 text-left align-bottom">' +
+      '<span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Semana</span></th>';
+    cats.forEach((cat, i) => {
       const c = colorGrupo(cat.categoria);
-
-      const col = document.createElement('div');
-      col.className = 'shrink-0 ' + opc.ancho + ' rounded-2xl border flex flex-col ' + opc.alto + ' transition-all ' +
-        (hayCoincidencia ? 'border-amber-400 bg-amber-50/70 ring-2 ring-amber-200'
-          : searchVal ? 'border-slate-200 bg-slate-50/60 opacity-50'
-          : personal ? 'border-blue-200 bg-blue-50/50' : 'border-slate-200 bg-slate-50/60');
-
-      let semanaPrevia = null;
-      const cuerpo = items.length
-        ? items.map(i => {
-            const sem = semanaISO(i.fecha);
-            const nuevaSemana = sem !== null && sem !== semanaPrevia;
-            const separador = nuevaSemana && semanaPrevia !== null
-              ? '<div class="flex items-center gap-1 pt-1.5 pb-0.5">' +
-                  '<span class="h-px flex-1 bg-slate-300"></span>' +
-                  '<span class="text-[8px] font-bold text-slate-400 uppercase tracking-wide">' + etiquetaSemana(i.fecha) + '</span>' +
-                  '<span class="h-px flex-1 bg-slate-300"></span></div>'
-              : '';
-            if (nuevaSemana) semanaPrevia = sem;
-            const marca = searchVal && coincide(i);
-            const fondo = marca ? 'bg-amber-100 border-amber-300'
-              : (sem !== null && sem % 2 === 0) ? 'bg-slate-200/60 border-slate-300/70'
-              : 'bg-white border-slate-100';
-            return separador +
-              '<div class="rounded-xl px-2 py-1.5 border ' + opc.texto + ' ' + fondo + '">' +
-                '<div class="flex justify-between gap-1">' +
-                  '<span class="font-medium text-slate-700 leading-tight break-words">' + escapeHTML(i.concepto || '(sin concepto)') + '</span>' +
-                  '<span class="font-bold num shrink-0 ' + (Number(i.real || 0) < 0 ? 'text-emerald-600' : 'text-slate-800') + '">' + formatEuro(Number(i.real || 0)) + '</span>' +
-                '</div>' +
-                '<span class="text-[9px] text-slate-400 font-semibold">' + (i.fecha ? i.fecha.slice(8, 10) + '/' + i.fecha.slice(5, 7) : '') + '</span>' +
-                (i.porRevisar ? '<span class="text-[9px] text-amber-600 font-bold ml-1">por revisar</span>' : '') +
-              '</div>';
-          }).join('')
-        : '<p class="text-[10px] text-slate-300 text-center py-3">Sin apuntes</p>';
-
-      const primeraSemana = items.length && items[0].fecha
-        ? '<div class="text-[8px] font-bold text-slate-400 uppercase tracking-wide text-center pt-1">' + etiquetaSemana(items[0].fecha) + '</div>'
-        : '';
-
-      col.innerHTML =
-        '<div class="px-2.5 py-2 border-b rounded-t-2xl cursor-grab active:cursor-grabbing ' + c.cab + '">' +
-          '<div class="flex items-center gap-1 min-w-0">' +
-            '<span class="' + c.punto + ' w-1.5 h-1.5 rounded-full shrink-0"></span>' +
-            '<span class="font-bold text-xs truncate ' + c.tit + '">' + escapeHTML(cat.categoria) + '</span>' +
-            (personal ? '<span class="text-[8px] font-bold text-blue-600 bg-blue-100 px-1 py-0.5 rounded shrink-0">P</span>' : '') +
-            '<span class="ml-auto flex items-center gap-0.5 shrink-0">' +
-              '<button onclick="moverGrupo(' + idxCat + ',' + (idxCat - 1) + ')" title="Mover a la izquierda"' +
-                (idxCat === 0 ? ' disabled class="w-4 h-4 text-[9px] rounded opacity-20"' : ' class="w-4 h-4 text-[9px] rounded ' + c.dato + ' hover:bg-white/70"') + '>&#9664;</button>' +
-              '<button onclick="moverGrupo(' + idxCat + ',' + (idxCat + 1) + ')" title="Mover a la derecha"' +
-                (idxCat === ultima ? ' disabled class="w-4 h-4 text-[9px] rounded opacity-20"' : ' class="w-4 h-4 text-[9px] rounded ' + c.dato + ' hover:bg-white/70"') + '>&#9654;</button>' +
-            '</span>' +
+      const esp = Number(cat.esperado || 0);
+      const real = gastadoCat[cat.categoria] || 0;
+      const queda = esp - real;
+      const personal = !!cat.excluirDelTotal;
+      if (!personal) { previstoCasa += esp; gastadoCasa += real; }
+      const items = data.registroVariables.filter(it => it.categoria === cat.categoria);
+      if (searchVal && items.some(coincide)) grupoConCoincidencia++;
+      const pct = esp > 0 ? Math.min(100, Math.round((real / esp) * 100)) : 0;
+      cabecera +=
+        '<th class="border-b-2 border-slate-200 border-l border-slate-100 p-0 align-top ' + tam.celda + '">' +
+          '<div class="' + c.cab + ' border-b px-2 py-1.5">' +
+            '<div class="flex items-center gap-1 min-w-0">' +
+              '<span class="' + c.punto + ' w-1.5 h-1.5 rounded-full shrink-0"></span>' +
+              '<span class="font-bold text-[11px] truncate ' + c.tit + '">' + esc(cat.categoria) + '</span>' +
+              (personal ? '<span class="text-[8px] font-bold text-blue-700 bg-blue-100 px-1 rounded shrink-0">P</span>' : '') +
+              '<span class="ml-auto flex items-center gap-0.5 shrink-0">' +
+                '<button onclick="moverGrupo(' + i + ',' + (i - 1) + ')" title="Mover a la izquierda"' +
+                  (i === 0 ? ' disabled class="w-4 h-4 text-[9px] rounded opacity-20"' : ' class="w-4 h-4 text-[9px] rounded ' + c.dato + ' hover:bg-white/70"') + '>&#9664;</button>' +
+                '<button onclick="moverGrupo(' + i + ',' + (i + 1) + ')" title="Mover a la derecha"' +
+                  (i === cats.length - 1 ? ' disabled class="w-4 h-4 text-[9px] rounded opacity-20"' : ' class="w-4 h-4 text-[9px] rounded ' + c.dato + ' hover:bg-white/70"') + '>&#9654;</button>' +
+              '</span>' +
+            '</div>' +
+            '<div class="flex items-center justify-between gap-1 mt-1">' +
+              '<span class="text-[9px] font-bold ' + c.dato + ' opacity-75 uppercase">Previsto</span>' +
+              '<span class="flex items-center gap-0.5">' +
+                '<input type="number" step="0.01" value="' + esp + '" data-panel="esperado" data-cat="' + i + '" ' +
+                  'class="w-14 text-right font-bold text-[10px] bg-white/80 border border-white rounded px-1 py-0.5 outline-none focus:ring-1 focus:ring-slate-400 num">' +
+                '<span class="text-[9px] ' + c.dato + '">€</span>' +
+              '</span>' +
+            '</div>' +
+            '<div class="mt-1 h-1 w-full bg-white/60 rounded-full overflow-hidden">' +
+              '<div data-barra-grupo="' + i + '" class="h-full rounded-full ' + (queda < 0 ? 'bg-red-500' : pct > 85 ? 'bg-amber-500' : 'bg-emerald-500') + '" style="width:' + pct + '%"></div>' +
+            '</div>' +
+            '<div data-queda-grupo="' + i + '" class="text-[9px] font-bold mt-0.5 text-right num ' + (queda < 0 ? 'text-red-700' : 'text-emerald-700') + '">' +
+              textoQueda(esp, real) +
+            '</div>' +
           '</div>' +
-          '<div class="flex items-center justify-between text-[10px] font-semibold mt-0.5">' +
-            '<span class="' + c.dato + ' opacity-70">' + items.length + (items.length === 1 ? ' apunte' : ' apuntes') + '</span>' +
-            '<span class="num ' + (total < 0 ? 'text-emerald-700' : c.dato) + '">' + formatEuro(total) + '</span>' +
-          '</div>' +
-        '</div>' +
-        primeraSemana +
-        '<div class="p-1.5 space-y-1 overflow-y-auto custom-scrollbar">' + cuerpo + '</div>';
-
-      col.draggable = true;
-      col.addEventListener('dragstart', ev => {
-        ev.dataTransfer.effectAllowed = 'move';
-        ev.dataTransfer.setData('text/plain', String(idxCat));
-        col.classList.add('opacity-40');
-      });
-      col.addEventListener('dragend', () => {
-        col.classList.remove('opacity-40');
-        cont.querySelectorAll('.ring-4').forEach(e2 => e2.classList.remove('ring-4', 'ring-indigo-400'));
-      });
-      col.addEventListener('dragover', ev => {
-        ev.preventDefault();
-        ev.dataTransfer.dropEffect = 'move';
-        col.classList.add('ring-4', 'ring-indigo-400');
-      });
-      col.addEventListener('dragleave', () => col.classList.remove('ring-4', 'ring-indigo-400'));
-      col.addEventListener('drop', ev => {
-        ev.preventDefault();
-        col.classList.remove('ring-4', 'ring-indigo-400');
-        moverGrupo(Number(ev.dataTransfer.getData('text/plain')), idxCat);
-      });
-
-      cont.appendChild(col);
+        '</th>';
     });
 
-    return conCoincidencia;
+    /* ---- una fila por semana ---- */
+    const hoy = todayISO();
+    let filas = '';
+    const pintarCelda = (lista, idxCat, fechaNueva, resaltar, nSem) => {
+      const cuerpo = lista.map(it => {
+        const i = idxDe.get(it);
+        const marca = coincide(it);
+        const neg = Number(it.real || 0) < 0;
+        return '<div class="group/f flex items-center gap-0.5 rounded px-0.5 ' + (marca ? 'bg-amber-200/70' : 'hover:bg-white') + '">' +
+          '<input type="text" value="' + esc(it.concepto || '') + '" placeholder="concepto…" data-panel="concepto" data-id="' + esc(it.id) + '"' +
+            (state.panelFoco === it.id ? ' data-panel-foco="1"' : '') +
+            ' class="flex-1 min-w-0 bg-transparent outline-none font-medium text-slate-700 ' + tam.txt + ' focus:bg-white rounded px-0.5 placeholder:text-slate-300">' +
+          '<input type="number" step="0.01" value="' + Number(it.real || 0) + '" data-panel="real" data-id="' + esc(it.id) + '"' +
+            ' class="' + tam.imp + ' text-right bg-transparent outline-none font-bold num focus:bg-white rounded px-0.5 ' + (neg ? 'text-emerald-600' : 'text-slate-800') + '">' +
+          '<button data-act="reg-remove" data-idx="' + i + '" title="Borrar este gasto"' +
+            ' class="w-4 h-4 shrink-0 rounded text-slate-300 hover:text-white hover:bg-red-500 flex items-center justify-center text-[11px] leading-none transition-colors">&times;</button>' +
+        '</div>';
+      }).join('');
+      const suma = lista.reduce((a, it) => a + Number(it.real || 0), 0);
+      return '<td class="border-l border-slate-100 align-top p-1 ' + (resaltar ? 'bg-amber-50/70' : '') + '">' +
+        cuerpo +
+        '<div class="flex items-center justify-between gap-1 mt-0.5">' +
+          '<button onclick="nuevoGastoEnCelda(' + idxCat + ',\'' + fechaNueva + '\')" title="Añadir un gasto en esta semana"' +
+            ' class="w-4 h-4 rounded text-slate-300 hover:text-white hover:bg-emerald-500 flex items-center justify-center text-[11px] leading-none font-bold transition-colors">+</button>' +
+          (lista.length > 1 ? '<span data-tot-celda="' + idxCat + '|' + nSem + '" class="text-[9px] font-bold text-slate-400 num">' + formatEuro(suma) + '</span>' : '') +
+        '</div>' +
+      '</td>';
+    };
+
+    semanas.forEach(sem => {
+      const esActual = hoy >= sem.desde && hoy <= sem.hasta;
+      filas += '<tr class="' + (sem.n % 2 === 0 ? 'bg-slate-50/70' : '') + '">' +
+        '<th class="sticky left-0 z-10 border-r border-t border-slate-200 px-2 py-1.5 text-left align-top ' +
+          (esActual ? 'bg-amber-100' : sem.n % 2 === 0 ? 'bg-slate-100' : 'bg-white') + '">' +
+          '<span class="block text-[9px] font-bold uppercase ' + (esActual ? 'text-amber-800' : 'text-slate-400') + '">Sem ' + sem.n + (esActual ? ' · ahora' : '') + '</span>' +
+          '<span class="block text-[10px] font-bold text-slate-600 whitespace-nowrap">' + sem.rango + '</span>' +
+          '<span data-tot-semana="' + sem.n + '" class="block text-[9px] font-bold text-slate-400 num mt-0.5">' + formatEuro(totalSemana[sem.n] || 0) + '</span>' +
+        '</th>' +
+        cats.map((cat, i) => {
+          const lista = (apuntes[cat.categoria] && apuntes[cat.categoria][sem.n]) || [];
+          return pintarCelda(lista, i, diaParaSemana(sem), searchVal && lista.some(coincide), sem.n);
+        }).join('') +
+      '</tr>';
+    });
+
+    // Los apuntes con fecha fuera del mes (o sin fecha) no pueden quedarse
+    // escondidos: van a su propia fila al final.
+    if (cats.some(c => (sueltos[c.categoria] || []).length)) {
+      filas += '<tr class="bg-amber-50/60">' +
+        '<th class="sticky left-0 z-10 bg-amber-100 border-r border-t border-slate-200 px-2 py-1.5 text-left align-top">' +
+          '<span class="block text-[9px] font-bold uppercase text-amber-800">Fuera del mes</span>' +
+          '<span class="block text-[9px] text-amber-700">revisa la fecha</span>' +
+        '</th>' +
+        cats.map((cat, i) => {
+          const lista = sueltos[cat.categoria] || [];
+          return pintarCelda(lista, i, semanas[0].desde, searchVal && lista.some(coincide), 0);
+        }).join('') +
+      '</tr>';
+    }
+
+    /* ---- totales abajo ---- */
+    let pie = '<tr class="bg-slate-800 text-white">' +
+      '<th class="sticky left-0 z-10 bg-slate-800 px-2 py-2 text-left">' +
+        '<span class="block text-[9px] font-bold uppercase tracking-wider text-slate-300">Gastado</span>' +
+        '<span data-tot-casa class="block text-[11px] font-extrabold num">' + formatEuro(gastadoCasa) + '</span>' +
+        '<span class="block text-[8px] text-slate-400 uppercase">solo casa</span>' +
+      '</th>';
+    cats.forEach((cat, i) => {
+      const real = gastadoCat[cat.categoria] || 0;
+      const esp = Number(cat.esperado || 0);
+      const queda = esp - real;
+      pie += '<td class="border-l border-slate-700 px-2 py-2 text-right align-middle">' +
+        '<span data-tot-grupo="' + i + '" class="block text-xs font-extrabold num">' + formatEuro(real) + '</span>' +
+        '<span data-pie-queda="' + i + '" class="block text-[9px] font-bold num ' +
+          (esp === 0 ? 'text-slate-500' : queda < 0 ? 'text-red-300' : 'text-emerald-300') + '">' +
+          textoQueda(esp, real) + '</span>' +
+      '</td>';
+    });
+    pie += '</tr>';
+
+    const previsto = previstoCasa;
+    cont.innerHTML =
+      '<div class="overflow-auto custom-scrollbar border border-slate-200 rounded-2xl ' + (opc.alto || '') + '">' +
+        '<table class="w-full border-collapse bg-white" style="min-width:' + (160 + cats.length * (opc.compacto ? 136 : 160)) + 'px">' +
+          '<thead class="sticky top-0 z-20 bg-white"><tr>' + cabecera + '</tr></thead>' +
+          '<tbody>' + filas + '</tbody>' +
+          '<tfoot class="sticky bottom-0 z-20">' + pie + '</tfoot>' +
+        '</table>' +
+      '</div>' +
+      '<div data-panel-resumen class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mt-2 text-[11px] font-bold">' +
+        resumenPanelHTML(previsto, gastadoCasa) +
+      '</div>';
+    cont.setAttribute('data-panel-raiz', '');
+
+    // devolvemos el foco al concepto recién creado, que si no se pierde al repintar
+    const foco = cont.querySelector('[data-panel-foco]');
+    if (foco) { foco.focus(); state.panelFoco = null; }
+
+    return grupoConCoincidencia;
   }
 
   function textoPista(searchVal, conCoincidencia) {
@@ -2080,36 +2314,47 @@
       ? (conCoincidencia
           ? '«<span class="font-bold text-slate-700">' + escapeHTML(searchVal) + '</span>» aparece en <span class="font-bold text-amber-700">' + conCoincidencia + (conCoincidencia === 1 ? '</span> grupo.' : '</span> grupos.')
           : 'No hay ningún apunte que ponga «<span class="font-bold text-slate-700">' + escapeHTML(searchVal) + '</span>».')
-      : 'Cada semana va con un sombreado distinto. Busca arriba para ver en qué grupos está un gasto, y arrastra una columna (o usa las flechas) para reordenarlas.';
+      : 'Una columna por grupo y una fila por semana. Escribe encima para cambiar un gasto, «+» añade y «×» borra. Las flechas de la cabecera reordenan las columnas.';
   }
 
-  function renderColumnasVariables(data, searchVal, excluidas) {
-    const enColumnas = state.vistaVariables === 'columnas';
-    document.getElementById('vista-columnas').classList.toggle('hidden', !enColumnas);
-    document.getElementById('vista-lista').classList.toggle('hidden', enColumnas);
+  function renderPanelVariables(data, searchVal) {
+    const enPanel = state.vistaVariables === 'panel';
+    document.getElementById('vista-panel').classList.toggle('hidden', !enPanel);
+    document.getElementById('vista-lista').classList.toggle('hidden', enPanel);
 
     const btnL = document.getElementById('btn-vista-lista');
-    const btnC = document.getElementById('btn-vista-columnas');
+    const btnC = document.getElementById('btn-vista-panel');
     const activo = 'px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 bg-amber-600 text-white shadow-sm';
     const apagado = 'px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-amber-900/70 hover:text-amber-900 hover:bg-white/60';
-    btnL.className = enColumnas ? apagado : activo;
-    btnC.className = enColumnas ? activo : apagado;
+    btnL.className = enPanel ? apagado : activo;
+    btnC.className = enPanel ? activo : apagado;
 
-    // El tablero grande se abre desde cualquiera de las dos vistas, así que se
-    // pinta siempre que el modal esté abierto, no solo estando en Columnas.
+    // El panel grande se abre desde cualquiera de las dos vistas, así que se
+    // pinta siempre que el modal esté abierto, no solo estando en Panel.
     const modal = document.getElementById('modal-columnas');
     if (!modal.classList.contains('hidden')) {
-      const m = construirColumnas(data, searchVal, document.getElementById('container-columnas-modal'),
-        { ancho: 'w-60', alto: 'max-h-[70vh]', texto: 'text-xs' });
+      const cont = document.getElementById('container-columnas-modal');
+      const m = conScrollIntacto(cont, () => construirPanel(data, searchVal, cont, { alto: 'max-h-[74vh]' }));
       document.getElementById('columnas-modal-pista').innerHTML = textoPista(searchVal, m);
       document.getElementById('columnas-modal-titulo').innerText = 'Gastos variables de ' + labelForKey(currentKey());
     }
 
-    if (!enColumnas) return;
+    if (!enPanel) return;
 
-    const n = construirColumnas(data, searchVal, document.getElementById('container-variables-columnas'),
-      { ancho: 'w-44', alto: 'max-h-80', texto: 'text-[11px]' });
+    const cont = document.getElementById('container-variables-panel');
+    const n = conScrollIntacto(cont, () => construirPanel(data, searchVal, cont, { alto: 'max-h-[28rem]', compacto: true }));
     document.getElementById('columnas-pista').innerHTML = textoPista(searchVal, n);
+  }
+
+  // Repintar el panel entero reinicia el scroll y te saca de donde estabas
+  // mirando, así que se guarda y se devuelve.
+  function conScrollIntacto(cont, pintar) {
+    const caja = cont.querySelector('div');
+    const x = caja ? caja.scrollLeft : 0, y = caja ? caja.scrollTop : 0;
+    const r = pintar();
+    const nueva = cont.querySelector('div');
+    if (nueva) { nueva.scrollLeft = x; nueva.scrollTop = y; }
+    return r;
   }
 
   function buscarDesdeAmpliado(valor) {
@@ -2233,6 +2478,7 @@
     const btn = e.target.closest('[data-act]');
     if (!btn || !mutators[btn.dataset.act]) return;
     mutators[btn.dataset.act](Number(btn.dataset.idx));
+    state.panelSucio = false;
     queueSave();
     renderAll();
   });
@@ -2244,6 +2490,26 @@
     if (!det.open || det.tagName !== 'DETAILS') return;
     det.querySelectorAll('canvas').forEach(c => { if (charts[c.id]) charts[c.id].resize(); });
   }, true);
+
+  // Edición en vivo dentro del panel: actualiza el dato y los totales sin
+  // reconstruir la tabla, que es lo que permite ir tecleando de celda en celda.
+  document.getElementById('app').addEventListener('input', e => {
+    const el = e.target.closest('[data-panel]');
+    if (el) editarCeldaPanel(el);
+  });
+
+  // Al salir del panel sí se repinta todo, para que el resto de la página
+  // (disponible, gráficas, presupuestos) recoja lo tecleado.
+  document.getElementById('app').addEventListener('focusout', e => {
+    if (!e.target.closest('[data-panel]')) return;
+    // Si el clic va a otro sitio del propio panel (otra celda, la «×», el «+»),
+    // no se repinta: hacerlo destruiría el botón antes de que llegue el clic.
+    if (e.relatedTarget && e.relatedTarget.closest('[data-panel-raiz]')) return;
+    setTimeout(() => {
+      if (document.activeElement && document.activeElement.closest('[data-panel-raiz]')) return;
+      if (state.panelSucio) { state.panelSucio = false; renderAll(); }
+    }, 0);
+  });
 
   document.getElementById('app').addEventListener('change', e => {
     const el = e.target.closest('[data-act]');
@@ -2949,7 +3215,7 @@
   Object.assign(window, {
     changePeriod, switchTab, openQuickWindow, closeQuickWindow, submitQuickWindow, irAlExtracto,
     updateQuickTargetMonth, quickAddVariableExpense, copyPreviousMonth, copyFijoToNext, copyIngresoToNext,
-    toggleSignoImporte, sincronizarSignoImporte, guardarNotaMes, cambiarVistaVariables, moverGrupo, abrirColumnasAmpliado, buscarDesdeAmpliado,
+    toggleSignoImporte, sincronizarSignoImporte, guardarNotaMes, cambiarVistaVariables, moverGrupo, nuevoGastoEnCelda, abrirColumnasAmpliado, buscarDesdeAmpliado,
     abrirValoracionMes, abrirCierreMes, confirmarCierreMes, reabrirMes, abrirValoracionAnual,
     openAddObjetivoModal, confirmAddObjetivo, openAddIngresoModal, confirmAddIngreso,
     openAddAhorroModal, confirmAddAhorro, openAddGastoFijoModal, confirmAddGastoFijo,
