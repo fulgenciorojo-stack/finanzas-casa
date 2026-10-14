@@ -173,7 +173,7 @@
           <span>Apuntar gasto</span>
         </button>
         <button onclick="abrirColumnasAmpliado()" title="Abrir el panel de gastos en grande" class="btn-pop px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl shadow-sm flex items-center gap-1.5">
-          <svg class="ic" style="width:16px;height:16px"><use href="#i-bag"></use></svg>
+          <svg class="ic" style="width:19px;height:19px"><use href="#i-bag"></use></svg>
           <span>Panel</span>
         </button>
         <button onclick="exportJSON()" title="Descargar copia de seguridad" class="btn-pop p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl">
@@ -210,7 +210,7 @@
 
       <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch">
 
-        <details class="group hover-lift md:col-span-4 bg-gradient-to-br from-blue-50 to-indigo-50/50 border border-blue-200/80 rounded-3xl shadow-sm hover:shadow-lg flex flex-col" open>
+        <details class="group hover-lift md:col-span-4 bg-gradient-to-br from-blue-50 to-indigo-50/50 border border-blue-200/80 rounded-3xl shadow-sm hover:shadow-lg flex flex-col">
           <summary class="text-xs font-bold text-blue-900 tracking-wider uppercase p-5 pb-3 border-b border-blue-200/60 flex items-center justify-center gap-1.5 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden hover:bg-blue-100/30 transition-colors">
             <svg class="ic text-blue-600"><use href="#i-scale"></use></svg>
             <span>DISPONIBLE PARA GASTAR</span>
@@ -268,7 +268,7 @@
           </div>
         </details>
 
-        <details class="group hover-lift md:col-span-4 bg-white border border-slate-200/80 rounded-3xl shadow-sm hover:shadow-lg relative" open>
+        <details class="group hover-lift md:col-span-4 bg-white border border-slate-200/80 rounded-3xl shadow-sm hover:shadow-lg relative">
           <summary class="p-4 pb-2 flex flex-col items-center cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden hover:bg-slate-50 rounded-3xl transition-colors">
             <span id="header-month-display" class="title-font text-lg font-bold text-slate-800">ENERO 2026</span>
             <svg class="ic text-slate-400 mt-1 transition-transform duration-200 group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" style="width:14px;height:14px"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"/></svg>
@@ -288,7 +288,7 @@
           </div>
         </details>
 
-        <details class="group hover-lift md:col-span-4 bg-gradient-to-br from-purple-50 to-pink-50/50 border border-purple-200/80 rounded-3xl shadow-sm hover:shadow-lg flex flex-col" open>
+        <details class="group hover-lift md:col-span-4 bg-gradient-to-br from-purple-50 to-pink-50/50 border border-purple-200/80 rounded-3xl shadow-sm hover:shadow-lg flex flex-col">
           <summary class="text-xs font-bold text-purple-900 tracking-wider uppercase p-5 pb-3 border-b border-purple-200/60 flex items-center justify-center gap-1.5 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden hover:bg-purple-100/30 transition-colors">
             <svg class="ic text-purple-600"><use href="#i-line"></use></svg>
             <span>RESUMEN GASTOS &amp; AHORRO</span>
@@ -356,7 +356,7 @@
         <summary class="bg-gradient-to-r from-teal-100 via-cyan-100 to-teal-50 hover:from-teal-200 hover:via-cyan-200 hover:to-teal-100 px-5 py-3.5 hover:pl-6 border-b border-teal-200 flex flex-wrap items-center justify-between gap-2 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden transition-all duration-200">
           <div class="flex items-center space-x-2">
             <div class="bg-teal-600 text-white p-2 rounded-xl shadow-sm text-xs">
-              <svg class="ic" style="width:18px;height:18px"><use href="#i-bag"></use></svg>
+              <svg class="ic" style="width:22px;height:22px"><use href="#i-bag"></use></svg>
             </div>
             <div>
               <h3 class="font-bold text-sm text-teal-950 uppercase tracking-wide flex items-center gap-1.5">Extracto de gastos variables <svg class="ic text-pink-500 latido" aria-hidden="true"><use href="#i-heart"></use></svg></h3>
@@ -798,6 +798,11 @@
   </main>
 
   <!-- Botón flotante -->
+  <button onclick="abrirColumnasAmpliado()" aria-label="Abrir el panel de gastos variables" title="Gastos variables"
+    class="btn-pop fixed bottom-24 right-5 z-40 w-16 h-16 rounded-2xl bg-gradient-to-tr from-teal-500 to-cyan-600 text-white shadow-xl hover:shadow-2xl flex items-center justify-center">
+    <svg class="ic" style="width:34px;height:34px"><use href="#i-bag"></use></svg>
+  </button>
+
   <button onclick="openQuickWindow()" aria-label="Apuntar un gasto" class="btn-pop fixed bottom-5 right-5 z-40 w-16 h-16 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 text-white shadow-xl hover:shadow-2xl flex items-center justify-center">
     <svg class="ic text-2xl"><use href="#i-plus"></use></svg>
   </button>
@@ -892,16 +897,16 @@
       <div class="space-y-3">
         <div>
           <label class="block text-[11px] font-semibold text-slate-500 mb-1" for="input-ingreso-concepto">Concepto</label>
-          <input type="text" id="input-ingreso-concepto" placeholder="Ej: Nómina, trabajo extra…" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-amber-300 outline-none">
+          <input type="text" id="input-ingreso-concepto" placeholder="Ej: Nómina, trabajo extra…" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-300 outline-none">
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block text-[11px] font-semibold text-slate-500 mb-1" for="input-ingreso-esperado">Esperado (€)</label>
-            <input type="number" step="0.01" id="input-ingreso-esperado" placeholder="0,00" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-amber-300 outline-none">
+            <input type="number" step="0.01" id="input-ingreso-esperado" placeholder="0,00" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-300 outline-none">
           </div>
           <div>
             <label class="block text-[11px] font-semibold text-slate-500 mb-1" for="input-ingreso-real">Real (€)</label>
-            <input type="number" step="0.01" id="input-ingreso-real" placeholder="0,00" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-amber-300 outline-none">
+            <input type="number" step="0.01" id="input-ingreso-real" placeholder="0,00" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-300 outline-none">
           </div>
         </div>
       </div>
@@ -980,7 +985,7 @@
   <div id="modal-categoria" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
     <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-xl space-y-4">
       <h3 class="font-bold text-base text-slate-800 title-font flex items-center gap-2"><svg class="ic text-amber-600"><use href="#i-tag"></use></svg>Nuevo grupo de gasto</h3>
-      <input type="text" id="input-nueva-categoria" placeholder="Ej: Regalos y fiestas" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-amber-300 outline-none">
+      <input type="text" id="input-nueva-categoria" placeholder="Ej: Regalos y fiestas" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-300 outline-none">
       <div class="flex justify-end gap-2 pt-2">
         <button onclick="closeModal('modal-categoria')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl">Cancelar</button>
         <button onclick="confirmAddCategory()" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-xl">Guardar grupo</button>
@@ -1004,7 +1009,7 @@
 
   <div id="modal-columnas" class="fixed inset-0 bg-slate-900/60 z-50 hidden">
     <div class="bg-white w-full h-full shadow-2xl overflow-hidden flex flex-col">
-      <div class="px-5 py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center gap-3">
+      <div class="px-5 py-3.5 bg-gradient-to-r from-teal-600 to-cyan-600 text-white flex items-center gap-3">
         <div class="bg-white/20 w-9 h-9 rounded-xl flex items-center justify-center shrink-0">
           <svg class="ic"><use href="#i-bag"></use></svg>
         </div>
@@ -1023,27 +1028,27 @@
           </button>
         </div>
       </div>
-      <form onsubmit="anadirGastoDesdePanel(event)" class="px-4 py-2.5 bg-amber-50 border-b border-amber-200 grid grid-cols-12 gap-2 items-center shrink-0">
+      <form onsubmit="anadirGastoDesdePanel(event)" class="px-4 py-2.5 bg-teal-50 border-b border-teal-200 grid grid-cols-12 gap-2 items-center shrink-0">
         <div class="col-span-5 sm:col-span-2">
-          <input type="date" id="pm-date" required class="w-full bg-white border border-amber-200 rounded-xl px-2 py-2 text-xs text-center font-semibold focus:ring-2 focus:ring-amber-300 outline-none">
+          <input type="date" id="pm-date" required class="w-full bg-white border border-teal-200 rounded-xl px-2 py-2 text-xs text-center font-semibold focus:ring-2 focus:ring-teal-300 outline-none">
         </div>
         <div class="col-span-7 sm:col-span-4">
-          <input type="text" id="pm-concept" placeholder="¿En qué? Ej: Mercadona…" required class="w-full bg-white border border-amber-200 rounded-xl px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-amber-300 outline-none">
+          <input type="text" id="pm-concept" placeholder="¿En qué? Ej: Mercadona…" required class="w-full bg-white border border-teal-200 rounded-xl px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-teal-300 outline-none">
         </div>
         <div class="col-span-6 sm:col-span-3">
-          <select id="pm-category" class="w-full bg-white border border-amber-200 rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-amber-300 outline-none"></select>
+          <select id="pm-category" class="w-full bg-white border border-teal-200 rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-teal-300 outline-none"></select>
         </div>
         <div class="col-span-4 sm:col-span-2">
           <div class="relative">
             <button type="button" data-signo-de="pm-amount" data-clase-base="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg text-sm font-bold flex items-center justify-center transition-colors"
               onclick="toggleSignoImporte('pm-amount')"
               class="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg text-sm font-bold flex items-center justify-center transition-colors bg-slate-100 text-slate-500" title="Positivo: gasto">+</button>
-            <input type="number" step="0.01" id="pm-amount" placeholder="0,00" required oninput="sincronizarSignoImporte(this)" class="w-full bg-white border border-amber-200 rounded-xl pl-8 pr-5 py-2 text-xs text-right font-bold focus:ring-2 focus:ring-amber-300 outline-none num">
+            <input type="number" step="0.01" id="pm-amount" placeholder="0,00" required oninput="sincronizarSignoImporte(this)" class="w-full bg-white border border-teal-200 rounded-xl pl-8 pr-5 py-2 text-xs text-right font-bold focus:ring-2 focus:ring-amber-300 outline-none num">
             <span class="absolute right-2 top-2 text-xs text-slate-400 font-bold">€</span>
           </div>
         </div>
         <div class="col-span-2 sm:col-span-1 flex justify-end">
-          <button type="submit" title="Apuntar este gasto" class="btn-pop w-full py-3 sm:py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl shadow-md flex items-center justify-center font-bold">
+          <button type="submit" title="Apuntar este gasto" class="btn-pop w-full py-3 sm:py-2 bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white rounded-xl shadow-md flex items-center justify-center font-bold">
             <svg class="ic text-sm"><use href="#i-plus"></use></svg>
           </button>
         </div>
@@ -2347,8 +2352,8 @@
       const esActual = hoy >= sem.desde && hoy <= sem.hasta;
       filas += '<tr class="' + (sem.n % 2 === 0 ? 'bg-slate-50/70' : '') + '">' +
         '<th class="sticky left-0 z-10 border-r border-t border-slate-200 px-2 py-1.5 text-left align-top ' +
-          (esActual ? 'bg-amber-100' : sem.n % 2 === 0 ? 'bg-slate-100' : 'bg-white') + '">' +
-          '<span class="block text-[9px] font-bold uppercase ' + (esActual ? 'text-amber-800' : 'text-slate-400') + '">Sem ' + sem.n + (esActual ? ' · ahora' : '') + '</span>' +
+          (esActual ? 'bg-teal-100' : sem.n % 2 === 0 ? 'bg-slate-100' : 'bg-white') + '">' +
+          '<span class="block text-[9px] font-bold uppercase ' + (esActual ? 'text-teal-800' : 'text-slate-400') + '">Sem ' + sem.n + (esActual ? ' · ahora' : '') + '</span>' +
           '<span class="block text-[10px] font-bold text-slate-600 whitespace-nowrap">' + sem.rango + '</span>' +
           '<span data-tot-semana="' + sem.n + '" class="block text-[9px] font-bold text-slate-400 num mt-0.5">' + formatEuro(totalSemana[sem.n] || 0) + '</span>' +
         '</th>' +
@@ -2476,7 +2481,7 @@
 
     /* --- una ficha por semana --- */
     const hoy = todayISO();
-    const ficha = (titulo, subtitulo, lista, fechaNueva, nSem, destacar) => {
+    const ficha = (titulo, subtitulo, lista, fechaNueva, nSem, tono) => {
       const suma = lista.reduce((a, it) => a + Number(it.real || 0), 0);
       const filas = lista.map(it => {
         const i = idxDe.get(it);
@@ -2484,16 +2489,20 @@
         return '<div class="flex items-center gap-1.5 py-1 ' + (coincide(it) ? 'bg-amber-100 rounded-lg px-1' : '') + '">' +
           '<input type="text" value="' + esc(it.concepto || '') + '" placeholder="¿en qué?" data-panel="concepto" data-id="' + esc(it.id) + '"' +
             (state.panelFoco === it.id ? ' data-panel-foco="1"' : '') +
-            ' class="flex-1 min-w-0 bg-slate-50 rounded-lg px-2 py-2 text-xs font-medium text-slate-700 outline-none focus:ring-2 focus:ring-amber-300 placeholder:text-slate-300">' +
+            ' class="flex-1 min-w-0 bg-slate-50 rounded-lg px-2 py-2 text-xs font-medium text-slate-700 outline-none focus:ring-2 focus:ring-teal-300 placeholder:text-slate-300">' +
           '<input type="number" step="0.01" value="' + Number(it.real || 0) + '" data-panel="real" data-id="' + esc(it.id) + '"' +
-            ' class="w-20 bg-slate-50 rounded-lg px-2 py-2 text-xs text-right font-bold num outline-none focus:ring-2 focus:ring-amber-300 ' + (neg ? 'text-emerald-600' : 'text-slate-800') + '">' +
+            ' class="w-20 bg-slate-50 rounded-lg px-2 py-2 text-xs text-right font-bold num outline-none focus:ring-2 focus:ring-teal-300 ' + (neg ? 'text-emerald-600' : 'text-slate-800') + '">' +
           '<button data-act="reg-remove" data-idx="' + i + '" aria-label="Borrar este gasto"' +
             ' class="w-9 h-9 shrink-0 rounded-lg bg-slate-100 text-slate-400 active:bg-red-500 active:text-white flex items-center justify-center text-base leading-none">&times;</button>' +
         '</div>';
       }).join('');
-      return '<div class="rounded-2xl border ' + (destacar ? 'border-amber-300 bg-amber-50/60' : 'border-slate-200 bg-white') + ' overflow-hidden">' +
-        '<div class="flex items-center justify-between px-3 py-1.5 ' + (destacar ? 'bg-amber-100' : 'bg-slate-50') + ' border-b border-slate-100">' +
-          '<span class="text-[10px] font-bold uppercase tracking-wider ' + (destacar ? 'text-amber-800' : 'text-slate-500') + '">' + titulo +
+      const marco = tono === 'ahora' ? 'border-teal-300 bg-teal-50/60'
+        : tono === 'aviso' ? 'border-amber-300 bg-amber-50/60' : 'border-slate-200 bg-white';
+      const cab = tono === 'ahora' ? 'bg-teal-100' : tono === 'aviso' ? 'bg-amber-100' : 'bg-slate-50';
+      const tit = tono === 'ahora' ? 'text-teal-800' : tono === 'aviso' ? 'text-amber-800' : 'text-slate-500';
+      return '<div class="rounded-2xl border ' + marco + ' overflow-hidden">' +
+        '<div class="flex items-center justify-between px-3 py-1.5 ' + cab + ' border-b border-slate-100">' +
+          '<span class="text-[10px] font-bold uppercase tracking-wider ' + tit + '">' + titulo +
             '<span class="font-semibold normal-case tracking-normal opacity-70"> · ' + subtitulo + '</span></span>' +
           '<span data-tot-celda="' + sel + '|' + nSem + '" class="text-[11px] font-bold text-slate-600 num">' + formatEuro(suma) + '</span>' +
         '</div>' +
@@ -2508,11 +2517,11 @@
     let fichas = semanas.map(sem => {
       const esActual = hoy >= sem.desde && hoy <= sem.hasta;
       const lista = (apuntes[cat.categoria] && apuntes[cat.categoria][sem.n]) || [];
-      return ficha('Semana ' + sem.n + (esActual ? ' · ahora' : ''), 'días ' + sem.rango, lista, diaParaSemana(sem), sem.n, esActual);
+      return ficha('Semana ' + sem.n + (esActual ? ' · ahora' : ''), 'días ' + sem.rango, lista, diaParaSemana(sem), sem.n, esActual ? 'ahora' : null);
     }).join('');
 
     const fuera = sueltos[cat.categoria] || [];
-    if (fuera.length) fichas += ficha('Fuera del mes', 'revisa la fecha', fuera, semanas[0].desde, 0, true);
+    if (fuera.length) fichas += ficha('Fuera del mes', 'revisa la fecha', fuera, semanas[0].desde, 0, 'aviso');
 
     cont.innerHTML =
       '<div class="flex gap-2 overflow-x-auto custom-scrollbar snap-x pb-2 -mx-1 px-1">' + chips + '</div>' +
