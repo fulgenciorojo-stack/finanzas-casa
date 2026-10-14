@@ -171,6 +171,10 @@
           <svg class="ic"><use href="#i-bolt"></use></svg>
           <span>Apuntar gasto</span>
         </button>
+        <button onclick="abrirColumnasAmpliado()" title="Abrir el panel de gastos en grande" class="btn-pop px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl shadow-sm flex items-center gap-1.5">
+          <svg class="ic"><use href="#i-grid"></use></svg>
+          <span>Panel</span>
+        </button>
         <button onclick="exportJSON()" title="Descargar copia de seguridad" class="btn-pop p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl">
           <svg class="ic"><use href="#i-download"></use></svg>
         </button>
@@ -344,6 +348,118 @@
           </div>
         </details>
 
+      </div>
+
+<details id="bloque-extracto" open class="group hover-lift bg-white border-2 border-amber-300 rounded-3xl shadow-lg shadow-amber-100 hover:shadow-xl overflow-hidden ring-1 ring-amber-200/60">
+
+        <summary class="bg-gradient-to-r from-amber-100 via-orange-100 to-amber-50 hover:from-amber-200 hover:via-orange-200 hover:to-amber-100 px-5 py-3.5 hover:pl-6 border-b border-amber-200 flex flex-wrap items-center justify-between gap-2 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden transition-all duration-200">
+          <div class="flex items-center space-x-2">
+            <div class="bg-amber-500 text-white p-2 rounded-xl shadow-sm text-xs">
+              <svg class="ic"><use href="#i-receipt"></use></svg>
+            </div>
+            <div>
+              <h3 class="font-bold text-base sm:text-lg text-amber-950 uppercase tracking-wider title-font flex items-center gap-1.5">Extracto de gastos variables <svg class="ic text-pink-500 latido" aria-hidden="true"><use href="#i-heart"></use></svg></h3>
+              <p class="text-[11px] text-amber-800 font-medium">Donde se trabaja el día a día del mes</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="bg-white/90 border border-amber-200 text-amber-900 text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+              Total: <span id="total-variables-real" class="text-pink-600 num">0,00 €</span>
+            </span>
+            <svg class="ic text-amber-800 transition-transform duration-200 group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" style="width:14px;height:14px"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"/></svg>
+          </div>
+        </summary>
+        <div class="fade-in-up">
+
+        <div class="p-4 bg-amber-50/50 border-b border-amber-100">
+          <span class="text-[10px] font-bold text-amber-900 uppercase tracking-wider mb-2 flex items-center gap-1">
+            <svg class="ic text-amber-500"><use href="#i-bolt"></use></svg> Entrada rápida de gasto
+          </span>
+          <form onsubmit="quickAddVariableExpense(event)" class="grid grid-cols-12 gap-2.5 items-center">
+            <div class="col-span-3 sm:col-span-2">
+              <input type="date" id="quick-date" class="w-full bg-white border border-slate-200 rounded-xl px-2 py-2 text-xs text-center font-semibold focus:ring-2 focus:ring-amber-300 outline-none shadow-sm" required>
+            </div>
+            <div class="col-span-9 sm:col-span-4">
+              <input type="text" id="quick-concept" placeholder="Ej: Compra Mercadona…" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-amber-300 outline-none shadow-sm" required>
+            </div>
+            <div class="col-span-6 sm:col-span-3">
+              <select id="quick-category" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-amber-300 outline-none shadow-sm"></select>
+            </div>
+            <div class="col-span-4 sm:col-span-2">
+              <div class="relative">
+                <button type="button" data-signo-de="quick-amount" data-clase-base="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg text-sm font-bold flex items-center justify-center transition-colors"
+                  onclick="toggleSignoImporte('quick-amount')"
+                  class="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg text-sm font-bold flex items-center justify-center transition-colors bg-slate-100 text-slate-500" title="Positivo: gasto">+</button>
+                <input type="number" step="0.01" id="quick-amount" placeholder="0,00" oninput="sincronizarSignoImporte(this)" class="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-5 py-2 text-xs text-right font-bold focus:ring-2 focus:ring-amber-300 outline-none shadow-sm num" required>
+                <span class="absolute right-2 top-2 text-xs text-slate-400 font-bold">€</span>
+              </div>
+            </div>
+            <div class="col-span-2 sm:col-span-1 flex justify-end">
+              <button type="submit" title="Registrar gasto" class="w-full py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl shadow-md transition-all flex items-center justify-center font-bold">
+                <svg class="ic text-sm"><use href="#i-plus"></use></svg>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="px-4 py-2.5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2 bg-slate-50/50">
+          <div id="container-category-pills" class="flex flex-wrap items-center gap-1.5 text-xs"></div>
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <div class="flex items-center bg-amber-200/70 border border-amber-300 p-1 rounded-xl text-xs font-bold shrink-0">
+              <button id="btn-vista-lista" onclick="cambiarVistaVariables('lista')" class="px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
+                <svg class="ic"><use href="#i-bars"></use></svg> Lista
+              </button>
+              <button id="btn-vista-panel" onclick="cambiarVistaVariables('panel')" class="px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
+                <svg class="ic"><use href="#i-grid"></use></svg> Panel
+              </button>
+            </div>
+                <button onclick="abrirColumnasAmpliado()" title="Abrir el panel completo en grande" class="btn-pop shrink-0 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md flex items-center gap-1.5 ring-2 ring-indigo-300/50"><svg class="ic"><use href="#i-eye"></use></svg><span>Ver en grande</span></button>
+            <div class="relative flex-1 sm:w-48 sm:flex-none">
+              <svg class="ic absolute left-3 top-2 text-slate-400"><use href="#i-search"></use></svg>
+              <input type="text" id="search-expenses" oninput="renderMonthlyView()" placeholder="Buscar gasto…" class="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-3 py-1.5 text-xs focus:ring-2 focus:ring-amber-300 outline-none shadow-sm">
+            </div>
+          </div>
+        </div>
+
+        <div id="vista-panel" class="hidden p-4">
+          <p id="columnas-pista" class="text-[11px] text-slate-500 mb-2"></p>
+          <div id="container-variables-panel"></div>
+        </div>
+
+        <div id="vista-lista" class="p-4 max-h-80 overflow-y-auto custom-scrollbar">
+          <table class="w-full text-xs text-left">
+            <thead>
+              <tr class="text-slate-400 font-bold border-b border-slate-100 uppercase text-[10px] tracking-wider">
+                <th class="pb-2 w-16 text-center">Fecha</th>
+                <th class="pb-2">Concepto</th>
+                <th class="pb-2 w-36">Grupo / Categoría</th>
+                <th class="pb-2 text-right w-24">Importe</th>
+                <th class="pb-2 w-16 text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-registro-variables" class="divide-y divide-slate-100"></tbody>
+          </table>
+          <div id="empty-state-variables" class="hidden text-center py-8 text-slate-400">
+            <svg class="ic text-3xl mb-2 text-slate-300"><use href="#i-receipt"></use></svg>
+            <p class="text-xs">No hay gastos registrados con este filtro.</p>
+          </div>
+        </div>
+
+        <div class="bg-amber-50/30 px-5 py-2.5 border-t border-amber-100 flex justify-between items-center text-xs font-bold text-slate-700">
+          <span class="text-slate-500">Registros mostrados: <span id="count-variables" class="text-amber-800 num">0</span></span>
+          <div>
+            <span class="text-slate-500 mr-2">Total de este periodo:</span>
+            <span id="total-variables-period" class="text-amber-800 font-extrabold text-sm num">0,00 €</span>
+          </div>
+        </div>
+
+        </div>
+      </details>
+
+      <div class="flex items-center gap-3 pt-2">
+        <span class="h-px flex-1 bg-slate-200"></span>
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Más detalle del mes</span>
+        <span class="h-px flex-1 bg-slate-200"></span>
       </div>
 
       <details class="group hover-lift bg-white border border-indigo-200/80 rounded-3xl shadow-sm overflow-hidden hover:shadow-lg">
@@ -558,112 +674,6 @@
         </summary>
         <div class="px-4 pb-3 fade-in-up">
           <textarea id="nota-fijos" placeholder="Apunta observaciones, detalles, recordatorios…" rows="3" class="w-full bg-white/70 border border-yellow-200 rounded-xl px-3 py-2 text-xs text-slate-700 placeholder:text-slate-300 outline-none focus:ring-2 focus:ring-yellow-300 resize-y leading-relaxed transition-colors focus:bg-white" oninput="guardarNotaMes(this.value)"></textarea>
-        </div>
-      </details>
-
-<details id="bloque-extracto" class="group hover-lift bg-white border border-amber-200 rounded-3xl shadow-md hover:shadow-lg overflow-hidden">
-
-        <summary class="bg-gradient-to-r from-amber-100 via-orange-100 to-amber-50 hover:from-amber-200 hover:via-orange-200 hover:to-amber-100 px-5 py-3.5 hover:pl-6 border-b border-amber-200 flex flex-wrap items-center justify-between gap-2 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden transition-all duration-200">
-          <div class="flex items-center space-x-2">
-            <div class="bg-amber-500 text-white p-2 rounded-xl shadow-sm text-xs">
-              <svg class="ic"><use href="#i-receipt"></use></svg>
-            </div>
-            <div>
-              <h3 class="font-bold text-sm text-amber-950 uppercase tracking-wider title-font flex items-center gap-1.5">Extracto de gastos variables <svg class="ic text-pink-500 latido" aria-hidden="true"><use href="#i-heart"></use></svg></h3>
-              <p class="text-[11px] text-amber-800 font-medium">Lo que apuntas desde el móvil aparece aquí</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="bg-white/90 border border-amber-200 text-amber-900 text-xs font-bold px-3 py-1 rounded-full shadow-sm">
-              Total: <span id="total-variables-real" class="text-pink-600 num">0,00 €</span>
-            </span>
-            <svg class="ic text-amber-800 transition-transform duration-200 group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" style="width:14px;height:14px"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"/></svg>
-          </div>
-        </summary>
-        <div class="fade-in-up">
-
-        <div class="p-4 bg-amber-50/50 border-b border-amber-100">
-          <span class="text-[10px] font-bold text-amber-900 uppercase tracking-wider mb-2 flex items-center gap-1">
-            <svg class="ic text-amber-500"><use href="#i-bolt"></use></svg> Entrada rápida de gasto
-          </span>
-          <form onsubmit="quickAddVariableExpense(event)" class="grid grid-cols-12 gap-2.5 items-center">
-            <div class="col-span-3 sm:col-span-2">
-              <input type="date" id="quick-date" class="w-full bg-white border border-slate-200 rounded-xl px-2 py-2 text-xs text-center font-semibold focus:ring-2 focus:ring-amber-300 outline-none shadow-sm" required>
-            </div>
-            <div class="col-span-9 sm:col-span-4">
-              <input type="text" id="quick-concept" placeholder="Ej: Compra Mercadona…" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-amber-300 outline-none shadow-sm" required>
-            </div>
-            <div class="col-span-6 sm:col-span-3">
-              <select id="quick-category" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-amber-300 outline-none shadow-sm"></select>
-            </div>
-            <div class="col-span-4 sm:col-span-2">
-              <div class="relative">
-                <button type="button" data-signo-de="quick-amount" data-clase-base="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg text-sm font-bold flex items-center justify-center transition-colors"
-                  onclick="toggleSignoImporte('quick-amount')"
-                  class="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg text-sm font-bold flex items-center justify-center transition-colors bg-slate-100 text-slate-500" title="Positivo: gasto">+</button>
-                <input type="number" step="0.01" id="quick-amount" placeholder="0,00" oninput="sincronizarSignoImporte(this)" class="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-5 py-2 text-xs text-right font-bold focus:ring-2 focus:ring-amber-300 outline-none shadow-sm num" required>
-                <span class="absolute right-2 top-2 text-xs text-slate-400 font-bold">€</span>
-              </div>
-            </div>
-            <div class="col-span-2 sm:col-span-1 flex justify-end">
-              <button type="submit" title="Registrar gasto" class="w-full py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl shadow-md transition-all flex items-center justify-center font-bold">
-                <svg class="ic text-sm"><use href="#i-plus"></use></svg>
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <div class="px-4 py-2.5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2 bg-slate-50/50">
-          <div id="container-category-pills" class="flex flex-wrap items-center gap-1.5 text-xs"></div>
-          <div class="flex items-center gap-2 w-full sm:w-auto">
-            <div class="flex items-center bg-amber-200/70 border border-amber-300 p-1 rounded-xl text-xs font-bold shrink-0">
-              <button id="btn-vista-lista" onclick="cambiarVistaVariables('lista')" class="px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
-                <svg class="ic"><use href="#i-bars"></use></svg> Lista
-              </button>
-              <button id="btn-vista-panel" onclick="cambiarVistaVariables('panel')" class="px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
-                <svg class="ic"><use href="#i-grid"></use></svg> Panel
-              </button>
-            </div>
-                <button onclick="abrirColumnasAmpliado()" title="Abrir el panel completo en grande" class="btn-pop shrink-0 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5"><svg class="ic"><use href="#i-eye"></use></svg><span class="hidden sm:inline">Ver en grande</span></button>
-            <div class="relative flex-1 sm:w-48 sm:flex-none">
-              <svg class="ic absolute left-3 top-2 text-slate-400"><use href="#i-search"></use></svg>
-              <input type="text" id="search-expenses" oninput="renderMonthlyView()" placeholder="Buscar gasto…" class="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-3 py-1.5 text-xs focus:ring-2 focus:ring-amber-300 outline-none shadow-sm">
-            </div>
-          </div>
-        </div>
-
-        <div id="vista-panel" class="hidden p-4">
-          <p id="columnas-pista" class="text-[11px] text-slate-500 mb-2"></p>
-          <div id="container-variables-panel"></div>
-        </div>
-
-        <div id="vista-lista" class="p-4 max-h-80 overflow-y-auto custom-scrollbar">
-          <table class="w-full text-xs text-left">
-            <thead>
-              <tr class="text-slate-400 font-bold border-b border-slate-100 uppercase text-[10px] tracking-wider">
-                <th class="pb-2 w-16 text-center">Fecha</th>
-                <th class="pb-2">Concepto</th>
-                <th class="pb-2 w-36">Grupo / Categoría</th>
-                <th class="pb-2 text-right w-24">Importe</th>
-                <th class="pb-2 w-16 text-center">Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="tbody-registro-variables" class="divide-y divide-slate-100"></tbody>
-          </table>
-          <div id="empty-state-variables" class="hidden text-center py-8 text-slate-400">
-            <svg class="ic text-3xl mb-2 text-slate-300"><use href="#i-receipt"></use></svg>
-            <p class="text-xs">No hay gastos registrados con este filtro.</p>
-          </div>
-        </div>
-
-        <div class="bg-amber-50/30 px-5 py-2.5 border-t border-amber-100 flex justify-between items-center text-xs font-bold text-slate-700">
-          <span class="text-slate-500">Registros mostrados: <span id="count-variables" class="text-amber-800 num">0</span></span>
-          <div>
-            <span class="text-slate-500 mr-2">Total de este periodo:</span>
-            <span id="total-variables-period" class="text-amber-800 font-extrabold text-sm num">0,00 €</span>
-          </div>
-        </div>
-
         </div>
       </details>
 
@@ -999,7 +1009,7 @@
         </div>
         <div class="min-w-0">
           <h3 id="columnas-modal-titulo" class="title-font text-lg font-bold leading-tight">Gastos variables</h3>
-          <p id="columnas-modal-pista" class="text-[11px] font-medium text-white/85"></p>
+          <p id="columnas-modal-pista" class="hidden sm:block text-[11px] font-medium text-white/85"></p>
         </div>
         <div class="ml-auto flex items-center gap-2 shrink-0">
           <div class="relative hidden sm:block">
@@ -1012,6 +1022,31 @@
           </button>
         </div>
       </div>
+      <form onsubmit="anadirGastoDesdePanel(event)" class="px-4 py-2.5 bg-amber-50 border-b border-amber-200 grid grid-cols-12 gap-2 items-center shrink-0">
+        <div class="col-span-5 sm:col-span-2">
+          <input type="date" id="pm-date" required class="w-full bg-white border border-amber-200 rounded-xl px-2 py-2 text-xs text-center font-semibold focus:ring-2 focus:ring-amber-300 outline-none">
+        </div>
+        <div class="col-span-7 sm:col-span-4">
+          <input type="text" id="pm-concept" placeholder="¿En qué? Ej: Mercadona…" required class="w-full bg-white border border-amber-200 rounded-xl px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-amber-300 outline-none">
+        </div>
+        <div class="col-span-6 sm:col-span-3">
+          <select id="pm-category" class="w-full bg-white border border-amber-200 rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-amber-300 outline-none"></select>
+        </div>
+        <div class="col-span-4 sm:col-span-2">
+          <div class="relative">
+            <button type="button" data-signo-de="pm-amount" data-clase-base="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg text-sm font-bold flex items-center justify-center transition-colors"
+              onclick="toggleSignoImporte('pm-amount')"
+              class="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg text-sm font-bold flex items-center justify-center transition-colors bg-slate-100 text-slate-500" title="Positivo: gasto">+</button>
+            <input type="number" step="0.01" id="pm-amount" placeholder="0,00" required oninput="sincronizarSignoImporte(this)" class="w-full bg-white border border-amber-200 rounded-xl pl-8 pr-5 py-2 text-xs text-right font-bold focus:ring-2 focus:ring-amber-300 outline-none num">
+            <span class="absolute right-2 top-2 text-xs text-slate-400 font-bold">€</span>
+          </div>
+        </div>
+        <div class="col-span-2 sm:col-span-1 flex justify-end">
+          <button type="submit" title="Apuntar este gasto" class="btn-pop w-full py-3 sm:py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl shadow-md flex items-center justify-center font-bold">
+            <svg class="ic text-sm"><use href="#i-plus"></use></svg>
+          </button>
+        </div>
+      </form>
       <div class="p-4 overflow-auto custom-scrollbar">
         <div id="container-columnas-modal"></div>
       </div>
@@ -1587,6 +1622,31 @@
     showToast('Gasto añadido a ' + labelForKey(fecha.slice(0, 7)));
   }
 
+  // Apuntar un gasto sin salir del panel ampliado: estás mirando el tablero,
+  // ves que algo no está y lo metes ahí mismo.
+  // Si estás viendo el mes en curso lo normal es apuntar hoy; en otro mes, el día 1.
+  function fechaPorDefectoDelMes(key) {
+    const hoy = todayISO();
+    return hoy.slice(0, 7) === key ? hoy : key + '-01';
+  }
+
+  function anadirGastoDesdePanel(e) {
+    e.preventDefault();
+    const fecha = document.getElementById('pm-date').value || todayISO();
+    const concepto = document.getElementById('pm-concept').value.trim();
+    const categoria = document.getElementById('pm-category').value;
+    const importe = Number(document.getElementById('pm-amount').value);
+    if (!concepto || !isFinite(importe)) return;
+
+    addExpense(fecha, concepto, categoria, importe, false);
+    document.getElementById('pm-concept').value = '';
+    document.getElementById('pm-amount').value = '';
+    reiniciarSignoImporte('pm-amount');
+    renderAll();
+    document.getElementById('pm-concept').focus();
+    showToast('«' + concepto + '» añadido a ' + labelForKey(fecha.slice(0, 7)));
+  }
+
   /* ---------- avisos ---------- */
 
   function showToast(message, isError) {
@@ -1618,10 +1678,17 @@
     copyBtn.classList.toggle('hidden', !canCopy);
     copyBtn.classList.toggle('flex', !!canCopy);
 
-    const quickCatSelect = document.getElementById('quick-category');
-    quickCatSelect.innerHTML = data.categoriasVariables
+    const opcionesCat = data.categoriasVariables
       .map(cat => '<option value="' + escapeHTML(cat.categoria) + '">' + escapeHTML(cat.categoria) + '</option>')
       .join('');
+    document.getElementById('quick-category').innerHTML = opcionesCat;
+    // El mismo desplegable en el panel ampliado, conservando lo ya elegido.
+    const selPanel = document.getElementById('pm-category');
+    const eraPanel = selPanel.value;
+    selPanel.innerHTML = opcionesCat;
+    if (eraPanel && data.categoriasVariables.some(c => c.categoria === eraPanel)) selPanel.value = eraPanel;
+    const fechaPanel = document.getElementById('pm-date');
+    if (!fechaPanel.value) fechaPanel.value = fechaPorDefectoDelMes(key);
 
     /* objetivos */
     const containerObj = document.getElementById('container-objetivos');
@@ -3363,7 +3430,7 @@
   Object.assign(window, {
     changePeriod, switchTab, openQuickWindow, closeQuickWindow, submitQuickWindow, irAlExtracto,
     updateQuickTargetMonth, quickAddVariableExpense, copyPreviousMonth, copyFijoToNext, copyIngresoToNext,
-    toggleSignoImporte, sincronizarSignoImporte, guardarNotaMes, cambiarVistaVariables, moverGrupo, nuevoGastoEnCelda, cambiarGrupoPanel, abrirColumnasAmpliado, buscarDesdeAmpliado,
+    toggleSignoImporte, sincronizarSignoImporte, guardarNotaMes, cambiarVistaVariables, moverGrupo, nuevoGastoEnCelda, cambiarGrupoPanel, anadirGastoDesdePanel, abrirColumnasAmpliado, buscarDesdeAmpliado,
     abrirValoracionMes, abrirCierreMes, confirmarCierreMes, reabrirMes, abrirValoracionAnual,
     openAddObjetivoModal, confirmAddObjetivo, openAddIngresoModal, confirmAddIngreso,
     openAddAhorroModal, confirmAddAhorro, openAddGastoFijoModal, confirmAddGastoFijo,
