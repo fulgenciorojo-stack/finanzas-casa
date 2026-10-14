@@ -143,14 +143,14 @@
       </div>
 
       <!-- Mes y año -->
-      <div class="flex items-center space-x-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
-        <select id="select-year" onchange="changePeriod()" class="bg-white text-slate-700 font-semibold text-sm px-3 py-1.5 rounded-xl border-none focus:ring-2 focus:ring-pink-300 shadow-sm outline-none cursor-pointer">
+      <div class="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
+        <select id="select-year" onchange="changePeriod()" class="bg-white text-slate-700 font-semibold text-xs px-2 py-1 rounded-lg border-none focus:ring-2 focus:ring-pink-300 shadow-sm outline-none cursor-pointer">
           <option value="2025">2025</option>
           <option value="2026" selected>2026</option>
           <option value="2027">2027</option>
           <option value="2028">2028</option>
         </select>
-        <select id="select-month" onchange="changePeriod()" class="bg-white text-slate-700 font-semibold text-sm px-3 py-1.5 rounded-xl border-none focus:ring-2 focus:ring-pink-300 shadow-sm outline-none cursor-pointer">
+        <select id="select-month" onchange="changePeriod()" class="bg-white text-slate-700 font-semibold text-xs px-2 py-1 rounded-lg border-none focus:ring-2 focus:ring-pink-300 shadow-sm outline-none cursor-pointer">
           <option value="0">ENERO</option>
           <option value="1">FEBRERO</option>
           <option value="2">MARZO</option>
@@ -172,18 +172,18 @@
           <svg class="ic"><use href="#i-bolt"></use></svg>
           <span>Apuntar gasto</span>
         </button>
-        <button onclick="abrirColumnasAmpliado()" title="Abrir el panel de gastos en grande" class="btn-pop px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl shadow-sm flex items-center gap-1.5">
+        <button onclick="abrirColumnasAmpliado()" title="Abrir el panel de gastos en grande" class="btn-pop px-3 py-1.5 bg-gradient-to-tr from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white text-xs font-semibold rounded-xl shadow-sm flex items-center gap-1.5">
           <svg class="ic" style="width:19px;height:19px"><use href="#i-bag"></use></svg>
           <span>Panel</span>
         </button>
-        <button onclick="exportJSON()" title="Descargar copia de seguridad" class="btn-pop p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl">
+        <button onclick="exportJSON()" title="Descargar copia de seguridad" class="btn-pop p-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg">
           <svg class="ic"><use href="#i-download"></use></svg>
         </button>
-        <button onclick="document.getElementById('import-file-input').click()" title="Restaurar desde una copia" class="btn-pop p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl">
+        <button onclick="document.getElementById('import-file-input').click()" title="Restaurar desde una copia" class="btn-pop p-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg">
           <svg class="ic"><use href="#i-upload"></use></svg>
         </button>
         <input type="file" id="import-file-input" class="hidden" accept=".json" onchange="importJSON(event)">
-        <button onclick="openResetModal()" title="Vaciar el mes que estás viendo" class="btn-pop p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl">
+        <button onclick="openResetModal()" title="Vaciar el mes que estás viendo" class="btn-pop p-1.5 text-xs bg-red-50 hover:bg-red-100 text-red-600 rounded-lg">
           <svg class="ic"><use href="#i-broom"></use></svg>
         </button>
       </div>
@@ -414,7 +414,7 @@
                 <svg class="ic"><use href="#i-grid"></use></svg> Panel
               </button>
             </div>
-                <button onclick="abrirColumnasAmpliado()" title="Abrir el panel completo en grande" class="btn-pop shrink-0 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md flex items-center gap-1.5 ring-2 ring-indigo-300/50"><svg class="ic"><use href="#i-eye"></use></svg><span>Ver en grande</span></button>
+                <button onclick="abrirColumnasAmpliado()" title="Abrir el panel completo en grande" class="btn-pop shrink-0 px-4 py-2 bg-gradient-to-tr from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white text-xs font-bold rounded-xl shadow-md flex items-center gap-1.5 ring-2 ring-teal-300/50"><svg class="ic"><use href="#i-eye"></use></svg><span>Ver en grande</span></button>
             <div class="relative flex-1 sm:w-48 sm:flex-none">
               <svg class="ic absolute left-3 top-2 text-slate-400"><use href="#i-search"></use></svg>
               <input type="text" id="search-expenses" oninput="renderMonthlyView()" placeholder="Buscar gasto…" class="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-3 py-1.5 text-xs focus:ring-2 focus:ring-teal-300 outline-none shadow-sm">
