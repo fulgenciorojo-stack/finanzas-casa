@@ -47,6 +47,12 @@
   .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
   .ic { width: 1em; height: 1em; display: inline-block; vertical-align: -0.125em; }
   .num { font-variant-numeric: tabular-nums; }
+  /* En el móvil la cabecera entera se comía un tercio de la pantalla al quedarse
+     fija. Al bajar se repliega y deja solo el mes y los dos botones del día a día. */
+  @media (max-width: 767px) {
+    header[data-compacta="1"] .replegable { display: none; }
+    header[data-compacta="1"] { box-shadow: 0 4px 12px -6px rgba(15,23,42,.35); }
+  }
   :focus-visible { outline: 2px solid #f48fb1; outline-offset: 2px; }
   .hover-lift { transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s cubic-bezier(.4,0,.2,1), border-color .3s ease; }
   .hover-lift:hover { transform: translateY(-6px) scale(1.012); }
@@ -129,8 +135,8 @@
 
   <!-- Cabecera -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row items-center justify-between gap-4">
-      <div class="flex items-center space-x-3">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row items-center justify-between gap-2 md:gap-4">
+      <div class="replegable flex items-center space-x-3">
         <img src="icono-192.png" alt="" width="192" height="192" class="w-12 h-12 rounded-2xl shadow-md shrink-0">
         <div>
           <h1 class="text-xl md:text-2xl font-bold text-slate-800 title-font tracking-tight">FINANZAS DORI DORI</h1>
@@ -142,15 +148,16 @@
         </div>
       </div>
 
-      <!-- Mes y año -->
-      <div class="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
-        <select id="select-year" onchange="changePeriod()" class="bg-white text-slate-700 font-semibold text-xs px-2 py-1 rounded-lg border-none focus:ring-2 focus:ring-pink-300 shadow-sm outline-none cursor-pointer">
+      <!-- Mes y año, con las utilidades justo debajo -->
+      <div class="flex flex-col items-center gap-1.5">
+        <div class="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
+          <select id="select-year" onchange="changePeriod()" class="bg-white text-slate-700 font-semibold text-xs px-2 py-1 rounded-lg border-none focus:ring-2 focus:ring-pink-300 shadow-sm outline-none cursor-pointer">
           <option value="2025">2025</option>
           <option value="2026" selected>2026</option>
           <option value="2027">2027</option>
           <option value="2028">2028</option>
         </select>
-        <select id="select-month" onchange="changePeriod()" class="bg-white text-slate-700 font-semibold text-xs px-2 py-1 rounded-lg border-none focus:ring-2 focus:ring-pink-300 shadow-sm outline-none cursor-pointer">
+          <select id="select-month" onchange="changePeriod()" class="bg-white text-slate-700 font-semibold text-xs px-2 py-1 rounded-lg border-none focus:ring-2 focus:ring-pink-300 shadow-sm outline-none cursor-pointer">
           <option value="0">ENERO</option>
           <option value="1">FEBRERO</option>
           <option value="2">MARZO</option>
@@ -164,32 +171,35 @@
           <option value="10">NOVIEMBRE</option>
           <option value="11">DICIEMBRE</option>
         </select>
+        </div>
+        <div class="replegable flex items-center gap-1.5">
+          <button onclick="exportJSON()" title="Descargar copia de seguridad" class="btn-pop p-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg">
+            <svg class="ic"><use href="#i-download"></use></svg>
+          </button>
+          <button onclick="document.getElementById('import-file-input').click()" title="Restaurar desde una copia" class="btn-pop p-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg">
+            <svg class="ic"><use href="#i-upload"></use></svg>
+          </button>
+          <input type="file" id="import-file-input" class="hidden" accept=".json" onchange="importJSON(event)">
+          <button onclick="openResetModal()" title="Vaciar el mes que estás viendo" class="btn-pop p-1.5 text-xs bg-red-50 hover:bg-red-100 text-red-600 rounded-lg">
+            <svg class="ic"><use href="#i-broom"></use></svg>
+          </button>
+        </div>
       </div>
 
-      <!-- Acciones -->
-      <div class="flex items-center space-x-2">
-        <button onclick="openQuickWindow()" class="btn-pop px-3.5 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-semibold rounded-xl shadow-sm flex items-center gap-1.5">
-          <svg class="ic"><use href="#i-bolt"></use></svg>
+      <!-- Acciones: las dos que se usan a diario, siempre a la vista -->
+      <div class="flex items-center gap-2">
+        <button onclick="openQuickWindow()" class="btn-pop px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-bold rounded-xl shadow-md flex items-center gap-1.5">
+          <svg class="ic" style="width:19px;height:19px"><use href="#i-bolt"></use></svg>
           <span>Apuntar gasto</span>
         </button>
-        <button onclick="abrirColumnasAmpliado()" title="Abrir el panel de gastos en grande" class="btn-pop px-3 py-1.5 bg-gradient-to-tr from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white text-xs font-semibold rounded-xl shadow-sm flex items-center gap-1.5">
+        <button onclick="abrirColumnasAmpliado()" title="Abrir el panel de gastos en grande" class="btn-pop px-4 py-2.5 bg-gradient-to-tr from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white text-xs font-bold rounded-xl shadow-md flex items-center gap-1.5">
           <svg class="ic" style="width:19px;height:19px"><use href="#i-bag"></use></svg>
           <span>Panel</span>
-        </button>
-        <button onclick="exportJSON()" title="Descargar copia de seguridad" class="btn-pop p-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg">
-          <svg class="ic"><use href="#i-download"></use></svg>
-        </button>
-        <button onclick="document.getElementById('import-file-input').click()" title="Restaurar desde una copia" class="btn-pop p-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg">
-          <svg class="ic"><use href="#i-upload"></use></svg>
-        </button>
-        <input type="file" id="import-file-input" class="hidden" accept=".json" onchange="importJSON(event)">
-        <button onclick="openResetModal()" title="Vaciar el mes que estás viendo" class="btn-pop p-1.5 text-xs bg-red-50 hover:bg-red-100 text-red-600 rounded-lg">
-          <svg class="ic"><use href="#i-broom"></use></svg>
         </button>
       </div>
 
       <!-- Pestañas -->
-      <div class="flex items-center bg-slate-100 p-1 rounded-2xl text-xs font-semibold">
+      <div class="replegable flex items-center bg-slate-100 p-1 rounded-2xl text-xs font-semibold">
         <button id="btn-tab-monthly" onclick="switchTab('monthly')" class="btn-pop px-3 py-2 rounded-xl shadow-sm bg-white text-pink-600 flex items-center gap-1">
           <svg class="ic"><use href="#i-calendar"></use></svg> Mensual
         </button>
@@ -798,14 +808,6 @@
   </main>
 
   <!-- Botón flotante -->
-  <button onclick="abrirColumnasAmpliado()" aria-label="Abrir el panel de gastos variables" title="Gastos variables"
-    class="btn-pop fixed bottom-24 right-5 z-40 w-16 h-16 rounded-2xl bg-gradient-to-tr from-teal-500 to-cyan-600 text-white shadow-xl hover:shadow-2xl flex items-center justify-center">
-    <svg class="ic" style="width:34px;height:34px"><use href="#i-bag"></use></svg>
-  </button>
-
-  <button onclick="openQuickWindow()" aria-label="Apuntar un gasto" class="btn-pop fixed bottom-5 right-5 z-40 w-16 h-16 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 text-white shadow-xl hover:shadow-2xl flex items-center justify-center">
-    <svg class="ic text-2xl"><use href="#i-plus"></use></svg>
-  </button>
 
   <!-- ==================== VENTANA DIRECTA DE GASTO ==================== -->
   <div id="quick-window" class="fixed inset-0 z-[60] hidden bg-slate-900/50 backdrop-blur-sm">
@@ -874,7 +876,7 @@
   </div>
 
   <!-- Aviso flotante -->
-  <div id="toast" class="fixed bottom-24 right-5 z-[70] transform translate-y-20 opacity-0 transition-all duration-300 ease-out flex items-center bg-slate-900 text-white text-xs px-4 py-3 rounded-2xl shadow-xl gap-2 pointer-events-none">
+  <div id="toast" class="fixed bottom-5 right-5 z-[70] transform translate-y-20 opacity-0 transition-all duration-300 ease-out flex items-center bg-slate-900 text-white text-xs px-4 py-3 rounded-2xl shadow-xl gap-2 pointer-events-none">
     <svg id="toast-icon" class="ic text-emerald-400"><use href="#i-check"></use></svg>
     <span id="toast-msg">Mensaje</span>
   </div>
@@ -2095,6 +2097,22 @@
     return hoy >= sem.desde && hoy <= sem.hasta ? hoy : sem.desde;
   }
 
+  // Una semana puede estar ya pasada, ser la que vivimos o estar por venir.
+  // Mirando un mes distinto del actual, todas caen a un lado o al otro.
+  function estadoSemana(sem) {
+    const hoy = todayISO();
+    if (hoy > sem.hasta) return 'pasada';
+    if (hoy < sem.desde) return 'futura';
+    return 'ahora';
+  }
+
+  const TONO_SEMANA = {
+    pasada: { fila: 'bg-teal-50/40',  celda: 'bg-teal-100/70', texto: 'text-teal-700/80', marco: 'border-teal-200 bg-teal-50/40',   cab: 'bg-teal-100/70', tit: 'text-teal-700' },
+    ahora:  { fila: 'bg-teal-50',     celda: 'bg-teal-300',    texto: 'text-teal-900',    marco: 'border-teal-400 bg-teal-50',      cab: 'bg-teal-200',    tit: 'text-teal-900' },
+    futura: { fila: 'bg-slate-50/60', celda: 'bg-slate-100',   texto: 'text-slate-400',   marco: 'border-slate-200 bg-white',       cab: 'bg-slate-100',   tit: 'text-slate-400' },
+    aviso:  { fila: 'bg-amber-50/60', celda: 'bg-amber-100',   texto: 'text-amber-800',   marco: 'border-amber-300 bg-amber-50/60', cab: 'bg-amber-100',   tit: 'text-amber-800' }
+  };
+
   function nuevoGastoEnCelda(idxCat, fecha) {
     const data = month();
     const cat = data.categoriasVariables[idxCat];
@@ -2248,8 +2266,14 @@
   // lo ancho y se salta de uno a otro con la barra de arriba.
   function panelEnFichas() { return window.innerWidth < 768; }
 
+  // Elegir un grupo en el panel deja el formulario de alta apuntando a ese
+  // mismo grupo: si estás mirando Compra, lo que apuntes va a Compra.
   function cambiarGrupoPanel(i) {
+    const cats = month().categoriasVariables;
+    if (i < 0 || i >= cats.length) return;
     state.panelGrupo = i;
+    const sel = document.getElementById('pm-category');
+    if (sel) sel.value = cats[i].categoria;
     renderMonthlyView();
   }
 
@@ -2288,11 +2312,15 @@
       const personal = !!cat.excluirDelTotal;
       const pct = esp > 0 ? Math.min(100, Math.round((real / esp) * 100)) : 0;
       cabecera +=
-        '<th class="border-b-2 border-slate-200 border-l border-slate-100 p-0 align-top ' + tam.celda + '">' +
+        '<th class="border-b-2 border-l border-slate-100 p-0 align-top ' + tam.celda + ' ' +
+            (state.panelGrupo === i ? 'border-b-slate-700' : 'border-b-slate-200') + '">' +
           '<div class="' + c.cab + ' border-b px-2 py-1.5">' +
             '<div class="flex items-center gap-1 min-w-0">' +
               '<span class="' + c.punto + ' w-1.5 h-1.5 rounded-full shrink-0"></span>' +
-              '<span class="font-bold text-[11px] truncate ' + c.tit + '">' + esc(cat.categoria) + '</span>' +
+              '<button onclick="cambiarGrupoPanel(' + i + ')" title="Apuntar en ' + esc(cat.categoria) + '"' +
+                ' class="font-bold text-[11px] truncate text-left ' + c.tit +
+                (state.panelGrupo === i ? ' underline decoration-2 underline-offset-2' : ' hover:underline') + '">' +
+                esc(cat.categoria) + '</button>' +
               (personal ? '<span class="text-[8px] font-bold text-blue-700 bg-blue-100 px-1 rounded shrink-0">P</span>' : '') +
               '<span class="ml-auto flex items-center gap-0.5 shrink-0">' +
                 '<button onclick="moverGrupo(' + i + ',' + (i - 1) + ')" title="Mover a la izquierda"' +
@@ -2338,7 +2366,7 @@
         '</div>';
       }).join('');
       const suma = lista.reduce((a, it) => a + Number(it.real || 0), 0);
-      return '<td class="border-l border-slate-100 align-top p-1 ' + (resaltar ? 'bg-amber-50/70' : '') + '">' +
+      return '<td class="border-l border-t border-slate-100 align-top p-1 ' + (resaltar ? 'bg-amber-50/70' : '') + '">' +
         cuerpo +
         '<div class="flex items-center justify-between gap-1 mt-0.5">' +
           '<button onclick="nuevoGastoEnCelda(' + idxCat + ',\'' + fechaNueva + '\')" title="Añadir un gasto en esta semana"' +
@@ -2349,13 +2377,14 @@
     };
 
     semanas.forEach(sem => {
-      const esActual = hoy >= sem.desde && hoy <= sem.hasta;
-      filas += '<tr class="' + (sem.n % 2 === 0 ? 'bg-slate-50/70' : '') + '">' +
-        '<th class="sticky left-0 z-10 border-r border-t border-slate-200 px-2 py-1.5 text-left align-top ' +
-          (esActual ? 'bg-teal-100' : sem.n % 2 === 0 ? 'bg-slate-100' : 'bg-white') + '">' +
-          '<span class="block text-[9px] font-bold uppercase ' + (esActual ? 'text-teal-800' : 'text-slate-400') + '">Sem ' + sem.n + (esActual ? ' · ahora' : '') + '</span>' +
-          '<span class="block text-[10px] font-bold text-slate-600 whitespace-nowrap">' + sem.rango + '</span>' +
-          '<span data-tot-semana="' + sem.n + '" class="block text-[9px] font-bold text-slate-400 num mt-0.5">' + formatEuro(totalSemana[sem.n] || 0) + '</span>' +
+      const est = estadoSemana(sem);
+      const esActual = est === 'ahora';
+      const t = TONO_SEMANA[est];
+      filas += '<tr class="' + t.fila + '">' +
+        '<th class="sticky left-0 z-10 border-r border-t border-slate-200 px-2 py-1.5 text-left align-top ' + t.celda + '">' +
+          '<span class="block text-[9px] font-bold uppercase ' + t.texto + '">Sem ' + sem.n + (esActual ? ' · ahora' : '') + '</span>' +
+          '<span class="block text-[10px] font-bold whitespace-nowrap ' + (est === 'futura' ? 'text-slate-400' : 'text-slate-700') + '">' + sem.rango + '</span>' +
+          '<span data-tot-semana="' + sem.n + '" class="block text-[9px] font-bold num mt-0.5 ' + (est === 'futura' ? 'text-slate-300' : 'text-slate-500') + '">' + formatEuro(totalSemana[sem.n] || 0) + '</span>' +
         '</th>' +
         cats.map((cat, i) => {
           const lista = (apuntes[cat.categoria] && apuntes[cat.categoria][sem.n]) || [];
@@ -2496,10 +2525,8 @@
             ' class="w-9 h-9 shrink-0 rounded-lg bg-slate-100 text-slate-400 active:bg-red-500 active:text-white flex items-center justify-center text-base leading-none">&times;</button>' +
         '</div>';
       }).join('');
-      const marco = tono === 'ahora' ? 'border-teal-300 bg-teal-50/60'
-        : tono === 'aviso' ? 'border-amber-300 bg-amber-50/60' : 'border-slate-200 bg-white';
-      const cab = tono === 'ahora' ? 'bg-teal-100' : tono === 'aviso' ? 'bg-amber-100' : 'bg-slate-50';
-      const tit = tono === 'ahora' ? 'text-teal-800' : tono === 'aviso' ? 'text-amber-800' : 'text-slate-500';
+      const t = TONO_SEMANA[tono] || TONO_SEMANA.futura;
+      const marco = t.marco, cab = t.cab, tit = t.tit;
       return '<div class="rounded-2xl border ' + marco + ' overflow-hidden">' +
         '<div class="flex items-center justify-between px-3 py-1.5 ' + cab + ' border-b border-slate-100">' +
           '<span class="text-[10px] font-bold uppercase tracking-wider ' + tit + '">' + titulo +
@@ -2515,9 +2542,9 @@
     };
 
     let fichas = semanas.map(sem => {
-      const esActual = hoy >= sem.desde && hoy <= sem.hasta;
+      const esActual = estadoSemana(sem) === 'ahora';
       const lista = (apuntes[cat.categoria] && apuntes[cat.categoria][sem.n]) || [];
-      return ficha('Semana ' + sem.n + (esActual ? ' · ahora' : ''), 'días ' + sem.rango, lista, diaParaSemana(sem), sem.n, esActual ? 'ahora' : null);
+      return ficha('Semana ' + sem.n + (esActual ? ' · ahora' : ''), 'días ' + sem.rango, lista, diaParaSemana(sem), sem.n, estadoSemana(sem));
     }).join('');
 
     const fuera = sueltos[cat.categoria] || [];
@@ -2723,6 +2750,14 @@
     const ahora = panelEnFichas();
     if (ahora !== modoPanelPrevio) { modoPanelPrevio = ahora; renderMonthlyView(); }
   });
+
+  // La cabecera se encoge al bajar en pantallas pequeñas.
+  (() => {
+    const cab = document.querySelector('header');
+    const ajustar = () => { cab.dataset.compacta = window.scrollY > 60 ? '1' : '0'; };
+    addEventListener('scroll', ajustar, { passive: true });
+    ajustar();
+  })();
 
   document.getElementById('app').addEventListener('input', e => {
     const el = e.target.closest('[data-panel]');
