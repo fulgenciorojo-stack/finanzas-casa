@@ -350,52 +350,52 @@
 
       </div>
 
-<details id="bloque-extracto" open class="group hover-lift bg-white border-2 border-amber-300 rounded-3xl shadow-lg shadow-amber-100 hover:shadow-xl overflow-hidden ring-1 ring-amber-200/60">
+<details id="bloque-extracto" open class="group hover-lift bg-white border-2 border-teal-400 rounded-3xl shadow-lg shadow-teal-100 hover:shadow-xl overflow-hidden ring-1 ring-teal-200/60">
 
-        <summary class="bg-gradient-to-r from-amber-100 via-orange-100 to-amber-50 hover:from-amber-200 hover:via-orange-200 hover:to-amber-100 px-5 py-3.5 hover:pl-6 border-b border-amber-200 flex flex-wrap items-center justify-between gap-2 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden transition-all duration-200">
+        <summary class="bg-gradient-to-r from-teal-100 via-cyan-100 to-teal-50 hover:from-teal-200 hover:via-cyan-200 hover:to-teal-100 px-5 py-3.5 hover:pl-6 border-b border-teal-200 flex flex-wrap items-center justify-between gap-2 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden transition-all duration-200">
           <div class="flex items-center space-x-2">
-            <div class="bg-amber-500 text-white p-2 rounded-xl shadow-sm text-xs">
+            <div class="bg-teal-600 text-white p-2 rounded-xl shadow-sm text-xs">
               <svg class="ic"><use href="#i-receipt"></use></svg>
             </div>
             <div>
-              <h3 class="font-bold text-base sm:text-lg text-amber-950 uppercase tracking-wider title-font flex items-center gap-1.5">Extracto de gastos variables <svg class="ic text-pink-500 latido" aria-hidden="true"><use href="#i-heart"></use></svg></h3>
-              <p class="text-[11px] text-amber-800 font-medium">Donde se trabaja el día a día del mes</p>
+              <h3 class="font-bold text-sm text-teal-950 uppercase tracking-wide flex items-center gap-1.5">Extracto de gastos variables <svg class="ic text-pink-500 latido" aria-hidden="true"><use href="#i-heart"></use></svg></h3>
+              <p class="text-[11px] text-teal-800 font-medium">Donde se trabaja el día a día del mes</p>
             </div>
           </div>
           <div class="flex items-center gap-2">
-            <span class="bg-white/90 border border-amber-200 text-amber-900 text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+            <span class="bg-white/90 border border-teal-200 text-teal-900 text-xs font-bold px-3 py-1 rounded-full shadow-sm">
               Total: <span id="total-variables-real" class="text-pink-600 num">0,00 €</span>
             </span>
-            <svg class="ic text-amber-800 transition-transform duration-200 group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" style="width:14px;height:14px"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"/></svg>
+            <svg class="ic text-teal-800 transition-transform duration-200 group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" style="width:14px;height:14px"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"/></svg>
           </div>
         </summary>
         <div class="fade-in-up">
 
-        <div class="p-4 bg-amber-50/50 border-b border-amber-100">
-          <span class="text-[10px] font-bold text-amber-900 uppercase tracking-wider mb-2 flex items-center gap-1">
-            <svg class="ic text-amber-500"><use href="#i-bolt"></use></svg> Entrada rápida de gasto
+        <div class="p-4 bg-teal-50/50 border-b border-teal-100">
+          <span class="text-[10px] font-bold text-teal-900 uppercase tracking-wider mb-2 flex items-center gap-1">
+            <svg class="ic text-teal-600"><use href="#i-bolt"></use></svg> Entrada rápida de gasto
           </span>
           <form onsubmit="quickAddVariableExpense(event)" class="grid grid-cols-12 gap-2.5 items-center">
             <div class="col-span-3 sm:col-span-2">
-              <input type="date" id="quick-date" class="w-full bg-white border border-slate-200 rounded-xl px-2 py-2 text-xs text-center font-semibold focus:ring-2 focus:ring-amber-300 outline-none shadow-sm" required>
+              <input type="date" id="quick-date" class="w-full bg-white border border-slate-200 rounded-xl px-2 py-2 text-xs text-center font-semibold focus:ring-2 focus:ring-teal-300 outline-none shadow-sm" required>
             </div>
             <div class="col-span-9 sm:col-span-4">
-              <input type="text" id="quick-concept" placeholder="Ej: Compra Mercadona…" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-amber-300 outline-none shadow-sm" required>
+              <input type="text" id="quick-concept" placeholder="Ej: Compra Mercadona…" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-teal-300 outline-none shadow-sm" required>
             </div>
             <div class="col-span-6 sm:col-span-3">
-              <select id="quick-category" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-amber-300 outline-none shadow-sm"></select>
+              <select id="quick-category" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-teal-300 outline-none shadow-sm"></select>
             </div>
             <div class="col-span-4 sm:col-span-2">
               <div class="relative">
                 <button type="button" data-signo-de="quick-amount" data-clase-base="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg text-sm font-bold flex items-center justify-center transition-colors"
                   onclick="toggleSignoImporte('quick-amount')"
                   class="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg text-sm font-bold flex items-center justify-center transition-colors bg-slate-100 text-slate-500" title="Positivo: gasto">+</button>
-                <input type="number" step="0.01" id="quick-amount" placeholder="0,00" oninput="sincronizarSignoImporte(this)" class="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-5 py-2 text-xs text-right font-bold focus:ring-2 focus:ring-amber-300 outline-none shadow-sm num" required>
+                <input type="number" step="0.01" id="quick-amount" placeholder="0,00" oninput="sincronizarSignoImporte(this)" class="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-5 py-2 text-xs text-right font-bold focus:ring-2 focus:ring-teal-300 outline-none shadow-sm num" required>
                 <span class="absolute right-2 top-2 text-xs text-slate-400 font-bold">€</span>
               </div>
             </div>
             <div class="col-span-2 sm:col-span-1 flex justify-end">
-              <button type="submit" title="Registrar gasto" class="w-full py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl shadow-md transition-all flex items-center justify-center font-bold">
+              <button type="submit" title="Registrar gasto" class="w-full py-2 bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white rounded-xl shadow-md transition-all flex items-center justify-center font-bold">
                 <svg class="ic text-sm"><use href="#i-plus"></use></svg>
               </button>
             </div>
@@ -405,7 +405,7 @@
         <div class="px-4 py-2.5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2 bg-slate-50/50">
           <div id="container-category-pills" class="flex flex-wrap items-center gap-1.5 text-xs"></div>
           <div class="flex items-center gap-2 w-full sm:w-auto">
-            <div class="flex items-center bg-amber-200/70 border border-amber-300 p-1 rounded-xl text-xs font-bold shrink-0">
+            <div class="flex items-center bg-teal-200/70 border border-teal-300 p-1 rounded-xl text-xs font-bold shrink-0">
               <button id="btn-vista-lista" onclick="cambiarVistaVariables('lista')" class="px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
                 <svg class="ic"><use href="#i-bars"></use></svg> Lista
               </button>
@@ -416,7 +416,7 @@
                 <button onclick="abrirColumnasAmpliado()" title="Abrir el panel completo en grande" class="btn-pop shrink-0 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md flex items-center gap-1.5 ring-2 ring-indigo-300/50"><svg class="ic"><use href="#i-eye"></use></svg><span>Ver en grande</span></button>
             <div class="relative flex-1 sm:w-48 sm:flex-none">
               <svg class="ic absolute left-3 top-2 text-slate-400"><use href="#i-search"></use></svg>
-              <input type="text" id="search-expenses" oninput="renderMonthlyView()" placeholder="Buscar gasto…" class="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-3 py-1.5 text-xs focus:ring-2 focus:ring-amber-300 outline-none shadow-sm">
+              <input type="text" id="search-expenses" oninput="renderMonthlyView()" placeholder="Buscar gasto…" class="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-3 py-1.5 text-xs focus:ring-2 focus:ring-teal-300 outline-none shadow-sm">
             </div>
           </div>
         </div>
@@ -1001,8 +1001,8 @@
     </div>
   </div>
 
-  <div id="modal-columnas" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-3">
-    <div class="bg-white rounded-3xl w-full max-w-[96rem] shadow-2xl overflow-hidden flex flex-col max-h-[95vh]">
+  <div id="modal-columnas" class="fixed inset-0 bg-slate-900/60 z-50 hidden">
+    <div class="bg-white w-full h-full shadow-2xl overflow-hidden flex flex-col">
       <div class="px-5 py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center gap-3">
         <div class="bg-white/20 w-9 h-9 rounded-xl flex items-center justify-center shrink-0">
           <svg class="ic"><use href="#i-receipt"></use></svg>
@@ -1047,8 +1047,8 @@
           </button>
         </div>
       </form>
-      <div class="p-4 overflow-auto custom-scrollbar">
-        <div id="container-columnas-modal"></div>
+      <div class="p-3 sm:p-4 grow min-h-0 flex flex-col">
+        <div id="container-columnas-modal" class="grow min-h-0 flex flex-col"></div>
       </div>
     </div>
   </div>
@@ -2249,7 +2249,13 @@
 
   function construirPanel(data, searchVal, cont, opc) {
     const d = datosPanel(data, searchVal);
-    if (panelEnFichas()) construirPanelFichas(data, searchVal, cont, d);
+    const fichas = panelEnFichas();
+    // A pantalla completa la tabla se estira para llenar el alto, pero las
+    // fichas necesitan su tamaño natural y que sea el contenedor quien ruede.
+    if (opc.enModal) cont.className = fichas
+      ? 'grow min-h-0 overflow-y-auto custom-scrollbar'
+      : 'grow min-h-0 flex flex-col';
+    if (fichas) construirPanelFichas(data, searchVal, cont, d);
     else construirPanelTabla(data, searchVal, cont, opc, d);
     cont.setAttribute('data-panel-raiz', '');
     const foco = cont.querySelector('[data-panel-foco]');
@@ -2266,7 +2272,7 @@
       : { txt: 'text-[11px]', imp: 'text-[11px] w-16', celda: 'min-w-[10rem]' };
 
     /* ---- cabecera: grupo, previsto editable y lo que queda ---- */
-    let cabecera = '<th class="sticky left-0 z-20 bg-white border-b-2 border-r border-slate-200 px-2 py-1.5 text-left align-bottom">' +
+    let cabecera = '<th class="sticky left-0 z-20 bg-white border-b-2 border-r border-slate-200 px-2 py-1.5 text-left align-bottom min-w-[6.5rem]">' +
       '<span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Semana</span></th>';
     cats.forEach((cat, i) => {
       const c = colorGrupo(cat.categoria);
@@ -2369,9 +2375,9 @@
 
     /* ---- totales abajo ---- */
     let pie = '<tr class="bg-slate-800 text-white">' +
-      '<th class="sticky left-0 z-10 bg-slate-800 px-2 py-2 text-left">' +
+      '<th class="sticky left-0 z-10 bg-slate-800 px-2 py-2 text-left min-w-[6.5rem]">' +
         '<span class="block text-[9px] font-bold uppercase tracking-wider text-slate-300">Gastado</span>' +
-        '<span data-tot-casa class="block text-[11px] font-extrabold num">' + formatEuro(gastadoCasa) + '</span>' +
+        '<span data-tot-casa class="block text-[11px] font-extrabold num whitespace-nowrap">' + formatEuro(gastadoCasa) + '</span>' +
         '<span class="block text-[8px] text-slate-400 uppercase">solo casa</span>' +
       '</th>';
     cats.forEach((cat, i) => {
@@ -2531,8 +2537,8 @@
 
     const btnL = document.getElementById('btn-vista-lista');
     const btnC = document.getElementById('btn-vista-panel');
-    const activo = 'px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 bg-amber-600 text-white shadow-sm';
-    const apagado = 'px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-amber-900/70 hover:text-amber-900 hover:bg-white/60';
+    const activo = 'px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 bg-teal-600 text-white shadow-sm';
+    const apagado = 'px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-teal-900/70 hover:text-teal-900 hover:bg-white/60';
     btnL.className = enPanel ? apagado : activo;
     btnC.className = enPanel ? activo : apagado;
 
@@ -2541,7 +2547,7 @@
     const modal = document.getElementById('modal-columnas');
     if (!modal.classList.contains('hidden')) {
       const cont = document.getElementById('container-columnas-modal');
-      const m = conScrollIntacto(cont, () => construirPanel(data, searchVal, cont, { alto: 'max-h-[74vh]' }));
+      const m = conScrollIntacto(cont, () => construirPanel(data, searchVal, cont, { alto: 'h-full', enModal: true }));
       document.getElementById('columnas-modal-pista').innerHTML = textoPista(searchVal, m);
       document.getElementById('columnas-modal-titulo').innerText = 'Gastos variables de ' + labelForKey(currentKey());
     }
@@ -3137,7 +3143,8 @@
   function openModal(id) {
     const el = document.getElementById(id);
     el.classList.remove('hidden');
-    el.classList.add('flex');
+    // El panel grande ocupa la pantalla entera: no se centra como los demás.
+    if (id !== 'modal-columnas') el.classList.add('flex');
   }
   function closeModal(id) {
     const el = document.getElementById(id);
