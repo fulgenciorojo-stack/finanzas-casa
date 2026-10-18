@@ -855,6 +855,14 @@
             class="w-full bg-white border border-slate-200 rounded-2xl px-4 py-3 text-sm font-semibold focus:ring-2 focus:ring-amber-300 outline-none shadow-sm">
         </div>
 
+        <label class="flex items-center gap-3 w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-2xl cursor-pointer select-none transition-colors has-[:checked]:bg-teal-50 has-[:checked]:border-teal-400">
+          <input type="checkbox" id="qw-prevision" class="w-5 h-5 rounded border-slate-300 text-teal-600 focus:ring-teal-400 cursor-pointer">
+          <span class="min-w-0">
+            <span class="block text-sm font-bold text-slate-700">Es una previsión</span>
+            <span class="block text-[11px] text-slate-400 leading-tight">Aún no lo has pagado: queda pendiente en el panel</span>
+          </span>
+        </label>
+
         <button type="submit" class="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-2xl shadow-lg font-bold text-sm transition-all flex items-center justify-center gap-2">
           <svg class="ic"><use href="#i-check"></use></svg>
           <span>Guardar gasto</span>
@@ -1034,10 +1042,10 @@
         <div class="col-span-5 sm:col-span-2">
           <input type="date" id="pm-date" required class="w-full bg-white border border-teal-200 rounded-xl px-2 py-2 text-xs text-center font-semibold focus:ring-2 focus:ring-teal-300 outline-none">
         </div>
-        <div class="col-span-7 sm:col-span-4">
+        <div class="col-span-7 sm:col-span-3">
           <input type="text" id="pm-concept" placeholder="¿En qué? Ej: Mercadona…" required class="w-full bg-white border border-teal-200 rounded-xl px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-teal-300 outline-none">
         </div>
-        <div class="col-span-6 sm:col-span-3">
+        <div class="col-span-6 sm:col-span-2">
           <select id="pm-category" class="w-full bg-white border border-teal-200 rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-teal-300 outline-none"></select>
         </div>
         <div class="col-span-4 sm:col-span-2">
@@ -1049,7 +1057,13 @@
             <span class="absolute right-2 top-2 text-xs text-slate-400 font-bold">€</span>
           </div>
         </div>
-        <div class="col-span-2 sm:col-span-1 flex justify-end">
+        <div class="col-span-6 sm:col-span-2">
+          <label class="flex items-center justify-center gap-1.5 w-full py-2 bg-white border border-teal-200 rounded-xl text-xs font-bold text-teal-700 cursor-pointer select-none hover:bg-teal-50 transition-colors has-[:checked]:bg-teal-600 has-[:checked]:text-white has-[:checked]:border-teal-600">
+            <input type="checkbox" id="pm-prevision" class="w-3.5 h-3.5 rounded border-teal-300 text-teal-600 focus:ring-teal-400 cursor-pointer">
+            <span>Previsión</span>
+          </label>
+        </div>
+        <div class="col-span-6 sm:col-span-1 flex justify-end">
           <button type="submit" title="Apuntar este gasto" class="btn-pop w-full py-3 sm:py-2 bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white rounded-xl shadow-md flex items-center justify-center font-bold">
             <svg class="ic text-sm"><use href="#i-plus"></use></svg>
           </button>
@@ -1530,6 +1544,7 @@
     win.classList.remove('hidden');
     document.getElementById('qw-date').value = todayISO();
     document.getElementById('qw-amount').value = '';
+    document.getElementById('qw-prevision').checked = false;
     document.getElementById('qw-concept').value = '';
     quickWinCategory = quickWinCategory || month().categoriasVariables[0].categoria;
     updateQuickTargetMonth();
@@ -1584,13 +1599,16 @@
     )).join('');
   }
 
-  function addExpense(fecha, concepto, categoria, importe, porRevisar) {
+  function addExpense(fecha, concepto, categoria, importe, porRevisar, esPrevision) {
     const key = fecha.slice(0, 7);
     const target = ensureMonth(key);
     if (!target.categoriasVariables.some(c => c.categoria === categoria)) {
       target.categoriasVariables.push({ categoria: categoria, esperado: 0, excluirDelTotal: false, nota: '' });
     }
-    const entry = { id: nuevoId(), fecha: fecha, concepto: concepto, categoria: categoria, real: importe, previsto: 0, porRevisar: !!porRevisar };
+    // Una previsión se guarda en su columna y deja lo pagado a cero, que es
+    // lo que la marca como pendiente hasta que se cobre.
+    const entry = { id: nuevoId(), fecha: fecha, concepto: concepto, categoria: categoria,
+      real: esPrevision ? 0 : importe, previsto: esPrevision ? importe : 0, porRevisar: !!porRevisar };
     target.registroVariables.unshift(entry);
     queueSave(key);
     return entry;
@@ -1603,7 +1621,8 @@
     const fecha = document.getElementById('qw-date').value || todayISO();
     if (!concepto || !isFinite(importe)) return;
 
-    const entry = addExpense(fecha, concepto, quickWinCategory, importe, true);
+    const esPrevision = document.getElementById('qw-prevision').checked;
+    const entry = addExpense(fecha, concepto, quickWinCategory, importe, true, esPrevision);
     sessionAdded.unshift(entry);
 
     document.getElementById('qw-amount').value = '';
@@ -1611,7 +1630,7 @@
     reiniciarSignoImporte('qw-amount');
     document.getElementById('qw-amount').focus();
     renderQuickRecent();
-    showToast(formatEuro(importe) + ' apuntado en ' + labelForKey(fecha.slice(0, 7)));
+    showToast(formatEuro(importe) + (esPrevision ? ' apuntado como previsión en ' : ' apuntado en ') + labelForKey(fecha.slice(0, 7)));
   }
 
   function quickAddVariableExpense(e) {
@@ -1644,15 +1663,16 @@
     const concepto = document.getElementById('pm-concept').value.trim();
     const categoria = document.getElementById('pm-category').value;
     const importe = Number(document.getElementById('pm-amount').value);
+    const esPrevision = document.getElementById('pm-prevision').checked;
     if (!concepto || !isFinite(importe)) return;
 
-    addExpense(fecha, concepto, categoria, importe, false);
+    addExpense(fecha, concepto, categoria, importe, false, esPrevision);
     document.getElementById('pm-concept').value = '';
     document.getElementById('pm-amount').value = '';
     reiniciarSignoImporte('pm-amount');
     renderAll();
     document.getElementById('pm-concept').focus();
-    showToast('«' + concepto + '» añadido a ' + labelForKey(fecha.slice(0, 7)));
+    showToast((esPrevision ? 'Previsión «' : '«') + concepto + '» añadida a ' + labelForKey(fecha.slice(0, 7)));
   }
 
   /* ---------- avisos ---------- */
@@ -2320,8 +2340,12 @@
     if (fichas) construirPanelFichas(data, searchVal, cont, d);
     else construirPanelTabla(data, searchVal, cont, opc, d);
     cont.setAttribute('data-panel-raiz', '');
-    const foco = cont.querySelector('[data-panel-foco]');
-    if (foco) { foco.focus(); state.panelFoco = null; }
+    const modalAbierto = !document.getElementById('modal-columnas').classList.contains('hidden');
+    const esLaVisible = opc.enModal ? modalAbierto : !modalAbierto;
+    if (esLaVisible) {
+      const foco = cont.querySelector('[data-panel-foco]');
+      if (foco) { foco.focus(); state.panelFoco = null; }
+    }
     return d.grupoConCoincidencia;
   }
 
