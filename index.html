@@ -1590,7 +1590,7 @@
     if (!target.categoriasVariables.some(c => c.categoria === categoria)) {
       target.categoriasVariables.push({ categoria: categoria, esperado: 0, excluirDelTotal: false, nota: '' });
     }
-    const entry = { id: nuevoId(), fecha: fecha, concepto: concepto, categoria: categoria, real: importe, porRevisar: !!porRevisar };
+    const entry = { id: nuevoId(), fecha: fecha, concepto: concepto, categoria: categoria, real: importe, previsto: 0, porRevisar: !!porRevisar };
     target.registroVariables.unshift(entry);
     queueSave(key);
     return entry;
@@ -2113,29 +2113,51 @@
     aviso:  { fila: 'bg-amber-50/60', celda: 'bg-amber-100',   texto: 'text-amber-800',   marco: 'border-amber-300 bg-amber-50/60', cab: 'bg-amber-100',   tit: 'text-amber-800' }
   };
 
+  // Un apunte está solo previsto mientras tenga importe en previsión y nada
+  // pagado. Al pagarlo, el importe cruza de una columna a la otra.
+  function soloPrevisto(it) {
+    return Number(it.previsto || 0) !== 0 && Number(it.real || 0) === 0;
+  }
+
+  function pagarPrevision(id) {
+    const data = month();
+    const it = data.registroVariables.find(r => r.id === id);
+    if (!it || !soloPrevisto(it)) return;
+    it.real = Number(it.previsto || 0);
+    it.previsto = 0;
+    state.panelSucio = false;
+    queueSave();
+    renderAll();
+    showToast('«' + (it.concepto || 'Gasto') + '» pasa a pagado: ' + formatEuro(it.real));
+  }
+
   function nuevoGastoEnCelda(idxCat, fecha) {
     const data = month();
     const cat = data.categoriasVariables[idxCat];
     if (!cat) return;
     const id = nuevoId();
-    data.registroVariables.push({ id, fecha, concepto: '', categoria: cat.categoria, real: 0, porRevisar: false });
+    data.registroVariables.push({ id, fecha, concepto: '', categoria: cat.categoria, real: 0, previsto: 0, porRevisar: false });
     state.panelFoco = id;
     state.panelSucio = false;
     queueSave();
     renderAll();
   }
 
-  function textoQueda(esperado, real) {
+  // Lo "libre" es lo que queda del presupuesto tras descontar lo ya pagado y
+  // lo que sabes que llega: las previsiones salen del mismo bote, no se suman.
+  function textoQueda(esperado, real, pendiente) {
     if (!esperado) return '<span class="opacity-60 font-semibold">sin previsión</span>';
-    const q = esperado - real;
-    return q >= 0 ? 'quedan ' + formatEuro(q) : 'pasado ' + formatEuro(-q);
+    const q = esperado - real - (pendiente || 0);
+    return (q >= 0 ? 'libres ' + formatEuro(q) : 'pasado ' + formatEuro(-q)) +
+      (pendiente ? '<span class="opacity-70 font-semibold"> · ' + formatEuro(pendiente) + ' por pagar</span>' : '');
   }
 
-  function resumenPanelHTML(previsto, gastado) {
-    const queda = previsto - gastado;
+  function resumenPanelHTML(previsto, gastado, pendiente) {
+    const queda = previsto - gastado - (pendiente || 0);
     return '<span class="text-slate-500">Previsto casa: <span class="text-indigo-600 num">' + formatEuro(previsto) + '</span></span>' +
       '<span class="text-slate-500">Gastado: <span class="text-pink-600 num">' + formatEuro(gastado) + '</span></span>' +
-      '<span class="text-slate-500">' + (queda >= 0 ? 'Queda: ' : 'Pasado: ') +
+      (pendiente ? '<span class="text-slate-500">Por pagar: <span class="text-teal-600 num">' + formatEuro(pendiente) + '</span></span>' : '') +
+      '<span class="text-slate-500">' + (queda >= 0 ? 'Libres: ' : 'Pasado: ') +
         '<span class="num ' + (queda >= 0 ? 'text-emerald-600' : 'text-red-600') + '">' + formatEuro(Math.abs(queda)) + '</span></span>';
   }
 
@@ -2153,6 +2175,7 @@
       const it = data.registroVariables.find(r => r.id === el.dataset.id);
       if (!it) return;
       if (el.dataset.panel === 'real') it.real = Number(el.value) || 0;
+      else if (el.dataset.panel === 'previsto') it.previsto = Number(el.value) || 0;
       else it.concepto = el.value;
     }
     state.panelSucio = true;
@@ -2164,23 +2187,27 @@
     if (!raiz) return;
     const data = month();
     const semanas = semanasDelMes(currentKey());
-    const porCat = {}, porSemana = {}, porCelda = {};
-    data.categoriasVariables.forEach(c => { porCat[c.categoria] = 0; });
+    const porCat = {}, pendCat = {}, porSemana = {}, porCelda = {};
+    data.categoriasVariables.forEach(c => { porCat[c.categoria] = 0; pendCat[c.categoria] = 0; });
     data.registroVariables.forEach(it => {
       const v = Number(it.real || 0);
-      if (porCat[it.categoria] !== undefined) porCat[it.categoria] += v;
+      if (porCat[it.categoria] !== undefined) {
+        porCat[it.categoria] += v;
+        pendCat[it.categoria] += soloPrevisto(it) ? Number(it.previsto || 0) : 0;
+      }
       const sem = semanas.find(w => it.fecha >= w.desde && it.fecha <= w.hasta);
       const n = sem ? sem.n : 0;
       porSemana[n] = (porSemana[n] || 0) + v;
       porCelda[it.categoria + '|' + n] = (porCelda[it.categoria + '|' + n] || 0) + v;
     });
 
-    let previsto = 0, gastado = 0;
+    let previsto = 0, gastado = 0, pendiente = 0;
     data.categoriasVariables.forEach((cat, i) => {
       const esp = Number(cat.esperado || 0);
       const real = porCat[cat.categoria] || 0;
-      const queda = esp - real;
-      if (!cat.excluirDelTotal) { previsto += esp; gastado += real; }
+      const pend = pendCat[cat.categoria] || 0;
+      const queda = esp - real - pend;
+      if (!cat.excluirDelTotal) { previsto += esp; gastado += real; pendiente += pend; }
 
       const barra = raiz.querySelector('[data-barra-grupo="' + i + '"]');
       if (barra) {
@@ -2190,14 +2217,14 @@
       }
       const cab = raiz.querySelector('[data-queda-grupo="' + i + '"]');
       if (cab) {
-        cab.innerHTML = textoQueda(esp, real);
+        cab.innerHTML = textoQueda(esp, real, pend);
         cab.className = 'text-[9px] font-bold mt-0.5 text-right num ' + (queda < 0 ? 'text-red-700' : 'text-emerald-700');
       }
       const tot = raiz.querySelector('[data-tot-grupo="' + i + '"]');
       if (tot) tot.innerText = formatEuro(real);
       const pq = raiz.querySelector('[data-pie-queda="' + i + '"]');
       if (pq) {
-        pq.innerHTML = textoQueda(esp, real);
+        pq.innerHTML = textoQueda(esp, real, pend);
         pq.className = 'block text-[9px] font-bold num ' +
           (esp === 0 ? 'text-slate-500' : queda < 0 ? 'text-red-300' : 'text-emerald-300');
       }
@@ -2214,7 +2241,7 @@
     const casa = raiz.querySelector('[data-tot-casa]');
     if (casa) casa.innerText = formatEuro(gastado);
     const res = raiz.querySelector('[data-panel-resumen]');
-    if (res) res.innerHTML = resumenPanelHTML(previsto, gastado);
+    if (res) res.innerHTML = resumenPanelHTML(previsto, gastado, pendiente);
   }
 
   // Panel tipo hoja de cálculo: una columna por grupo, una fila por semana,
@@ -2240,25 +2267,30 @@
       else sueltos[it.categoria].push(it);
     });
 
-    const gastadoCat = {}, totalSemana = {};
-    let gastadoCasa = 0, previstoCasa = 0, grupoConCoincidencia = 0;
-    cats.forEach(c => { gastadoCat[c.categoria] = 0; });
+    const gastadoCat = {}, pendienteCat = {}, totalSemana = {}, pendienteSemana = {};
+    let gastadoCasa = 0, previstoCasa = 0, pendienteCasa = 0, grupoConCoincidencia = 0;
+    cats.forEach(c => { gastadoCat[c.categoria] = 0; pendienteCat[c.categoria] = 0; });
     data.registroVariables.forEach(it => {
       const v = Number(it.real || 0);
-      if (gastadoCat[it.categoria] !== undefined) gastadoCat[it.categoria] += v;
+      const p = soloPrevisto(it) ? Number(it.previsto || 0) : 0;
+      if (gastadoCat[it.categoria] !== undefined) { gastadoCat[it.categoria] += v; pendienteCat[it.categoria] += p; }
       const sem = semanas.find(w => it.fecha >= w.desde && it.fecha <= w.hasta);
-      if (sem) totalSemana[sem.n] = (totalSemana[sem.n] || 0) + v;
+      if (sem) {
+        totalSemana[sem.n] = (totalSemana[sem.n] || 0) + v;
+        pendienteSemana[sem.n] = (pendienteSemana[sem.n] || 0) + p;
+      }
     });
 
     cats.forEach(cat => {
       if (!cat.excluirDelTotal) {
         previstoCasa += Number(cat.esperado || 0);
         gastadoCasa += gastadoCat[cat.categoria] || 0;
+        pendienteCasa += pendienteCat[cat.categoria] || 0;
       }
       if (searchVal && data.registroVariables.some(it => it.categoria === cat.categoria && coincide(it))) grupoConCoincidencia++;
     });
 
-    return { semanas, cats, idxDe, coincide, apuntes, sueltos, gastadoCat, totalSemana, gastadoCasa, previstoCasa, grupoConCoincidencia };
+    return { semanas, cats, idxDe, coincide, apuntes, sueltos, gastadoCat, pendienteCat, totalSemana, pendienteSemana, gastadoCasa, previstoCasa, pendienteCasa, grupoConCoincidencia };
   }
 
   // En el móvil la tabla no cabe: 8 columnas son cinco pantallas de arrastre y
@@ -2294,12 +2326,12 @@
   }
 
   function construirPanelTabla(data, searchVal, cont, opc, d) {
-    const { semanas, cats, idxDe, coincide, apuntes, sueltos, gastadoCat, totalSemana } = d;
-    const gastadoCasa = d.gastadoCasa, previstoCasa = d.previstoCasa;
+    const { semanas, cats, idxDe, coincide, apuntes, sueltos, gastadoCat, pendienteCat, totalSemana, pendienteSemana } = d;
+    const gastadoCasa = d.gastadoCasa, previstoCasa = d.previstoCasa, pendienteCasa = d.pendienteCasa;
     const esc = escapeHTML;
     const tam = opc.compacto
-      ? { txt: 'text-[10px]', imp: 'text-[10px] w-14', celda: 'min-w-[8.5rem]' }
-      : { txt: 'text-[11px]', imp: 'text-[11px] w-16', celda: 'min-w-[10rem]' };
+      ? { txt: 'text-[10px]', imp: 'text-[10px] w-11', celda: 'min-w-[11.5rem]' }
+      : { txt: 'text-[11px]', imp: 'text-[11px] w-12', celda: 'min-w-[13rem]' };
 
     /* ---- cabecera: grupo, previsto editable y lo que queda ---- */
     let cabecera = '<th class="sticky left-0 z-20 bg-white border-b-2 border-r border-slate-200 px-2 py-1.5 text-left align-bottom min-w-[6.5rem]">' +
@@ -2308,7 +2340,8 @@
       const c = colorGrupo(cat.categoria);
       const esp = Number(cat.esperado || 0);
       const real = gastadoCat[cat.categoria] || 0;
-      const queda = esp - real;
+      const pend = pendienteCat[cat.categoria] || 0;
+      const queda = esp - real - pend;
       const personal = !!cat.excluirDelTotal;
       const pct = esp > 0 ? Math.min(100, Math.round((real / esp) * 100)) : 0;
       cabecera +=
@@ -2341,7 +2374,12 @@
               '<div data-barra-grupo="' + i + '" class="h-full rounded-full ' + (queda < 0 ? 'bg-red-500' : pct > 85 ? 'bg-amber-500' : 'bg-emerald-500') + '" style="width:' + pct + '%"></div>' +
             '</div>' +
             '<div data-queda-grupo="' + i + '" class="text-[9px] font-bold mt-0.5 text-right num ' + (queda < 0 ? 'text-red-700' : 'text-emerald-700') + '">' +
-              textoQueda(esp, real) +
+              textoQueda(esp, real, pend) +
+            '</div>' +
+            '<div class="flex justify-end gap-0.5 text-[8px] font-bold uppercase tracking-wide mt-0.5 opacity-70">' +
+              '<span class="' + tam.imp.split(' ')[1] + ' text-right text-teal-700">Prev</span>' +
+              '<span class="' + tam.imp.split(' ')[1] + ' text-right text-slate-600">Pag</span>' +
+              '<span class="w-8"></span>' +
             '</div>' +
           '</div>' +
         '</th>';
@@ -2355,12 +2393,20 @@
         const i = idxDe.get(it);
         const marca = coincide(it);
         const neg = Number(it.real || 0) < 0;
-        return '<div class="group/f flex items-center gap-0.5 rounded px-0.5 ' + (marca ? 'bg-amber-200/70' : 'hover:bg-white') + '">' +
+        const pend = soloPrevisto(it);
+        return '<div class="group/f flex items-center gap-0.5 rounded px-0.5 ' +
+            (marca ? 'bg-amber-200/70' : pend ? 'bg-teal-50 border-l-2 border-teal-400' : 'hover:bg-white') + '">' +
           '<input type="text" value="' + esc(it.concepto || '') + '" placeholder="concepto…" data-panel="concepto" data-id="' + esc(it.id) + '"' +
             (state.panelFoco === it.id ? ' data-panel-foco="1"' : '') +
-            ' class="flex-1 min-w-0 bg-transparent outline-none font-medium text-slate-700 ' + tam.txt + ' focus:bg-white rounded px-0.5 placeholder:text-slate-300">' +
-          '<input type="number" step="0.01" value="' + Number(it.real || 0) + '" data-panel="real" data-id="' + esc(it.id) + '"' +
-            ' class="' + tam.imp + ' text-right bg-transparent outline-none font-bold num focus:bg-white rounded px-0.5 ' + (neg ? 'text-emerald-600' : 'text-slate-800') + '">' +
+            ' class="flex-1 min-w-0 bg-transparent outline-none font-medium ' + (pend ? 'text-teal-800 italic' : 'text-slate-700') + ' ' + tam.txt + ' focus:bg-white rounded px-0.5 placeholder:text-slate-300">' +
+          '<input type="number" step="0.01" value="' + (Number(it.previsto || 0) || '') + '" placeholder="–" data-panel="previsto" data-id="' + esc(it.id) + '" title="Previsión: lo que esperas pagar"' +
+            ' class="' + tam.imp + ' text-right bg-transparent outline-none font-bold num focus:bg-white rounded px-0.5 text-teal-600 placeholder:text-slate-200">' +
+          '<input type="number" step="0.01" value="' + (Number(it.real || 0) || '') + '" placeholder="–" data-panel="real" data-id="' + esc(it.id) + '" title="Pagado"' +
+            ' class="' + tam.imp + ' text-right bg-transparent outline-none font-bold num focus:bg-white rounded px-0.5 placeholder:text-slate-200 ' + (neg ? 'text-emerald-600' : 'text-slate-800') + '">' +
+          (pend
+            ? '<button onclick="pagarPrevision(\'' + esc(it.id) + '\')" title="Marcar como pagado"' +
+                ' class="w-4 h-4 shrink-0 rounded bg-teal-500 text-white hover:bg-teal-600 flex items-center justify-center text-[10px] leading-none transition-colors">&#10003;</button>'
+            : '<span class="w-4 h-4 shrink-0"></span>') +
           '<button data-act="reg-remove" data-idx="' + i + '" title="Borrar este gasto"' +
             ' class="w-4 h-4 shrink-0 rounded text-slate-300 hover:text-white hover:bg-red-500 flex items-center justify-center text-[11px] leading-none transition-colors">&times;</button>' +
         '</div>';
@@ -2385,6 +2431,7 @@
           '<span class="block text-[9px] font-bold uppercase ' + t.texto + '">Sem ' + sem.n + (esActual ? ' · ahora' : '') + '</span>' +
           '<span class="block text-[10px] font-bold whitespace-nowrap ' + (est === 'futura' ? 'text-slate-400' : 'text-slate-700') + '">' + sem.rango + '</span>' +
           '<span data-tot-semana="' + sem.n + '" class="block text-[9px] font-bold num mt-0.5 ' + (est === 'futura' ? 'text-slate-300' : 'text-slate-500') + '">' + formatEuro(totalSemana[sem.n] || 0) + '</span>' +
+          (pendienteSemana[sem.n] ? '<span class="block text-[8px] font-bold num text-teal-600">+' + formatEuro(pendienteSemana[sem.n]) + ' prev.</span>' : '') +
         '</th>' +
         cats.map((cat, i) => {
           const lista = (apuntes[cat.categoria] && apuntes[cat.categoria][sem.n]) || [];
@@ -2418,12 +2465,13 @@
     cats.forEach((cat, i) => {
       const real = gastadoCat[cat.categoria] || 0;
       const esp = Number(cat.esperado || 0);
-      const queda = esp - real;
+      const pend = pendienteCat[cat.categoria] || 0;
+      const queda = esp - real - pend;
       pie += '<td class="border-l border-slate-700 px-2 py-2 text-right align-middle">' +
         '<span data-tot-grupo="' + i + '" class="block text-xs font-extrabold num">' + formatEuro(real) + '</span>' +
         '<span data-pie-queda="' + i + '" class="block text-[9px] font-bold num ' +
           (esp === 0 ? 'text-slate-500' : queda < 0 ? 'text-red-300' : 'text-emerald-300') + '">' +
-          textoQueda(esp, real) + '</span>' +
+          textoQueda(esp, real, pend) + '</span>' +
       '</td>';
     });
     pie += '</tr>';
@@ -2438,14 +2486,14 @@
         '</table>' +
       '</div>' +
       '<div data-panel-resumen class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mt-2 text-[11px] font-bold">' +
-        resumenPanelHTML(previsto, gastadoCasa) +
+        resumenPanelHTML(previsto, gastadoCasa, pendienteCasa) +
       '</div>';
   }
 
   // Presentación de móvil: un grupo a pantalla completa, semana a semana,
   // con botones del tamaño de un dedo y una barra para cambiar de grupo.
   function construirPanelFichas(data, searchVal, cont, d) {
-    const { semanas, cats, idxDe, coincide, apuntes, sueltos, gastadoCat } = d;
+    const { semanas, cats, idxDe, coincide, apuntes, sueltos, gastadoCat, pendienteCat } = d;
     const esc = escapeHTML;
     if (!cats.length) { cont.innerHTML = '<p class="text-xs text-slate-400 text-center py-6">Todavía no hay grupos de gasto.</p>'; return; }
 
@@ -2455,13 +2503,14 @@
     const c = colorGrupo(cat.categoria);
     const esp = Number(cat.esperado || 0);
     const real = gastadoCat[cat.categoria] || 0;
-    const queda = esp - real;
+    const pend = pendienteCat[cat.categoria] || 0;
+    const queda = esp - real - pend;
     const pct = esp > 0 ? Math.min(100, Math.round((real / esp) * 100)) : 0;
 
     /* --- barra de grupos: de un vistazo cuánto queda en cada uno --- */
     const chips = cats.map((ct, i) => {
       const cc = colorGrupo(ct.categoria);
-      const e = Number(ct.esperado || 0), r = gastadoCat[ct.categoria] || 0;
+      const e = Number(ct.esperado || 0), r = (gastadoCat[ct.categoria] || 0) + (pendienteCat[ct.categoria] || 0);
       const hayCoincidencia = searchVal && data.registroVariables.some(it => it.categoria === ct.categoria && coincide(it));
       return '<button onclick="cambiarGrupoPanel(' + i + ')" class="shrink-0 snap-start px-3 py-2 rounded-xl border text-left transition-all ' +
         (i === sel ? cc.cab + ' border-current shadow-sm ring-2 ring-slate-400/40'
@@ -2504,7 +2553,7 @@
         '</div>' +
         '<div class="flex justify-between text-[11px] font-bold mt-1">' +
           '<span class="' + c.dato + ' num">Gastado <span data-tot-grupo="' + sel + '">' + formatEuro(real) + '</span></span>' +
-          '<span data-queda-grupo="' + sel + '" class="num ' + (queda < 0 ? 'text-red-700' : 'text-emerald-700') + '">' + textoQueda(esp, real) + '</span>' +
+          '<span data-queda-grupo="' + sel + '" class="num ' + (queda < 0 ? 'text-red-700' : 'text-emerald-700') + '">' + textoQueda(esp, real, pend) + '</span>' +
         '</div>' +
       '</div>';
 
@@ -2515,12 +2564,20 @@
       const filas = lista.map(it => {
         const i = idxDe.get(it);
         const neg = Number(it.real || 0) < 0;
-        return '<div class="flex items-center gap-1.5 py-1 ' + (coincide(it) ? 'bg-amber-100 rounded-lg px-1' : '') + '">' +
+        const pend = soloPrevisto(it);
+        return '<div class="flex items-center gap-1.5 py-1 ' +
+            (coincide(it) ? 'bg-amber-100 rounded-lg px-1' : pend ? 'bg-teal-50 rounded-lg px-1 border-l-4 border-teal-400' : '') + '">' +
           '<input type="text" value="' + esc(it.concepto || '') + '" placeholder="¿en qué?" data-panel="concepto" data-id="' + esc(it.id) + '"' +
             (state.panelFoco === it.id ? ' data-panel-foco="1"' : '') +
-            ' class="flex-1 min-w-0 bg-slate-50 rounded-lg px-2 py-2 text-xs font-medium text-slate-700 outline-none focus:ring-2 focus:ring-teal-300 placeholder:text-slate-300">' +
-          '<input type="number" step="0.01" value="' + Number(it.real || 0) + '" data-panel="real" data-id="' + esc(it.id) + '"' +
-            ' class="w-20 bg-slate-50 rounded-lg px-2 py-2 text-xs text-right font-bold num outline-none focus:ring-2 focus:ring-teal-300 ' + (neg ? 'text-emerald-600' : 'text-slate-800') + '">' +
+            ' class="flex-1 min-w-0 bg-slate-50 rounded-lg px-2 py-2 text-xs font-medium outline-none focus:ring-2 focus:ring-teal-300 placeholder:text-slate-300 ' + (pend ? 'text-teal-800 italic' : 'text-slate-700') + '">' +
+          '<input type="number" step="0.01" value="' + (Number(it.previsto || 0) || '') + '" placeholder="prev." data-panel="previsto" data-id="' + esc(it.id) + '" title="Previsión"' +
+            ' class="w-16 bg-teal-50 rounded-lg px-1.5 py-2 text-xs text-right font-bold num text-teal-700 outline-none focus:ring-2 focus:ring-teal-300 placeholder:text-teal-300 placeholder:font-normal">' +
+          '<input type="number" step="0.01" value="' + (Number(it.real || 0) || '') + '" placeholder="pag." data-panel="real" data-id="' + esc(it.id) + '" title="Pagado"' +
+            ' class="w-16 bg-slate-50 rounded-lg px-1.5 py-2 text-xs text-right font-bold num outline-none focus:ring-2 focus:ring-teal-300 placeholder:text-slate-300 placeholder:font-normal ' + (neg ? 'text-emerald-600' : 'text-slate-800') + '">' +
+          (pend
+            ? '<button onclick="pagarPrevision(\'' + esc(it.id) + '\')" aria-label="Marcar como pagado"' +
+                ' class="w-9 h-9 shrink-0 rounded-lg bg-teal-500 text-white active:bg-teal-700 flex items-center justify-center text-base leading-none">&#10003;</button>'
+            : '') +
           '<button data-act="reg-remove" data-idx="' + i + '" aria-label="Borrar este gasto"' +
             ' class="w-9 h-9 shrink-0 rounded-lg bg-slate-100 text-slate-400 active:bg-red-500 active:text-white flex items-center justify-center text-base leading-none">&times;</button>' +
         '</div>';
@@ -2555,7 +2612,7 @@
       cabecera +
       '<div class="space-y-2 mt-2">' + fichas + '</div>' +
       '<div data-panel-resumen class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 mt-3 text-[11px] font-bold">' +
-        resumenPanelHTML(d.previstoCasa, d.gastadoCasa) +
+        resumenPanelHTML(d.previstoCasa, d.gastadoCasa, d.pendienteCasa) +
       '</div>';
   }
 
@@ -3482,7 +3539,7 @@
   Object.assign(window, {
     changePeriod, switchTab, openQuickWindow, closeQuickWindow, submitQuickWindow, irAlExtracto,
     updateQuickTargetMonth, quickAddVariableExpense, copyPreviousMonth, copyFijoToNext, copyIngresoToNext,
-    toggleSignoImporte, sincronizarSignoImporte, guardarNotaMes, cambiarVistaVariables, moverGrupo, nuevoGastoEnCelda, cambiarGrupoPanel, anadirGastoDesdePanel, abrirColumnasAmpliado, buscarDesdeAmpliado,
+    toggleSignoImporte, sincronizarSignoImporte, guardarNotaMes, cambiarVistaVariables, moverGrupo, nuevoGastoEnCelda, cambiarGrupoPanel, anadirGastoDesdePanel, pagarPrevision, abrirColumnasAmpliado, buscarDesdeAmpliado,
     abrirValoracionMes, abrirCierreMes, confirmarCierreMes, reabrirMes, abrirValoracionAnual,
     openAddObjetivoModal, confirmAddObjetivo, openAddIngresoModal, confirmAddIngreso,
     openAddAhorroModal, confirmAddAhorro, openAddGastoFijoModal, confirmAddGastoFijo,
