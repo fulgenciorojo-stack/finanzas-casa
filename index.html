@@ -1818,7 +1818,7 @@
     document.getElementById('nota-fijos').value = data.nota || '';
 
     /* registro de variables */
-    const spentPerGroup = {};
+    const spentPerGroup = {}, previstoPerGroup = {};
     const excluidas = new Set(data.categoriasVariables.filter(c => c.excluirDelTotal).map(c => c.categoria));
     let sumVarReal = 0, sumVarCasa = 0, sumVarPersonal = 0;
     let pendientes = 0;
@@ -1828,6 +1828,10 @@
       if (excluidas.has(item.categoria)) sumVarPersonal += amt;
       else sumVarCasa += amt;
       spentPerGroup[item.categoria] = (spentPerGroup[item.categoria] || 0) + amt;
+      // Las previsiones apuntadas no son gasto todavía, pero sí cuentan para
+      // lo que queda por salir y para la previsión de fin de mes.
+      previstoPerGroup[item.categoria] = (previstoPerGroup[item.categoria] || 0) +
+        (soloPrevisto(item) ? Number(item.previsto || 0) : 0);
       if (item.porRevisar) pendientes++;
     });
 
@@ -1886,17 +1890,17 @@
     containerProgress.innerHTML = '';
     let sumVarEsp = 0, sumVarPendienteCasa = 0, sumVarQuedanTotal = 0;
     data.categoriasVariables.forEach((cat, idx) => {
-      const esp = Number(cat.esperado || 0);
-      sumVarEsp += esp;
       const real = spentPerGroup[cat.categoria] || 0;
-      sumVarQuedanTotal += (esp - real);
+      const prevApuntado = previstoPerGroup[cat.categoria] || 0;
+      const q = cuentasGrupo(cat.esperado, real, prevApuntado);
+      const esp = q.prevision;          // el presupuesto sube si lo conocido ya lo supera
+      sumVarEsp += esp;
+      sumVarQuedanTotal += q.porGastar;
       const isPersonal = !!cat.excluirDelTotal;
-      if (!isPersonal) {
-        sumVarPendienteCasa += Math.max(esp - real, 0);
-      }
-      desgloseItems.push({ label: cat.categoria, delta: esp - real, personal: isPersonal, isFijo: false });
+      if (!isPersonal) sumVarPendienteCasa += q.porGastar;
+      desgloseItems.push({ label: cat.categoria, delta: q.porGastar, personal: isPersonal, isFijo: false, previsto: prevApuntado });
       const pct = esp > 0 ? Math.min(100, Math.round((real / esp) * 100)) : (real > 0 ? 100 : 0);
-      const isOver = real > esp && esp > 0;
+      const isOver = real > q.esperado && q.esperado > 0;
       const card = document.createElement('div');
       card.className = 'hover-lift p-3 rounded-2xl flex flex-col justify-between gap-2 hover:shadow-md ' +
         (isPersonal ? 'bg-blue-50/60 border border-blue-200 hover:border-blue-300' : 'bg-slate-50 border border-slate-200 hover:border-amber-300');
@@ -1910,7 +1914,7 @@
           '</div>' +
           '<div class="flex items-center gap-1 text-xs shrink-0">' +
             '<span class="text-slate-400 font-medium">Presupuesto:</span>' +
-            '<input type="number" step="0.01" value="' + esp + '" data-act="cat" data-field="esperado" data-idx="' + idx + '" class="w-16 text-right font-semibold text-slate-700 bg-white border border-slate-200 rounded px-1 text-xs outline-none num">' +
+            '<input type="number" step="0.01" value="' + Number(cat.esperado || 0) + '" data-act="cat" data-field="esperado" data-idx="' + idx + '" class="w-16 text-right font-semibold text-slate-700 bg-white border border-slate-200 rounded px-1 text-xs outline-none num">' +
             '<span class="text-slate-400">€</span>' +
           '</div>' +
         '</div>' +
@@ -1920,8 +1924,14 @@
           '</div>' +
           '<div class="flex justify-between items-center text-[10px] font-bold num">' +
             '<span class="' + (isOver ? 'text-red-600' : 'text-slate-600') + '">Gastado: ' + formatEuro(real) + ' (' + pct + '%)</span>' +
-            '<span class="' + (esp - real < 0 ? 'text-red-500' : 'text-emerald-600') + '">' + (esp - real >= 0 ? 'Quedan ' + formatEuro(esp - real) : 'Excedido por ' + formatEuro(real - esp)) + '</span>' +
+            '<span class="text-emerald-600">Por gastar ' + formatEuro(q.porGastar) + '</span>' +
           '</div>' +
+          (prevApuntado || q.excedido
+            ? '<div class="flex justify-between items-center text-[9px] font-semibold num">' +
+                (prevApuntado ? '<span class="text-teal-600">De ellos, ' + formatEuro(prevApuntado) + ' ya previstos</span>' : '<span></span>') +
+                (q.excedido ? '<span class="text-red-500">Se pasa de los ' + formatEuro(q.esperado) + '</span>' : '<span></span>') +
+              '</div>'
+            : '') +
         '</div>' +
         '<details class="mt-1.5 pt-1.5 border-t border-slate-200/70"' + (cat.nota ? ' open' : '') + '>' +
           '<summary class="text-[10px] text-slate-400 hover:text-slate-600 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden flex items-center gap-1 transition-colors">' +
@@ -1933,18 +1943,18 @@
     });
     document.getElementById('total-variables-esperado').innerText = formatEuro(sumVarEsp);
     const elVarQuedan = document.getElementById('total-variables-quedan');
-    elVarQuedan.innerText = (sumVarQuedanTotal >= 0 ? 'Quedan: ' : 'Excedido: ') + formatEuro(Math.abs(sumVarQuedanTotal));
-    elVarQuedan.className = 'font-bold num ' + (sumVarQuedanTotal >= 0 ? 'text-emerald-600' : 'text-red-600');
+    elVarQuedan.innerText = 'Por gastar: ' + formatEuro(sumVarQuedanTotal);
+    elVarQuedan.className = 'font-bold num text-emerald-600';
 
     /* desglose de lo que queda */
     const containerDesglose = document.getElementById('container-desglose-queda');
     containerDesglose.innerHTML = desgloseItems.map(item => {
-      const isOverItem = item.delta < 0;
+      const isOverItem = false;
       const tag = item.isFijo ? '' : (item.personal ? ' <span class="text-[9px] font-bold text-blue-500 bg-blue-100 px-1.5 py-0.5 rounded-md">Personal</span>' : '');
       return '<div class="flex items-center justify-between py-1.5">' +
         '<span class="font-semibold text-slate-700">' + escapeHTML(item.label) + tag + '</span>' +
         '<span class="font-bold ' + (isOverItem ? 'text-red-600' : 'text-emerald-600') + '">' +
-          (isOverItem ? 'Excedido por ' + formatEuro(-item.delta) : 'Quedan ' + formatEuro(item.delta)) +
+          formatEuro(item.delta) + (item.previsto ? '<span class="text-teal-600 font-semibold"> · ' + formatEuro(item.previsto) + ' previstos</span>' : '') +
         '</span>' +
       '</div>';
     }).join('');
@@ -2182,6 +2192,8 @@
     return {
       esperado: esp, gastado: gas, pendiente: pen,
       falta: Math.max(0, esp - conocido),
+      // lo que queda por salir del bolsillo: lo ya previsto más lo aún sin detallar
+      porGastar: pen + Math.max(0, esp - conocido),
       prevision: Math.max(esp, conocido),
       excedido: conocido > esp && esp > 0
     };
@@ -2194,17 +2206,17 @@
       if (c.excluirDelTotal) return a;
       const q = cuentasGrupo(c.esperado, gastadoCat[c.categoria] || 0, pendienteCat[c.categoria] || 0);
       a.gastado += q.gastado; a.pendiente += q.pendiente;
-      a.falta += q.falta; a.prevision += q.prevision;
+      a.falta += q.falta; a.porGastar += q.porGastar; a.prevision += q.prevision;
       return a;
-    }, { gastado: 0, pendiente: 0, falta: 0, prevision: 0 });
+    }, { gastado: 0, pendiente: 0, falta: 0, porGastar: 0, prevision: 0 });
   }
 
   function resumenPanelHTML(t) {
     const dato = (etiqueta, valor, color) =>
       '<span class="text-slate-500">' + etiqueta + ': <span class="' + color + ' num">' + formatEuro(valor) + '</span></span>';
     return dato('Gastado', t.gastado, 'text-pink-600') +
-      (t.pendiente ? dato('Por pagar', t.pendiente, 'text-teal-600') : '') +
-      dato('Falta por gastar', t.falta, 'text-emerald-600') +
+      dato('Por gastar', t.porGastar, 'text-emerald-600') +
+      (t.pendiente ? '<span class="text-slate-400 text-[10px]">(' + formatEuro(t.pendiente) + ' ya apuntado)</span>' : '') +
       '<span class="text-slate-500 font-extrabold">Previsión fin de mes: <span class="text-indigo-600 num">' + formatEuro(t.prevision) + '</span></span>';
   }
 
@@ -2268,10 +2280,10 @@
         cab.className = 'text-[9px] font-bold mt-0.5 text-right num ' + (queda < 0 ? 'text-red-700' : 'text-emerald-700');
       }
       const q = cuentasGrupo(esp, real, pend);
-      ['gastado', 'pagar', 'falta', 'prev'].forEach(marca => {
+      ['gastado', 'porgastar', 'prev'].forEach(marca => {
         const celda = raiz.querySelector('[data-pie="' + marca + '|' + i + '"]');
         if (celda) celda.innerText = formatEuro(
-          marca === 'gastado' ? q.gastado : marca === 'pagar' ? q.pendiente : marca === 'falta' ? q.falta : q.prevision);
+          marca === 'gastado' ? q.gastado : marca === 'porgastar' ? q.porGastar : q.prevision);
       });
       const tot = raiz.querySelector('[data-tot-grupo="' + i + '"]');
       if (tot) tot.innerText = formatEuro(real);
@@ -2292,7 +2304,7 @@
       if (e) e.innerText = formatEuro(porSemana[sem.n] || 0);
     });
     const t = totalesMes(data.categoriasVariables, porCat, pendCat);
-    [['gastado', t.gastado], ['pagar', t.pendiente], ['falta', t.falta], ['prev', t.prevision]].forEach(([marca, valor]) => {
+    [['gastado', t.gastado], ['porgastar', t.porGastar], ['prev', t.prevision]].forEach(([marca, valor]) => {
       const el = raiz.querySelector('[data-casa="' + marca + '"]');
       if (el) el.innerText = formatEuro(valor);
     });
@@ -2539,10 +2551,11 @@
       '</tr>';
     };
 
+    // "Por pagar" y "falta por gastar" salen del mismo bolsillo, así que se
+    // enseñan sumados; por dentro siguen separados para calcular la previsión.
     let pie =
       filaPie('Gastado', gastadoCasa, 'gastado', i => cuentasDe(i).gastado, '', true) +
-      filaPie('Por pagar', pendienteCasa, 'pagar', i => cuentasDe(i).pendiente, 'text-teal-300', false) +
-      filaPie('Falta por gastar', totalCasa('falta'), 'falta', i => cuentasDe(i).falta, 'text-emerald-300', true) +
+      filaPie('Por gastar', totalCasa('porGastar'), 'porgastar', i => cuentasDe(i).porGastar, 'text-emerald-300', true) +
       filaPie('Previsión fin de mes', totalCasa('prevision'), 'prev', i => cuentasDe(i).prevision, 'text-indigo-300', true);
 
     const previsto = previstoCasa;
@@ -2624,12 +2637,8 @@
         '<div class="grid grid-cols-2 gap-x-3 gap-y-0.5 mt-2 pt-2 border-t border-white/50 text-[11px] font-bold">' +
           '<span class="flex justify-between"><span class="opacity-70">Gastado</span>' +
             '<span data-pie="gastado|' + sel + '" class="num ' + c.dato + '">' + formatEuro(q.gastado) + '</span></span>' +
-          (q.pendiente
-            ? '<span class="flex justify-between"><span class="opacity-70">Por pagar</span>' +
-              '<span data-pie="pagar|' + sel + '" class="num text-teal-700">' + formatEuro(q.pendiente) + '</span></span>'
-            : '<span></span>') +
-          '<span class="flex justify-between"><span class="opacity-70">Falta</span>' +
-            '<span data-pie="falta|' + sel + '" class="num text-emerald-700">' + formatEuro(q.falta) + '</span></span>' +
+          '<span class="flex justify-between"><span class="opacity-70">Por gastar</span>' +
+            '<span data-pie="porgastar|' + sel + '" class="num text-emerald-700">' + formatEuro(q.porGastar) + '</span></span>' +
           '<span class="flex justify-between"><span class="opacity-70">Fin de mes</span>' +
             '<span data-pie="prev|' + sel + '" class="num text-indigo-700">' + formatEuro(q.prevision) + '</span></span>' +
         '</div>' +
@@ -2936,8 +2945,14 @@
     const excl = new Set((d.categoriasVariables || []).filter(c => c.excluirDelTotal).map(c => c.categoria));
     const reg = d.registroVariables || [];
 
-    const gastadoPorCat = {};
-    reg.forEach(i => { gastadoPorCat[i.categoria] = (gastadoPorCat[i.categoria] || 0) + Number(i.real || 0); });
+    const gastadoPorCat = {}, previstoPorCat = {};
+    reg.forEach(i => {
+      gastadoPorCat[i.categoria] = (gastadoPorCat[i.categoria] || 0) + Number(i.real || 0);
+      previstoPorCat[i.categoria] = (previstoPorCat[i.categoria] || 0) + (soloPrevisto(i) ? Number(i.previsto || 0) : 0);
+    });
+    const previstoPendiente = (d.categoriasVariables || [])
+      .filter(c => !c.excluirDelTotal)
+      .reduce((a, c) => a + (previstoPorCat[c.categoria] || 0), 0);
 
     const ingresos = sum(d.ingresos, 'real');
     const fijos = sum(d.gastosFijos, 'real');
@@ -2950,11 +2965,21 @@
     // Para los fijos sin "esperado" puesto se usa lo realmente pagado: si no,
     // el presupuesto se quedaría corto y la comparación no diría nada.
     const presFijos = (d.gastosFijos || []).reduce((a, g) => a + Math.max(Number(g.esperado || 0), Number(g.real || 0)), 0);
-    const presVar = (d.categoriasVariables || []).filter(c => !c.excluirDelTotal).reduce((a, c) => a + Number(c.esperado || 0), 0);
+    // El presupuesto de variables incluye las previsiones apuntadas: si lo que
+    // ya se sabe de un grupo supera lo presupuestado, manda lo que se sabe.
+    const presVar = (d.categoriasVariables || []).filter(c => !c.excluirDelTotal)
+      .reduce((a, c) => a + cuentasGrupo(c.esperado, gastadoPorCat[c.categoria] || 0, previstoPorCat[c.categoria] || 0).prevision, 0);
 
+    // Un grupo se marca como pasado si lo gastado más lo ya previsto supera su
+    // presupuesto: avisa antes de que el recibo llegue, no después.
     const excedidas = (d.categoriasVariables || [])
-      .filter(c => !c.excluirDelTotal && Number(c.esperado || 0) > 0 && (gastadoPorCat[c.categoria] || 0) > Number(c.esperado))
-      .map(c => ({ categoria: c.categoria, exceso: (gastadoPorCat[c.categoria] || 0) - Number(c.esperado) }))
+      .filter(c => !c.excluirDelTotal && Number(c.esperado || 0) > 0 &&
+        (gastadoPorCat[c.categoria] || 0) + (previstoPorCat[c.categoria] || 0) > Number(c.esperado))
+      .map(c => ({
+        categoria: c.categoria,
+        exceso: (gastadoPorCat[c.categoria] || 0) + (previstoPorCat[c.categoria] || 0) - Number(c.esperado),
+        soloPrevisto: (gastadoPorCat[c.categoria] || 0) <= Number(c.esperado)
+      }))
       .sort((a, b) => b.exceso - a.exceso);
 
     const top = Object.keys(gastadoPorCat)
@@ -2974,7 +2999,7 @@
       balance: ingresos - gastos,
       libre: ingresos - gastos - ahorro - inversion,
       tasaAhorro: ingresos > 0 ? ((ingresos - gastos) / ingresos) * 100 : 0,
-      presupuesto: presFijos + presVar, presVar,
+      presupuesto: presFijos + presVar, presVar, previstoPendiente,
       pctPresupuesto: presVar > 0 ? (variables / presVar) * 100 : 0,
       excedidas, top,
       enCurso, diasMes, diaHoy,
@@ -3034,6 +3059,7 @@
       filaValor('Ha entrado', formatEuro(m.ingresos), 'text-amber-700') +
       filaValor('Gastos fijos', formatEuro(m.fijos), 'text-pink-600') +
       filaValor('Gastos variables de casa', formatEuro(m.variables), 'text-orange-600') +
+      (m.previstoPendiente ? filaValor('Previsto y aún sin pagar', formatEuro(m.previstoPendiente), 'text-teal-600') : '') +
       filaValor('Total gastado', formatEuro(m.gastos), 'text-pink-700') +
       filaValor('Diferencia', formatEuro(m.balance), m.balance >= 0 ? 'text-emerald-600' : 'text-red-600') +
       (m.ahorro || m.inversion ? filaValor('Ahorro e inversión', formatEuro(m.ahorro + m.inversion), 'text-emerald-600') : '') +
@@ -3084,7 +3110,8 @@
     if (m.excedidas.length) {
       html += '<div class="pt-1 space-y-1"><p class="text-[11px] font-bold text-slate-500">GRUPOS PASADOS DE PRESUPUESTO</p>' +
         m.excedidas.slice(0, 4).map(e =>
-          '<div class="flex justify-between text-xs"><span class="text-slate-700 font-medium">' + escapeHTML(e.categoria) + '</span>' +
+          '<div class="flex justify-between text-xs"><span class="text-slate-700 font-medium">' + escapeHTML(e.categoria) +
+          (e.soloPrevisto ? '<span class="text-teal-600 font-normal"> · contando lo previsto</span>' : '') + '</span>' +
           '<span class="text-red-600 font-bold num">+' + formatEuro(e.exceso) + '</span></div>').join('') +
         '</div>';
     } else if (m.presVar > 0) {
