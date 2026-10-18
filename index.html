@@ -2172,13 +2172,40 @@
       (pendiente ? '<span class="opacity-70 font-semibold"> · ' + formatEuro(pendiente) + ' por pagar</span>' : '');
   }
 
-  function resumenPanelHTML(previsto, gastado, pendiente) {
-    const queda = previsto - gastado - (pendiente || 0);
-    return '<span class="text-slate-500">Previsto casa: <span class="text-indigo-600 num">' + formatEuro(previsto) + '</span></span>' +
-      '<span class="text-slate-500">Gastado: <span class="text-pink-600 num">' + formatEuro(gastado) + '</span></span>' +
-      (pendiente ? '<span class="text-slate-500">Por pagar: <span class="text-teal-600 num">' + formatEuro(pendiente) + '</span></span>' : '') +
-      '<span class="text-slate-500">' + (queda >= 0 ? 'Libres: ' : 'Pasado: ') +
-        '<span class="num ' + (queda >= 0 ? 'text-emerald-600' : 'text-red-600') + '">' + formatEuro(Math.abs(queda)) + '</span></span>';
+  // Las cuentas de un grupo, calculadas en un solo sitio.
+  // La previsión de fin de mes es la mayor entre el presupuesto que pusiste y
+  // lo que ya se sabe (gastado + previsiones): así no se cuenta nada dos veces,
+  // pero si lo conocido se pasa del presupuesto, manda lo conocido.
+  function cuentasGrupo(esperado, gastado, pendiente) {
+    const esp = Number(esperado || 0), gas = Number(gastado || 0), pen = Number(pendiente || 0);
+    const conocido = gas + pen;
+    return {
+      esperado: esp, gastado: gas, pendiente: pen,
+      falta: Math.max(0, esp - conocido),
+      prevision: Math.max(esp, conocido),
+      excedido: conocido > esp && esp > 0
+    };
+  }
+
+  // Totales del mes (solo casa): se suman grupo a grupo para que la previsión
+  // de fin de mes use el criterio de cada uno y no una media que engañe.
+  function totalesMes(cats, gastadoCat, pendienteCat) {
+    return cats.reduce((a, c) => {
+      if (c.excluirDelTotal) return a;
+      const q = cuentasGrupo(c.esperado, gastadoCat[c.categoria] || 0, pendienteCat[c.categoria] || 0);
+      a.gastado += q.gastado; a.pendiente += q.pendiente;
+      a.falta += q.falta; a.prevision += q.prevision;
+      return a;
+    }, { gastado: 0, pendiente: 0, falta: 0, prevision: 0 });
+  }
+
+  function resumenPanelHTML(t) {
+    const dato = (etiqueta, valor, color) =>
+      '<span class="text-slate-500">' + etiqueta + ': <span class="' + color + ' num">' + formatEuro(valor) + '</span></span>';
+    return dato('Gastado', t.gastado, 'text-pink-600') +
+      (t.pendiente ? dato('Por pagar', t.pendiente, 'text-teal-600') : '') +
+      dato('Falta por gastar', t.falta, 'text-emerald-600') +
+      '<span class="text-slate-500 font-extrabold">Previsión fin de mes: <span class="text-indigo-600 num">' + formatEuro(t.prevision) + '</span></span>';
   }
 
   // Escribir en una celda NO puede repintar la tabla: te quedarías sin el sitio
@@ -2240,6 +2267,12 @@
         cab.innerHTML = textoQueda(esp, real, pend);
         cab.className = 'text-[9px] font-bold mt-0.5 text-right num ' + (queda < 0 ? 'text-red-700' : 'text-emerald-700');
       }
+      const q = cuentasGrupo(esp, real, pend);
+      ['gastado', 'pagar', 'falta', 'prev'].forEach(marca => {
+        const celda = raiz.querySelector('[data-pie="' + marca + '|' + i + '"]');
+        if (celda) celda.innerText = formatEuro(
+          marca === 'gastado' ? q.gastado : marca === 'pagar' ? q.pendiente : marca === 'falta' ? q.falta : q.prevision);
+      });
       const tot = raiz.querySelector('[data-tot-grupo="' + i + '"]');
       if (tot) tot.innerText = formatEuro(real);
       const pq = raiz.querySelector('[data-pie-queda="' + i + '"]');
@@ -2258,10 +2291,13 @@
       const e = raiz.querySelector('[data-tot-semana="' + sem.n + '"]');
       if (e) e.innerText = formatEuro(porSemana[sem.n] || 0);
     });
-    const casa = raiz.querySelector('[data-tot-casa]');
-    if (casa) casa.innerText = formatEuro(gastado);
+    const t = totalesMes(data.categoriasVariables, porCat, pendCat);
+    [['gastado', t.gastado], ['pagar', t.pendiente], ['falta', t.falta], ['prev', t.prevision]].forEach(([marca, valor]) => {
+      const el = raiz.querySelector('[data-casa="' + marca + '"]');
+      if (el) el.innerText = formatEuro(valor);
+    });
     const res = raiz.querySelector('[data-panel-resumen]');
-    if (res) res.innerHTML = resumenPanelHTML(previsto, gastado, pendiente);
+    if (res) res.innerHTML = resumenPanelHTML(t);
   }
 
   // Panel tipo hoja de cálculo: una columna por grupo, una fila por semana,
@@ -2480,25 +2516,34 @@
     }
 
     /* ---- totales abajo ---- */
-    let pie = '<tr class="bg-slate-800 text-white">' +
-      '<th class="sticky left-0 z-10 bg-slate-800 px-2 py-2 text-left min-w-[6.5rem]">' +
-        '<span class="block text-[9px] font-bold uppercase tracking-wider text-slate-300">Gastado</span>' +
-        '<span data-tot-casa class="block text-[11px] font-extrabold num whitespace-nowrap">' + formatEuro(gastadoCasa) + '</span>' +
-        '<span class="block text-[8px] text-slate-400 uppercase">solo casa</span>' +
-      '</th>';
-    cats.forEach((cat, i) => {
-      const real = gastadoCat[cat.categoria] || 0;
-      const esp = Number(cat.esperado || 0);
-      const pend = pendienteCat[cat.categoria] || 0;
-      const queda = esp - real - pend;
-      pie += '<td class="border-l border-slate-700 px-2 py-2 text-right align-middle">' +
-        '<span data-tot-grupo="' + i + '" class="block text-xs font-extrabold num">' + formatEuro(real) + '</span>' +
-        '<span data-pie-queda="' + i + '" class="block text-[9px] font-bold num ' +
-          (esp === 0 ? 'text-slate-500' : queda < 0 ? 'text-red-300' : 'text-emerald-300') + '">' +
-          textoQueda(esp, real, pend) + '</span>' +
-      '</td>';
-    });
-    pie += '</tr>';
+    const cuentasDe = i => {
+      const cat = cats[i];
+      return cuentasGrupo(cat.esperado, gastadoCat[cat.categoria] || 0, pendienteCat[cat.categoria] || 0);
+    };
+    const totalCasa = campo => cats.reduce((a, cat, i) =>
+      a + (cat.excluirDelTotal ? 0 : cuentasDe(i)[campo]), 0);
+
+    const filaPie = (etiqueta, apunte, marca, valorDe, color, mostrarCero) => {
+      if (!mostrarCero && !cats.some((c, i) => valorDe(i))) return '';
+      return '<tr class="bg-slate-800 text-white">' +
+        '<th class="sticky left-0 z-10 bg-slate-800 px-2 py-1 text-left min-w-[6.5rem] border-t border-slate-700">' +
+          '<span class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">' + etiqueta + '</span>' +
+          '<span ' + (marca === 'gastado' ? 'data-tot-casa ' : '') + 'data-casa="' + marca + '" class="block text-[11px] font-extrabold num whitespace-nowrap ' + color + '">' +
+            formatEuro(apunte) + '</span>' +
+        '</th>' +
+        cats.map((cat, i) =>
+          '<td class="border-l border-t border-slate-700 px-2 py-1 text-right align-middle">' +
+            '<span ' + (marca === 'gastado' ? 'data-tot-grupo="' + i + '" ' : '') + 'data-pie="' + marca + '|' + i + '" class="text-xs font-bold num ' + color + '">' +
+              formatEuro(valorDe(i)) + '</span>' +
+          '</td>').join('') +
+      '</tr>';
+    };
+
+    let pie =
+      filaPie('Gastado', gastadoCasa, 'gastado', i => cuentasDe(i).gastado, '', true) +
+      filaPie('Por pagar', pendienteCasa, 'pagar', i => cuentasDe(i).pendiente, 'text-teal-300', false) +
+      filaPie('Falta por gastar', totalCasa('falta'), 'falta', i => cuentasDe(i).falta, 'text-emerald-300', true) +
+      filaPie('Previsión fin de mes', totalCasa('prevision'), 'prev', i => cuentasDe(i).prevision, 'text-indigo-300', true);
 
     const previsto = previstoCasa;
     cont.innerHTML =
@@ -2510,7 +2555,7 @@
         '</table>' +
       '</div>' +
       '<div data-panel-resumen class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mt-2 text-[11px] font-bold">' +
-        resumenPanelHTML(previsto, gastadoCasa, pendienteCasa) +
+        resumenPanelHTML(totalesMes(cats, gastadoCat, pendienteCat)) +
       '</div>';
   }
 
@@ -2528,6 +2573,7 @@
     const esp = Number(cat.esperado || 0);
     const real = gastadoCat[cat.categoria] || 0;
     const pend = pendienteCat[cat.categoria] || 0;
+    const q = cuentasGrupo(esp, real, pend);
     const queda = esp - real - pend;
     const pct = esp > 0 ? Math.min(100, Math.round((real / esp) * 100)) : 0;
 
@@ -2575,10 +2621,19 @@
         '<div class="mt-2 h-1.5 w-full bg-white/60 rounded-full overflow-hidden">' +
           '<div data-barra-grupo="' + sel + '" class="h-full rounded-full ' + (queda < 0 ? 'bg-red-500' : pct > 85 ? 'bg-amber-500' : 'bg-emerald-500') + '" style="width:' + pct + '%"></div>' +
         '</div>' +
-        '<div class="flex justify-between text-[11px] font-bold mt-1">' +
-          '<span class="' + c.dato + ' num">Gastado <span data-tot-grupo="' + sel + '">' + formatEuro(real) + '</span></span>' +
-          '<span data-queda-grupo="' + sel + '" class="num ' + (queda < 0 ? 'text-red-700' : 'text-emerald-700') + '">' + textoQueda(esp, real, pend) + '</span>' +
+        '<div class="grid grid-cols-2 gap-x-3 gap-y-0.5 mt-2 pt-2 border-t border-white/50 text-[11px] font-bold">' +
+          '<span class="flex justify-between"><span class="opacity-70">Gastado</span>' +
+            '<span data-pie="gastado|' + sel + '" class="num ' + c.dato + '">' + formatEuro(q.gastado) + '</span></span>' +
+          (q.pendiente
+            ? '<span class="flex justify-between"><span class="opacity-70">Por pagar</span>' +
+              '<span data-pie="pagar|' + sel + '" class="num text-teal-700">' + formatEuro(q.pendiente) + '</span></span>'
+            : '<span></span>') +
+          '<span class="flex justify-between"><span class="opacity-70">Falta</span>' +
+            '<span data-pie="falta|' + sel + '" class="num text-emerald-700">' + formatEuro(q.falta) + '</span></span>' +
+          '<span class="flex justify-between"><span class="opacity-70">Fin de mes</span>' +
+            '<span data-pie="prev|' + sel + '" class="num text-indigo-700">' + formatEuro(q.prevision) + '</span></span>' +
         '</div>' +
+        '<div data-queda-grupo="' + sel + '" class="hidden"></div>' +
       '</div>';
 
     /* --- una ficha por semana --- */
@@ -2636,7 +2691,7 @@
       cabecera +
       '<div class="space-y-2 mt-2">' + fichas + '</div>' +
       '<div data-panel-resumen class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 mt-3 text-[11px] font-bold">' +
-        resumenPanelHTML(d.previstoCasa, d.gastadoCasa, d.pendienteCasa) +
+        resumenPanelHTML(totalesMes(cats, gastadoCat, pendienteCat)) +
       '</div>';
   }
 
