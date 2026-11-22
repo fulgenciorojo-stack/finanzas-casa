@@ -3158,15 +3158,23 @@
   // La cabecera se encoge al bajar en pantallas pequeñas.
   (() => {
     const cab = document.querySelector('header');
-    let pedido = false;
-    // Dos umbrales distintos: si fuese uno solo, quedarse justo encima lo haría
-    // abrir y cerrar sin parar. Y el cálculo se hace una vez por fotograma.
+    let pedido = false, bloqueadoHasta = 0;
+    // Al encogerse la cabecera el navegador recoloca el scroll unos 60 px hacia
+    // atrás. Si los dos umbrales están más juntos que ese salto, cerrarla te
+    // devuelve por debajo del umbral de abrir y se queda parpadeando. Por eso
+    // la banda (60–220) es más ancha que el salto, y además se ignora el scroll
+    // mientras dura la animación, que es cuando llega el recolocado.
+    const CERRAR_EN = 220, ABRIR_EN = 60, ANIMACION = 380;
     const ajustar = () => {
       pedido = false;
+      if (performance.now() < bloqueadoHasta) return;
       const compacta = cab.dataset.compacta === '1';
       const y = window.scrollY;
-      if (!compacta && y > 70) cab.dataset.compacta = '1';
-      else if (compacta && y < 30) cab.dataset.compacta = '0';
+      const quiere = compacta ? (y < ABRIR_EN ? '0' : '1') : (y > CERRAR_EN ? '1' : '0');
+      if (quiere !== cab.dataset.compacta) {
+        cab.dataset.compacta = quiere;
+        bloqueadoHasta = performance.now() + ANIMACION;
+      }
     };
     addEventListener('scroll', () => {
       if (pedido) return;
@@ -3174,7 +3182,6 @@
       requestAnimationFrame(ajustar);
     }, { passive: true });
     cab.dataset.compacta = '0';
-    ajustar();
   })();
 
   document.getElementById('app').addEventListener('input', e => {
