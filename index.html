@@ -196,6 +196,10 @@
           <svg class="ic" style="width:19px;height:19px"><use href="#i-bag"></use></svg>
           <span>Panel</span>
         </button>
+        <button onclick="abrirAlquiler()" title="Apuntes del alquiler de Murcia" class="btn-pop px-4 py-2.5 bg-gradient-to-tr from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white text-xs font-bold rounded-xl shadow-md flex items-center gap-1.5">
+          <svg class="ic" style="width:19px;height:19px"><use href="#i-house"></use></svg>
+          <span>Alquiler Murcia</span>
+        </button>
       </div>
 
       <!-- Pestañas -->
@@ -1019,6 +1023,49 @@
     </div>
   </div>
 
+  <div id="modal-alquiler" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[55] hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+      <div class="px-5 py-3.5 bg-gradient-to-r from-violet-500 to-purple-600 text-white flex items-center gap-3 shrink-0">
+        <div class="bg-white/20 w-9 h-9 rounded-xl flex items-center justify-center shrink-0">
+          <svg class="ic"><use href="#i-house"></use></svg>
+        </div>
+        <div class="min-w-0">
+          <h3 class="title-font text-lg font-bold leading-tight">Alquiler Murcia</h3>
+          <p id="alquiler-subtitulo" class="text-[11px] font-medium text-white/85"></p>
+        </div>
+        <button onclick="closeModal('modal-alquiler')" aria-label="Cerrar" class="ml-auto w-9 h-9 rounded-xl bg-white/20 hover:bg-white/30 flex items-center justify-center transition-all shrink-0">
+          <svg class="ic"><use href="#i-x"></use></svg>
+        </button>
+      </div>
+
+      <form onsubmit="anadirApunteAlquiler(event)" class="px-5 py-3 bg-violet-50 border-b border-violet-200 grid grid-cols-12 gap-2 items-center shrink-0">
+        <div class="col-span-8">
+          <input type="text" id="alq-texto" placeholder="¿Qué apuntas? Ej: recibo noviembre…" required
+            class="w-full bg-white border border-violet-200 rounded-xl px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-violet-300 outline-none">
+        </div>
+        <div class="col-span-3">
+          <div class="relative">
+            <input type="number" step="0.01" id="alq-importe" placeholder="0,00"
+              class="w-full bg-white border border-violet-200 rounded-xl pl-2 pr-5 py-2 text-xs text-right font-bold focus:ring-2 focus:ring-violet-300 outline-none num">
+            <span class="absolute right-2 top-2 text-xs text-slate-400 font-bold">€</span>
+          </div>
+        </div>
+        <div class="col-span-1 flex justify-end">
+          <button type="submit" title="Apuntar" class="btn-pop w-full py-2 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white rounded-xl shadow-md flex items-center justify-center font-bold">
+            <svg class="ic text-sm"><use href="#i-plus"></use></svg>
+          </button>
+        </div>
+      </form>
+
+      <div id="alquiler-lista" class="p-4 space-y-2 overflow-y-auto custom-scrollbar grow"></div>
+
+      <div class="px-5 py-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs font-bold shrink-0">
+        <span class="text-slate-500">Cobrado: <span id="alquiler-cobrado" class="text-emerald-600 num">0,00 €</span></span>
+        <span class="text-slate-500">Pendiente: <span id="alquiler-pendiente" class="text-violet-600 num">0,00 €</span></span>
+      </div>
+    </div>
+  </div>
+
   <div id="modal-columnas" class="fixed inset-0 bg-slate-900/60 z-50 hidden">
     <div class="bg-white w-full h-full shadow-2xl overflow-hidden flex flex-col">
       <div class="px-5 py-3.5 bg-gradient-to-r from-teal-600 to-cyan-600 text-white flex items-center gap-3">
@@ -1184,6 +1231,7 @@
       gastosFijos: [],
       categoriasVariables: DEFAULT_CATEGORIES.map(c => ({ categoria: c, esperado: 0, excluirDelTotal: CATEGORIAS_PERSONALES.has(c), nota: '' })),
       registroVariables: [],
+      alquiler: [],
       borrados: [],
       nota: '',
       cerrado: false,
@@ -1198,6 +1246,7 @@
     if (!Array.isArray(m.ahorros)) m.ahorros = [];
     if (!Array.isArray(m.gastosFijos)) m.gastosFijos = [];
     if (!Array.isArray(m.registroVariables)) m.registroVariables = [];
+    if (!Array.isArray(m.alquiler)) m.alquiler = [];
     if (!Array.isArray(m.borrados)) m.borrados = [];
     if (!Array.isArray(m.categoriasVariables) || !m.categoriasVariables.length) {
       m.categoriasVariables = DEFAULT_CATEGORIES.map(c => ({ categoria: c, esperado: 0, excluirDelTotal: CATEGORIAS_PERSONALES.has(c), nota: '' }));
@@ -1256,6 +1305,7 @@
       gastosFijos: base.gastosFijos || [],
       categoriasVariables: catsMerged,
       registroVariables: [],
+      alquiler: base.alquiler || [],
       borrados: [],
       // Gana la nota escrita más tarde, mirando su marca de hora: si no, el
       // dispositivo que guarde el último pisa con su copia vieja lo que
@@ -3558,6 +3608,87 @@
       '<button onclick="closeModal(\'modal-valoracion\')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">Cerrar</button>');
   }
 
+  /* ---------- alquiler de Murcia ---------- */
+
+  function abrirAlquiler() {
+    openModal('modal-alquiler');
+    pintarAlquiler();
+    setTimeout(() => document.getElementById('alq-texto').focus(), 60);
+  }
+
+  function anadirApunteAlquiler(e) {
+    e.preventDefault();
+    const texto = document.getElementById('alq-texto').value.trim();
+    if (!texto) return;
+    const importe = Number(document.getElementById('alq-importe').value) || 0;
+    month().alquiler.push({ id: nuevoId(), texto, importe, pagado: false, fecha: todayISO() });
+    document.getElementById('alq-texto').value = '';
+    document.getElementById('alq-importe').value = '';
+    queueSave();
+    pintarAlquiler();
+    document.getElementById('alq-texto').focus();
+  }
+
+  function marcarAlquilerPagado(id) {
+    const a = month().alquiler.find(x => x.id === id);
+    if (!a) return;
+    a.pagado = !a.pagado;
+    queueSave();
+    pintarAlquiler();
+  }
+
+  function borrarApunteAlquiler(id) {
+    const lista = month().alquiler;
+    const i = lista.findIndex(x => x.id === id);
+    if (i >= 0) lista.splice(i, 1);
+    queueSave();
+    pintarAlquiler();
+  }
+
+  function editarApunteAlquiler(id, campo, valor) {
+    const a = month().alquiler.find(x => x.id === id);
+    if (!a) return;
+    a[campo] = campo === 'importe' ? (Number(valor) || 0) : valor;
+    queueSave();
+    actualizarTotalesAlquiler();
+  }
+
+  function actualizarTotalesAlquiler() {
+    const lista = month().alquiler || [];
+    const cobrado = lista.filter(a => a.pagado).reduce((t, a) => t + Number(a.importe || 0), 0);
+    const pendiente = lista.filter(a => !a.pagado).reduce((t, a) => t + Number(a.importe || 0), 0);
+    document.getElementById('alquiler-cobrado').innerText = formatEuro(cobrado);
+    document.getElementById('alquiler-pendiente').innerText = formatEuro(pendiente);
+    document.getElementById('alquiler-subtitulo').innerText =
+      labelForKey(currentKey()) + ' · ' + lista.length + (lista.length === 1 ? ' apunte' : ' apuntes');
+  }
+
+  function pintarAlquiler() {
+    const lista = month().alquiler || [];
+    const cont = document.getElementById('alquiler-lista');
+    cont.innerHTML = lista.length
+      ? lista.map(a =>
+          '<div class="flex items-center gap-2 rounded-2xl border px-3 py-2 transition-colors ' +
+            (a.pagado ? 'border-emerald-200 bg-emerald-50' : 'border-slate-200 bg-white') + '">' +
+            '<button onclick="marcarAlquilerPagado(\'' + escapeHTML(a.id) + '\')" aria-label="Marcar como pagado"' +
+              ' class="w-8 h-8 shrink-0 rounded-lg flex items-center justify-center transition-colors ' +
+              (a.pagado ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-300 hover:bg-slate-200') + '">' +
+              '<svg class="ic text-sm"><use href="#i-check"></use></svg></button>' +
+            '<input type="text" value="' + escapeHTML(a.texto || '') + '" oninput="editarApunteAlquiler(\'' + escapeHTML(a.id) + '\',\'texto\',this.value)"' +
+              ' class="flex-1 min-w-0 bg-transparent outline-none text-xs font-medium ' +
+              (a.pagado ? 'text-emerald-800 line-through' : 'text-slate-700') + '">' +
+            '<span class="text-[10px] text-slate-400 font-semibold shrink-0">' + (a.fecha || '').slice(8, 10) + '/' + (a.fecha || '').slice(5, 7) + '</span>' +
+            '<input type="number" step="0.01" value="' + (Number(a.importe || 0) || '') + '" placeholder="–" oninput="editarApunteAlquiler(\'' + escapeHTML(a.id) + '\',\'importe\',this.value)"' +
+              ' class="w-20 bg-transparent outline-none text-xs text-right font-bold num shrink-0 ' +
+              (a.pagado ? 'text-emerald-700' : 'text-slate-800') + '">' +
+            '<button onclick="borrarApunteAlquiler(\'' + escapeHTML(a.id) + '\')" aria-label="Borrar"' +
+              ' class="w-8 h-8 shrink-0 rounded-lg bg-slate-100 text-slate-400 hover:bg-red-500 hover:text-white flex items-center justify-center">' +
+              '<svg class="ic text-xs"><use href="#i-trash"></use></svg></button>' +
+          '</div>').join('')
+      : '<p class="text-xs text-slate-400 text-center py-8">Aún no has apuntado nada de este mes.</p>';
+    actualizarTotalesAlquiler();
+  }
+
   /* ---------- modales ---------- */
 
   function openModal(id) {
@@ -3857,7 +3988,8 @@
   Object.assign(window, {
     changePeriod, switchTab, openQuickWindow, closeQuickWindow, submitQuickWindow, irAlExtracto,
     updateQuickTargetMonth, quickAddVariableExpense, copyPreviousMonth, copyFijoToNext, copyIngresoToNext,
-    toggleSignoImporte, sincronizarSignoImporte, guardarNotaMes, cambiarVistaVariables, moverGrupo, nuevoGastoEnCelda, cambiarGrupoPanel, anadirGastoDesdePanel, pagarPrevision, pagarFijo, nuevoFijoEnSemana, abrirColumnasAmpliado, buscarDesdeAmpliado,
+    toggleSignoImporte, sincronizarSignoImporte, guardarNotaMes, cambiarVistaVariables, moverGrupo, nuevoGastoEnCelda, cambiarGrupoPanel, anadirGastoDesdePanel, pagarPrevision, pagarFijo, nuevoFijoEnSemana,
+    abrirAlquiler, anadirApunteAlquiler, marcarAlquilerPagado, borrarApunteAlquiler, editarApunteAlquiler, abrirColumnasAmpliado, buscarDesdeAmpliado,
     abrirValoracionMes, abrirCierreMes, confirmarCierreMes, reabrirMes, abrirValoracionAnual,
     openAddObjetivoModal, confirmAddObjetivo, openAddIngresoModal, confirmAddIngreso,
     openAddAhorroModal, confirmAddAhorro, openAddGastoFijoModal, confirmAddGastoFijo,
